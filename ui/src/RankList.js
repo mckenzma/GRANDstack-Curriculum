@@ -34,7 +34,7 @@ class RankList extends React.Component {
       order: "asc",
       orderBy: "id",
       page: 0,
-      rowsPerPage: 10
+      rowsPerPage: 50
     };
   }
 
@@ -84,6 +84,7 @@ class RankList extends React.Component {
                     <TableCell
                       key="id"
                       sortDirection={orderBy === "id" ? order : false}
+                      numeric
                     >
                       <Tooltip
                         title="Sort"
