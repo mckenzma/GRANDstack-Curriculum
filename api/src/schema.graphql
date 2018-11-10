@@ -30,6 +30,12 @@ type Category {
   businesses: [Business] @relation(name: "IN_CATEGORY", direction: "IN")
 }
 
+type Rank {
+  id: ID!
+  nameShort: String
+  nameLong: String
+}
+
 type Query {
     usersBySubstring(substring: String, first: Int = 10, offset: Int = 0): [User] @cypher(statement: "MATCH (u:User) WHERE u.name CONTAINS $substring RETURN u")
 }
