@@ -38,7 +38,16 @@ type Rank {
 
 type Strike {
   name: ID!
+  steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
+} 
+
+type StepDescription {
+  _id: ID!
+  text: String
+  number: String
+  strike: [Strike] @relation(name: "STEP_FOR", direction: "OUT")
 }
+
 
 type Query {
     usersBySubstring(substring: String, first: Int = 10, offset: Int = 0): [User] @cypher(statement: "MATCH (u:User) WHERE u.name CONTAINS $substring RETURN u")

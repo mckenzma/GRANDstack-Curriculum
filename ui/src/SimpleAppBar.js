@@ -6,8 +6,6 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 
-import SimpleSelect from './SimpleSelect';
-
 const styles = {
   root: {
     flexGrow: 1,
@@ -24,7 +22,6 @@ function SimpleAppBar(props) {
           <Typography variant="h6" color="inherit">
             Curriculum
           </Typography>
-          <SimpleSelect />
         </Toolbar>
       </AppBar>
     </div>

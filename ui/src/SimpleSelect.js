@@ -27,7 +27,7 @@ const styles = theme => ({
 
 class SimpleSelect extends React.Component {
   state = {
-    age: '',
+    rank: '',
     name: 'hai',
     labelWidth: 0,
   };
@@ -46,15 +46,15 @@ class SimpleSelect extends React.Component {
     const { classes } = this.props;
 
     return (
-      <form className={classes.root} autoComplete="off">
-        <FormControl className={classes.formControl}>
-          <InputLabel htmlFor="age-simple">Age</InputLabel>
+      <form className={this.props.classes.root} autoComplete="off">
+        <FormControl className={this.props.classes.formControl}>
+          <InputLabel htmlFor="rank-simple">Rank</InputLabel>
           <Select
-            value={this.state.age}
+            value={this.state.rank}
             onChange={this.handleChange}
             inputProps={{
-              name: 'age',
-              id: 'age-simple',
+              name: 'rank',
+              id: 'rank-simple',
             }}
           >
             <MenuItem value="">

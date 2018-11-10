@@ -61,6 +61,11 @@ class StrikeList extends React.Component {
           ) {
             Strike(first: $first, offset: $offset, orderBy: $orderBy) {
               name
+              steps {
+                _id
+                text
+                number
+              }
             }
           }
         `}
