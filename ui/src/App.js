@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 //import UserList from './UserList';
 import RankList from './RankList';
+import StrikeList from './StrikeList';
 
 import SimpleAppBar from './SimpleAppBar';
 
@@ -18,6 +19,7 @@ class App extends Component {
 
         {/*<UserList />*/}
         <RankList />
+        <StrikeList />
       </div>
     );
   }
