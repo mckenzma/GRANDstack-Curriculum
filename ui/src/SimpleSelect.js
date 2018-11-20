@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Query } from "react-apollo";
+import gql from "graphql-tag";
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 //import Input from '@material-ui/core/Input';
@@ -46,26 +48,51 @@ class SimpleSelect extends React.Component {
     const { classes } = this.props;
 
     return (
-      <form className={this.props.classes.root} autoComplete="off">
-        <FormControl className={this.props.classes.formControl}>
-          <InputLabel htmlFor="rank-simple">Rank</InputLabel>
-          <Select
-            value={this.state.rank}
-            onChange={this.handleChange}
-            inputProps={{
-              name: 'rank',
-              id: 'rank-simple',
-            }}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={10}>Ten</MenuItem>
-            <MenuItem value={20}>Twenty</MenuItem>
-            <MenuItem value={30}>Thirty</MenuItem>
-          </Select>
-        </FormControl>
-      </form>
+      <Query
+        query={gql`
+          {
+            Rank {
+              id
+              nameLong
+            }
+          }
+        `}
+      >
+        {({ loading, error, data }) => {
+          if (loading) return <p>Loading...</p>;
+          if (error) return <p>Error</p>;
+
+          return(
+
+            <form className={this.props.classes.root} autoComplete="off">
+              <FormControl className={this.props.classes.formControl}>
+                <InputLabel htmlFor="rank-simple">Rank</InputLabel>
+                <Select
+                  value={this.state.rank}
+                  onChange={this.handleChange}
+                  inputProps={{
+                    name: 'rank',
+                    id: 'rank-simple',
+                  }}
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  {/*<MenuItem value={10}>Ten</MenuItem>
+                  <MenuItem value={20}>Twenty</MenuItem>
+                  <MenuItem value={30}>Thirty</MenuItem>*/}
+                  {data.Rank.map(n => {
+                    return(
+                      <MenuItem >{n.nameLong}</MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+            </form>
+
+          );
+        }}
+      </Query>
     );
   }
 }

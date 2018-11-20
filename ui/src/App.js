@@ -47,7 +47,7 @@ class App extends Component {
           
 
             {/*<UserList />*/}
-            <RankList />
+            {/*<RankList />*/}
             <StrikeList />
 
         </Typography>
