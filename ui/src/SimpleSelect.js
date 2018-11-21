@@ -83,7 +83,7 @@ class SimpleSelect extends React.Component {
                   <MenuItem value={30}>Thirty</MenuItem>*/}
                   {data.Rank.map(n => {
                     return(
-                      <MenuItem >{n.nameLong}</MenuItem>
+                      <MenuItem value={n.id}>{n.nameLong}</MenuItem>
                     );
                   })}
                 </Select>
