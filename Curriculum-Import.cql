@@ -16,3 +16,8 @@ MATCH (strike:Strike {name: row.Name})
 MERGE (strike)<-[:STEP_FOR]-(stepDescription:StepDescription {text: row.`Step Description`, number: row.`Step #`})
 ON CREATE SET stepDescription.text = row.`Step Description`,
               stepDescription.number = row.`Step #`
+
+// load csv file to create create techniques and connect to rank
+LOAD CSV WITH HEADERS FROM 'file:///CurriculumDatabaseBlocks.csv' AS row
+MERGE (block:Block {name: row.Name})
+ON CREATE SET block.name = row.Name

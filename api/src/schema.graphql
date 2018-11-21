@@ -48,6 +48,10 @@ type StepDescription {
   strike: [Strike] @relation(name: "STEP_FOR", direction: "OUT")
 }
 
+type Block {
+  name: ID!
+}
+
 
 type Query {
     usersBySubstring(substring: String, first: Int = 10, offset: Int = 0): [User] @cypher(statement: "MATCH (u:User) WHERE u.name CONTAINS $substring RETURN u")
