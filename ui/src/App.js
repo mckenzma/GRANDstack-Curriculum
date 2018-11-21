@@ -4,6 +4,7 @@ import './App.css';
 import RankList from './RankList';
 import StrikeList from './StrikeList';
 import BlockList from './BlockList';
+import KickList from './KickList';
 
 import SimpleAppBar from './SimpleAppBar';
 import SimpleSelect from './SimpleSelect';
@@ -51,6 +52,7 @@ class App extends Component {
             {/*<RankList />*/}
             <StrikeList />
             <BlockList />
+            <KickList />
 
         </Typography>
         </Paper>

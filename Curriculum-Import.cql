@@ -21,3 +21,8 @@ ON CREATE SET stepDescription.text = row.`Step Description`,
 LOAD CSV WITH HEADERS FROM 'file:///CurriculumDatabaseBlocks.csv' AS row
 MERGE (block:Block {name: row.Name})
 ON CREATE SET block.name = row.Name
+
+// load csv file to create create techniques and connect to rank
+LOAD CSV WITH HEADERS FROM 'file:///CurriculumDatabaseKicks.csv' AS row
+MERGE (kick:Kick {name: row.Name})
+ON CREATE SET kick.name = row.Name
