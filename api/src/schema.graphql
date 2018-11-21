@@ -46,14 +46,18 @@ type StepDescription {
   text: String
   number: String
   strike: [Strike] @relation(name: "STEP_FOR", direction: "OUT")
+  block: [Block] @relation(name: "STEP_FOR", direction: "OUT")
+  kick: [Kick] @relation(name: "STEP_FOR", direction: "OUT")
 }
 
 type Block {
   name: ID!
+  steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
 }
 
 type Kick {
   name: ID!
+  steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
 }
 
 type Query {

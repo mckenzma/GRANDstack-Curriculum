@@ -61,6 +61,12 @@ class BlockList extends React.Component {
           ) {
             Block(first: $first, offset: $offset, orderBy: $orderBy) {
               name
+              name
+              steps {
+                _id
+                text
+                number
+              }
             }
           }
         `}
@@ -105,6 +111,13 @@ class BlockList extends React.Component {
                       <TableRow key={n.id}>
                         <TableCell component="th" scope="row">
                           {n.name}
+                            {n.steps
+                                .slice()   
+                                .map(o => {
+                                  return (
+                                    <p>{o.text}</p>
+                                  );
+                                })}
                         </TableCell>
                       </TableRow>
                     );
