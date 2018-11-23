@@ -5,6 +5,9 @@ import RankList from './RankList';
 import StrikeList from './StrikeList';
 import BlockList from './BlockList';
 import KickList from './KickList';
+import StanceList from './StanceList';
+import MovementList from './MovementList';
+import TurnList from './TurnList';
 
 import SimpleAppBar from './SimpleAppBar';
 import SimpleSelect from './SimpleSelect';
@@ -53,6 +56,9 @@ class App extends Component {
             <StrikeList />
             <BlockList />
             <KickList />
+            <StanceList />
+            <MovementList />
+            <TurnList />
 
         </Typography>
         </Paper>

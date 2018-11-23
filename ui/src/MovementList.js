@@ -1,7 +1,7 @@
 import React from "react";
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
-import "./BlockList.css";
+import "./MovementList.css";
 import { withStyles } from "@material-ui/core/styles";
 import {
   Table,
@@ -26,7 +26,7 @@ const styles = theme => ({
   }
 });
 
-class BlockList extends React.Component {
+class MovementList extends React.Component {
   constructor(props) {
     super(props);
 
@@ -54,12 +54,12 @@ class BlockList extends React.Component {
     return (
       <Query
         query={gql`
-          query blocksPaginateQuery(
+          query movementsPaginateQuery(
             $first: Int
             $offset: Int
-            $orderBy: _BlockOrdering
+            $orderBy: _MovementOrdering
           ) {
-            Block(first: $first, offset: $offset, orderBy: $orderBy) {
+            Movement(first: $first, offset: $offset, orderBy: $orderBy) {
               name
               name
               steps {
@@ -99,25 +99,25 @@ class BlockList extends React.Component {
                           direction={order}
                           onClick={() => this.handleSortRequest("name")}
                         >
-                          Block Name
+                          Movement Name
                         </TableSortLabel>
                       </Tooltip>
                     </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {data.Block.map(n => {
+                  {data.Movement.map(n => {
                     return (
                       <TableRow key={n.id}>
                         <TableCell component="th" scope="row">
                           {n.name}
                             {/*{n.steps
-                                .slice()   
-                                .map(o => {
-                                  return (
-                                    <p>{o.text}</p>
-                                  );
-                                })}*/}
+                              .slice()   
+                              .map(o => {
+                                return (
+                                  <p>{o.text}</p>
+                                );
+                              })}*/}
                         </TableCell>
                       </TableRow>
                     );
@@ -132,4 +132,4 @@ class BlockList extends React.Component {
   }
 }
 
-export default withStyles(styles)(BlockList);
+export default withStyles(styles)(MovementList);

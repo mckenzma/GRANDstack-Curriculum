@@ -52,6 +52,9 @@ type StepDescription {
   strike: [Strike] @relation(name: "STEP_FOR", direction: "OUT")
   block: [Block] @relation(name: "STEP_FOR", direction: "OUT")
   kick: [Kick] @relation(name: "STEP_FOR", direction: "OUT")
+  stance: [Stance] @relation(name: "STEP_FOR", direction: "OUT")
+  movement: [Movement] @relation(name: "STEP_FOR", direction: "OUT")
+  turn: [Turn] @relation(name: "STEP_FOR", direction: "OUT")
 }
 
 type Block {
@@ -61,6 +64,24 @@ type Block {
 }
 
 type Kick {
+  name: ID!
+  steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
+  rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
+}
+
+type Stance {
+  name: ID!
+  steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
+  rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
+}
+
+type Movement {
+  name: ID!
+  steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
+  rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
+}
+
+type Turn {
   name: ID!
   steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
   rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
