@@ -8,8 +8,9 @@ ON CREATE SET rank.id = toFloat(row.`Rank Reference`),
 
 // load csv file to create create techniques and connect to rank
 LOAD CSV WITH HEADERS FROM 'file:///CurriculumDatabaseStrikes.csv' AS row
-MATCH (rank:Rank {nameShort: row.Rank})
-MERGE (strike:Strike {name: row.Name})-[:REQUIRED_FOR]->(rank)
+//MATCH (rank:Rank {nameShort: row.Rank})
+//MERGE (strike:Strike {name: row.Name})-[:REQUIRED_FOR]->(rank)
+MERGE (strike:Strike {name: row.Name})
 ON CREATE SET strike.name = row.Name
 
 // connect descriptions to strikes
@@ -22,8 +23,9 @@ ON CREATE SET stepDescription.text = row.`Step Description`,
 
 // load csv file to create create techniques and connect to rank
 LOAD CSV WITH HEADERS FROM 'file:///CurriculumDatabaseBlocks.csv' AS row
-MATCH (rank:Rank {nameShort: row.Rank})
-MERGE (block:Block {name: row.Name})-[:REQUIRED_FOR]->(rank)
+//MATCH (rank:Rank {nameShort: row.Rank})
+//MERGE (block:Block {name: row.Name})-[:REQUIRED_FOR]->(rank)
+MERGE (block:Block {name: row.Name})
 ON CREATE SET block.name = row.Name
 
 // connect descriptions to blocks
@@ -36,8 +38,9 @@ ON CREATE SET stepDescription.text = row.`Step Description`,
 
 // load csv file to create create techniques and connect to rank
 LOAD CSV WITH HEADERS FROM 'file:///CurriculumDatabaseKicks.csv' AS row
-MATCH (rank:Rank {nameShort: row.Rank})
-MERGE (kick:Kick {name: row.Name})-[:REQUIRED_FOR]->(rank)
+//MATCH (rank:Rank {nameShort: row.Rank})
+//MERGE (kick:Kick {name: row.Name})-[:REQUIRED_FOR]->(rank)
+MERGE (kick:Kick {name: row.Name})
 ON CREATE SET kick.name = row.Name
 
 // connect descriptions to kicks
@@ -46,3 +49,10 @@ MATCH (kick:Kick {name: row.Name})
 MERGE (kick)<-[:STEP_FOR]-(stepDescription:StepDescription {text: row.`Step Description`, number: row.`Step #`})
 ON CREATE SET stepDescription.text = row.`Step Description`,
               stepDescription.number = row.`Step #`
+
+
+// connect technique to Rank
+LOAD CSV WITH HEADERS FROM 'file:///CurriculumDatabaseAllTechniques.csv' AS row
+MATCH (rank:Rank {nameShort: row.Rank})
+MATCH (technique {name: row.Name})
+MERGE (rank)<-[:REQUIRED_FOR]-(technique)
