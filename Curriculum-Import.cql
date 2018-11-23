@@ -56,3 +56,17 @@ LOAD CSV WITH HEADERS FROM 'file:///CurriculumDatabaseAllTechniques.csv' AS row
 MATCH (rank:Rank {nameShort: row.Rank})
 MATCH (technique {name: row.Name})
 MERGE (rank)<-[:REQUIRED_FOR]-(technique)
+
+
+// Query to count all [:REQUIRED_FOR] techniques connected to particular rank
+MATCH (rank:Rank)
+OPTIONAL MATCH (rank)<-[:REQUIRED_FOR]-(strike:Strike)
+OPTIONAL MATCH (rank)<-[:REQUIRED_FOR]-(block:Block)
+OPTIONAL MATCH (rank)<-[:REQUIRED_FOR]-(kick:Kick)
+RETURN rank.id, 
+     rank.nameLong, 
+       count(strike) AS StrikeCount, 
+       count(block) AS BlockCount, 
+       count(kick) AS KickCount, 
+       count(strike)+count(block)+count(kick) AS TechniqueCount
+ORDER BY rank.id
