@@ -34,11 +34,15 @@ type Rank {
   id: ID!
   nameShort: String
   nameLong: String
+  strike: [Strike] @relation(name: "REQUIRED_FOR", direction: "IN")
+  block: [Block] @relation(name: "REQUIRED_FOR", direction: "IN")
+  kick: [Kick] @relation(name: "REQUIRED_FOR", direction: "IN")
 }
 
 type Strike {
   name: ID!
   steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
+  rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
 } 
 
 type StepDescription {
@@ -53,11 +57,13 @@ type StepDescription {
 type Block {
   name: ID!
   steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
+  rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
 }
 
 type Kick {
   name: ID!
   steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
+  rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
 }
 
 type Query {
