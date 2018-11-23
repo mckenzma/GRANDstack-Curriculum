@@ -51,6 +51,50 @@ ON CREATE SET stepDescription.text = row.`Step Description`,
               stepDescription.number = row.`Step #`
 
 
+// create (:Stance)
+LOAD CSV WITH HEADERS FROM 'file:///CurriculumDatabaseStances.csv' AS row
+MERGE (stance:Stance {name: row.Name})
+ON CREATE SET stance.name = row.Name
+
+// connect descriptions to stances
+LOAD CSV WITH HEADERS FROM 'file:///CurriculumDatabaseStances.csv' AS row
+MATCH (stance:Stance {name: row.Name})
+MERGE (stance)<-[:STEP_FOR]-(stepDescription:StepDescription {text: row.`Step Description`, number: row.`Step #`})
+ON CREATE SET stepDescription.text = row.`Step Description`,
+              stepDescription.number = row.`Step #`
+
+
+// create (:Movement)
+LOAD CSV WITH HEADERS FROM 'file:///CurriculumDatabaseMovements.csv' AS row
+MERGE (movement:Movement {name: row.Name})
+ON CREATE SET movement.name = row.Name
+
+// connect descriptions to stances
+LOAD CSV WITH HEADERS FROM 'file:///CurriculumDatabaseMovements.csv' AS row
+MATCH (movement:Movement {name: row.Name})
+MERGE (movement)<-[:STEP_FOR]-(stepDescription:StepDescription {text: row.`Step Description`, number: row.`Step #`})
+ON CREATE SET stepDescription.text = row.`Step Description`,
+              stepDescription.number = row.`Step #`
+
+
+// create (:Turn)
+LOAD CSV WITH HEADERS FROM 'file:///CurriculumDatabaseTurns.csv' AS row
+MERGE (turn:Turn {name: row.Name})
+ON CREATE SET turn.name = row.Name
+
+// connect descriptions to stances
+LOAD CSV WITH HEADERS FROM 'file:///CurriculumDatabaseTurns.csv' AS row
+MATCH (turn:Turn {name: row.Name})
+MERGE (turn)<-[:STEP_FOR]-(stepDescription:StepDescription {text: row.`Step Description`, number: row.`Step #`})
+ON CREATE SET stepDescription.text = row.`Step Description`,
+              stepDescription.number = row.`Step #`
+
+
+
+
+
+
+
 // connect technique to Rank
 LOAD CSV WITH HEADERS FROM 'file:///CurriculumDatabaseAllTechniques.csv' AS row
 MATCH (rank:Rank {nameShort: row.Rank})
@@ -63,10 +107,16 @@ MATCH (rank:Rank)
 OPTIONAL MATCH (rank)<-[:REQUIRED_FOR]-(strike:Strike)
 OPTIONAL MATCH (rank)<-[:REQUIRED_FOR]-(block:Block)
 OPTIONAL MATCH (rank)<-[:REQUIRED_FOR]-(kick:Kick)
+OPTIONAL MATCH (rank)<-[:REQUIRED_FOR]-(stance:Stance)
+OPTIONAL MATCH (rank)<-[:REQUIRED_FOR]-(movement:Movement)
+OPTIONAL MATCH (rank)<-[:REQUIRED_FOR]-(turn:Turn)
 RETURN rank.id, 
      rank.nameLong, 
        count(strike) AS StrikeCount, 
        count(block) AS BlockCount, 
        count(kick) AS KickCount, 
-       count(strike)+count(block)+count(kick) AS TechniqueCount
+       count(stance) AS StanceCount,
+       count(movement) AS MovementCount,
+       count(turn) AS TurnCount,
+       count(strike)+count(block)+count(kick)+count(stance)+count(movement)+count(turn) AS TechniqueCount
 ORDER BY rank.id
