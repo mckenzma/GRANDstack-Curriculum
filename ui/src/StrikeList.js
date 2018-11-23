@@ -110,13 +110,13 @@ class StrikeList extends React.Component {
                       <TableRow key={n.id}>
                         <TableCell component="th" scope="row">
                           {n.name}
-                            {n.steps
+                            {/*{n.steps
                               .slice()   
                               .map(o => {
                                 return (
                                   <p>{o.text}</p>
                                 );
-                              })}
+                              })}*/}
                         </TableCell>
                       </TableRow>
                     );
