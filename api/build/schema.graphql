@@ -1,0 +1,78 @@
+type User {
+  id: ID!
+  name: String
+  friends(first: Int = 10, offset: Int = 0): [User] @relation(name: "FRIENDS", direction: "BOTH")
+  reviews(first: Int = 10, offset: Int = 0): [Review] @relation(name: "WROTE", direction: "OUT")
+  avgStars: Float @cypher(statement: "MATCH (this)-[:WROTE]->(r:Review) RETURN toFloat(avg(r.stars))")
+  numReviews: Int @cypher(statement: "MATCH (this)-[:WROTE]->(r:Review) RETURN COUNT(r)")
+  totalStars: Int @cypher(statement: "MATCH (this)-[:WROTE]->(r:Review) RETURN SUM(r.stars)")
+}
+type Business {
+  id: ID!
+  name: String
+  address: String
+  city: String
+  state: String
+  reviews(first: Int = 10, offset: Int = 0): [Review] @relation(name: "REVIEWS", direction: "IN")
+  categories(first: Int = 10, offset: Int =0): [Category] @relation(name: "IN_CATEGORY", direction: "OUT")
+  numReviews: Int @cypher(statement: "MATCH (this)<-[:REVIEWS]-(r:Review) RETURN count(r)")
+  avgStars: Float @cypher(statement: "MATCH (this)<-[:REVIEWS]-(r:Review) WHERE r.stars IS NOT NULL RETURN toFloat(avg(r.stars))")
+  category: String @cypher(statement: "MATCH (this)-[:IN_CATEGORY]->(r:Category) RETURN r.name")
+}
+type Review {
+  id: ID!
+  stars: Int
+  text: String
+  business: Business @relation(name: "REVIEWS", direction: "OUT")
+  user: User @relation(name: "WROTE", direction: "IN")
+  business_name: String @cypher(statement: "MATCH (this)-[:REVIEWS]->(r:Business) RETURN r.name")
+  user_name: String @cypher(statement: "MATCH (this)<-[:WROTE]-(r:User) RETURN r.name")
+}
+type Category {
+  name: ID!
+  businesses(first: Int = 10, offset: Int = 0): [Business] @relation(name: "IN_CATEGORY", direction: "IN")
+}
+type Ring {
+  name: ID!
+  divisions: [Division] @relation(name: "OCCURS_IN", direction: "IN")
+  percentDivsCompleted: Float @cypher(statement: "MATCH (this)<-[:OCCURS_IN]-(d1:Division) WITH this, count(d1) as total_divs MATCH (this)<-[:OCCURS_IN]-(d2:Division) WHERE d2.status = 'Complete' WITH this, total_divs, count(d2) as complete_divs RETURN toFloat((toFloat(complete_divs) / toFloat(total_divs)) * 100)")
+  percentDivsNotCompleted: Float @cypher(statement: "MATCH (this)<-[:OCCURS_IN]-(d1:Division) WITH this, count(d1) as total_divs MATCH (this)<-[:OCCURS_IN]-(d2:Division) WHERE d2.status <> 'Complete' WITH this, total_divs, count(d2) as complete_divs RETURN toFloat((toFloat(complete_divs) / toFloat(total_divs)) * 100)")
+}
+type Division {
+  id: ID!
+  nameLong: String
+  nameShort: String
+  sex: String
+  rank: String
+  ageLow: Int
+  ageHigh: Int
+  status: String
+  competitors: [Person] @relation(name: "COMPETES_IN", direction: "IN")
+  divRing: [Ring] @relation(name: "OCCURS_IN", direction: "OUT")
+}
+type Person {
+  name: ID!
+  lastName: String!
+  firstName: String!
+  sex: String
+  age: Int
+  rank: String
+  divsCompeted: [Division] @relation(name: "COMPETES_IN", direction: "OUT")
+  
+  school: String @cypher(statement: "MATCH (this)-[:STUDENT_AT]->(s:School) RETURN s.name")
+  region: String @cypher(statement: "MATCH (this)-[:STUDENT_AT]->(:School)-[:LOCATED_IN]->(re:Region) RETURN re.name")
+}
+type School {
+  name: ID!
+  numCompetitors: Int @cypher(statement: "MATCH (this)<-[:STUDENT_AT]-(p:Person)-[:COMPETES_IN]->(d:Division) RETURN count(DISTINCT p.name) ")
+}
+type Region {
+  name: ID!
+}
+type Query {
+    
+    usersBySubstring(substring: String, first: Int = 10, offset: Int = 0): [User] @cypher(statement: "MATCH (u:User) WHERE u.name CONTAINS $substring RETURN u")
+    
+    judges(name: String): [Person] @cypher(statement: "MATCH (p:Person) WHERE p.age >=18 AND p.rank CONTAINS 'Black Belt' RETURN p")
+    
+}
