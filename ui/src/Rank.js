@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { makeStyles } from "@material-ui/core/styles";
@@ -12,8 +12,6 @@ import Paper from "@material-ui/core/Paper";
 import { TableSortLabel } from "@material-ui/core";
 
 import Grid from "@material-ui/core/Grid";
-
-import Button from "@material-ui/core/Button";
 
 import CreateRank from "./CreateRank";
 
@@ -39,18 +37,17 @@ const useStyles = makeStyles(theme => ({
 const GET_RANKS = gql`
   {
     Rank {
-      nameLong
-      #nameShort
+      name
+      rankOrder
     }
   }
 `;
-
 
 export default function Rank() {
   const classes = useStyles();
 
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("nameLong");
+  const [orderBy, setOrderBy] = useState("rankOrder");
 
   const handleSortRequest = property => {
     const newOrderBy = property;
@@ -79,65 +76,62 @@ export default function Rank() {
     <div className={classes.root}>
       <Grid container spacing={3}>
         <Grid item /*xs={12}*/ sm={6}>
-    <Paper className={classes.root}>
-      <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell
-              key="nameLong"
-              sortDirection={orderBy === "nameLong" ? order : false}
-            >
-              <Tooltip title="Sort" placement="bottom-start" enterDelay={300}>
-                <TableSortLabel
-                  active={orderBy === "nameLong"}
-                  direction={order}
-                  onClick={() => handleSortRequest("nameLong")}
-                >
-                  Name (Long)
-                </TableSortLabel>
-              </Tooltip>
-            </TableCell>
-            {/*<TableCell
-              key="nameShort"
-              sortDirection={orderBy === "nameShort" ? order : false}
-            >
-              <Tooltip title="Sort" placement="bottom-end" enterDelay={300}>
-                <TableSortLabel
-                  active={orderBy === "nameShort"}
-                  direction={order}
-                  onClick={() => handleSortRequest("nameShort")}
-                >
-                  Name (Short)
-                </TableSortLabel>
-              </Tooltip>
-            </TableCell>*/}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.Rank //.slice()
-            .sort(getSorting(order, orderBy))
-            .map(n => {
-              return (
-                // <TableRow key={n.id}>
-                <TableRow key={n.nameLong}>
-                  <TableCell component="th" scope="row">
-                    {n.nameLong}
-                  </TableCell>
-                  {/*<TableCell>{n.nameShort}</TableCell>*/}
-                </TableRow>
-              );
-            })}
-        </TableBody>
-      </Table>
-    </Paper>
-    </Grid>
-<Grid item /*xs={12}*/ sm={6}>
-<Paper className={classes.root}>
-<CreateRank />
-</Paper>
-</Grid>
-
-    </Grid>
+          <Table className={classes.table}>
+          <TableHead>
+            <TableRow>
+              <TableCell
+                key="rankOrder"
+                sortDirection={orderBy === "rankOrder" ? order : false}
+              >
+                <Tooltip title="Sort" placement="bottom-start" enterDelay={300}>
+                  <TableSortLabel
+                    active={orderBy === "rankOrder"}
+                    direction={order}
+                    onClick={() => handleSortRequest("rankOrder")}
+                  >
+                    Order
+                  </TableSortLabel>
+                </Tooltip>
+              </TableCell>
+              <TableCell
+                key="name"
+                sortDirection={orderBy === "name" ? order : false}
+              >
+                <Tooltip title="Sort" placement="bottom-start" enterDelay={300}>
+                  <TableSortLabel
+                    active={orderBy === "name"}
+                    direction={order}
+                    onClick={() => handleSortRequest("name")}
+                  >
+                    Name
+                  </TableSortLabel>
+                </Tooltip>
+              </TableCell>
+              
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.Rank //.slice()
+              .sort(getSorting(order, orderBy))
+              .map(n => {
+                return (
+                  <TableRow key={n.name}>
+                    <TableCell component="th" scope="row">
+                      {n.rankOrder}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {n.name}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+          </TableBody>
+        </Table>
+      </Grid>
+      <Grid item /*xs={12}*/ sm={6}>
+        <CreateRank data={data} GET_RANKS={GET_RANKS} />
+      </Grid>
+      </Grid>
     </div>
   );
 }

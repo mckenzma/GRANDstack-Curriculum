@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import "./App.css";
 import clsx from "clsx";
 
@@ -6,6 +6,7 @@ import clsx from "clsx";
 import PropTypes from "prop-types";
 // import classNames from "classnames";
 import { withStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -41,20 +42,23 @@ import { ThemeProvider } from '@material-ui/core/styles';
 
 const drawerWidth = 240;
 
-const styles = theme => ({
+// const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1
   },
   appFrame: {
     // height: 430,
-    // height: "100%",
-    height: "auto",
+    height: "100%",
+    // height: "auto",
     zIndex: 1,
     overflow: "hidden",
     position: "relative",
     // position: 'absolute',
+    // position: 'flex',
     display: "flex",
-    width: "100%"
+    width: "100%",
+    flexGrow: 1
   },
   appBar: {
     position: "absolute",
@@ -122,7 +126,7 @@ const styles = theme => ({
   "contentShift-right": {
     marginRight: 0
   },
-});
+}));
 
 
 /*use this to set theme colors*/
@@ -143,29 +147,37 @@ const theme2 = createMuiTheme({
   },
 });
 
-class App extends Component {
-  state = {
-    open: false,
-    anchor: "left"
+export default function App() {
+// class App extends Component {
+  // state = {
+  //   open: false,
+  //   anchor: "left"
+  // };
+  const classes = useStyles();
+
+  const [open, setOpen] = useState(false);
+  const [anchor, setAnchor] = useState("left");
+
+  const handleDrawerOpen = () => {
+    // this.setState({ open: true });
+    setOpen(true);
   };
 
-  handleDrawerOpen = () => {
-    this.setState({ open: true });
+  const handleDrawerClose = () => {
+    // this.setState({ open: false });
+    setOpen(false);
   };
 
-  handleDrawerClose = () => {
-    this.setState({ open: false });
+  const handleChangeAnchor = event => {
+    // this.setState({
+    //   anchor: event.target.value
+    // });
+    setAnchor(event.target.value);
   };
 
-  handleChangeAnchor = event => {
-    this.setState({
-      anchor: event.target.value
-    });
-  };
-
-  render() {
-    const { classes, theme } = this.props;
-    const { anchor, open } = this.state;
+  // render() {
+    // const { classes, theme } = this.props;
+    // const { anchor, open } = this.state;
 
     const drawer = (
       <Drawer
@@ -177,8 +189,8 @@ class App extends Component {
         }}
       >
         <div className={classes.drawerHeader}>
-          <IconButton onClick={this.handleDrawerClose}>
-            {theme.direction === "rtl" ? (
+          <IconButton onClick={/*this.*/handleDrawerClose}>
+            {classes.direction === "rtl" ? (
               <ChevronRightIcon />
             ) : (
               <ChevronLeftIcon />
@@ -265,7 +277,7 @@ class App extends Component {
                 <IconButton
                   color="inherit"
                   aria-label="Open drawer"
-                  onClick={this.handleDrawerOpen}
+                  onClick={/*this.*/handleDrawerOpen}
                   // className={classNames(
                   className={
                     clsx(classes.menuButton, open && classes.hide)
@@ -301,13 +313,13 @@ class App extends Component {
       </div>
       </ThemeProvider>
     );
-  }
+  // }
 }
 
-App.propTypes = {
-  classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired
-};
+// App.propTypes = {
+//   classes: PropTypes.object.isRequired,
+//   theme: PropTypes.object.isRequired
+// };
 
-export default withStyles(styles, { withTheme: true })(App);
+// export default withStyles(styles, { withTheme: true })(App);
 // export default App;

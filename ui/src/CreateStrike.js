@@ -6,10 +6,10 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 // import Typography from "@material-ui/core/Typography";
 
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
-import StepContent from "@material-ui/core/StepContent";
+// import Stepper from "@material-ui/core/Stepper";
+// import Step from "@material-ui/core/Step";
+// import StepLabel from "@material-ui/core/StepLabel";
+// import StepContent from "@material-ui/core/StepContent";
 import Button from "@material-ui/core/Button";
 
 import CreateStrikeTextField from "./CreateStrikeTextField";
@@ -45,48 +45,48 @@ const CREATE_STRIKE = gql`
   }
 `;
 
-export default function CreateStrike() {
+export default function CreateStrike({ data, GET_STRIKES }) {
   const classes = useStyles();
 
   const [name, setName] = useState("");
 
-  // let input;
-  const [CreateStrike, { data }] = useMutation(CREATE_STRIKE);
+  const [CreateStrike] = useMutation(
+    CREATE_STRIKE,
+    {
+      update(cache, { data: { CreateStrike } }) {
+        const { Strike } = cache.readQuery({ query: GET_STRIKES });
+        cache.writeQuery({
+          query: GET_STRIKES,
+          data: { Strike: Strike.concat([CreateStrike]) },
+        })
+      }
+    }
+  );
 
-
-  const handleReset = () => {
-    // setRank("");
-    setName("");
-  };
+  const handleClick = event => {
+    CreateStrike({
+      variables: { name: name }
+    });
+  }
 
   return (
-    <Paper className={classes.root} elevation={1}>
-    {/*<Typography /*variant="headline"* component="h3">
-        Registration
-      </Typography>*/}
-      <div className={classes.root} /*justifyContent="flex-start"*/>
-            <form className={classes.container} noValidate autoComplete="off">
-              <CreateStrikeTextField
-                name={name}
-                setName={setName}
-              />
-            </form>
-          </div>
-      
-        <Paper square elevation={1} className={classes.resetContainer}>
-          <Button
-            onClick={e => {
-              CreateStrike({
-                variables: { name: name }
-              });
-            }}
-            className={classes.button}
-            color="primary"
-            variant="contained"
-          >
-            Submit
-          </Button>
-        </Paper>
-    </Paper>
+    <div className={classes.root} /*justifyContent="flex-start"*/>
+      <form className={classes.container} noValidate autoComplete="off">
+        <CreateStrikeTextField
+          name={name}
+          setName={setName}
+        />
+      </form>
+  
+      <Button
+        onClick={handleClick}
+
+        className={classes.button}
+        color="primary"
+        variant="contained"
+      >
+        Submit
+      </Button>
+    </div>
   );
 }

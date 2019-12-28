@@ -19,18 +19,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function CreateRankTextField({ name, setName }) {
+export default function CreateBlockTextField({ name, setName }) {
   const classes = useStyles();
 
   return (
     <TextField
-      id="outlined-rank"
-      label="Rank"
+      id="outlined-block"
+      label="Block"
       className={classes.textField}
       onChange={e => setName(e.target.value)}
       margin="normal"
       variant="outlined"
-      helperText="Enter rank name"
+      helperText="Enter block name"
     />
   );
 }

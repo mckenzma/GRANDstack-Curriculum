@@ -23,15 +23,14 @@ export default function CreateStrikeTextField({ name, setName }) {
   const classes = useStyles();
 
   return (
-    // {/*<form className={classes.container} noValidate autoComplete="off">*/}
     <TextField
       id="outlined-rank"
-      label="Rank"
+      label="Strike"
       className={classes.textField}
       onChange={e => setName(e.target.value)}
       margin="normal"
       variant="outlined"
+      helperText="Enter strike name"
     />
-    // {/*</form>*/}
   );
 }

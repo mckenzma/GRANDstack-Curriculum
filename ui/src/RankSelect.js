@@ -21,23 +21,28 @@ const useStyles = makeStyles(theme => ({
 const GET_RANKS = gql`
   {
     Rank {
-      nameLong
-      #nameShort
+      name
+      rankOrder
     }
   }
 `;
 
-// export default function RankSelect({ rank, setRank }) {
 export default function RankSelect() {
   const classes = useStyles();
 
+  const [order, setOrder] = useState("asc");
+  const [orderBy, setOrderBy] = useState("rankOrder");
+
   const inputLabel = React.useRef(null);
   const [labelWidth, setLabelWidth] = React.useState(0);
-  // React.useEffect(() => {
-  //   setLabelWidth(inputLabel.current.offsetWidth);
-  // }, []);
 
   const [rank, setRank] = useState("");
+
+  const getSorting = (order, orderBy) => {
+  return order === "desc"
+    ? (a, b) => (b[orderBy] < a[orderBy] ? -1 : 1)
+    : (a, b) => (a[orderBy] < b[orderBy] ? -1 : 1);
+  };
 
   const { loading, error, data } = useQuery(GET_RANKS);
 
@@ -57,35 +62,16 @@ export default function RankSelect() {
           onChange={e => setRank(e.target.value)}
           labelWidth={labelWidth}
         >
-        {data.Rank
-          .map(n => {
-            return (
-              <MenuItem key={n.nameLong} value={n.nameLong}>{n.nameLong}</MenuItem>
-            );
-          })}
-
-
-
-          {/*<MenuItem value="">
+        {/*<MenuItem value="">
             <em>None</em>
           </MenuItem>*/}
-          {/*<MenuItem value={"white"}>White</MenuItem>
-          <MenuItem value={"yellow"}>Yellow</MenuItem>
-          <MenuItem value={"orange"}>Orange</MenuItem>
-          <MenuItem value={"purple"}>Purple</MenuItem>
-          <MenuItem value={"blue"}>Blue</MenuItem>
-          <MenuItem value={"green"}>Green</MenuItem>
-          <MenuItem value={"red"}>Red</MenuItem>
-          <MenuItem value={"first black"}>1st Black</MenuItem>
-          <MenuItem value={"second black"}>2nd Black</MenuItem>
-          <MenuItem value={"third black"}>3rd Black</MenuItem>
-          <MenuItem value={"fourth black"}>4th Black</MenuItem>
-          <MenuItem value={"fifth black"}>5th Black</MenuItem>
-          <MenuItem value={"sixth black"}>6th Black</MenuItem>
-          <MenuItem value={"seventh black"}>7th Black</MenuItem>
-          <MenuItem value={"eighth black"}>8th Black</MenuItem>
-          <MenuItem value={"nineth black"}>9th Black</MenuItem>
-          <MenuItem value={"tenth black"}>10th Black</MenuItem>*/}
+        {data.Rank
+          .sort(getSorting(order, orderBy))
+          .map(n => {
+            return (
+              <MenuItem key={n.name} value={n.name}>{n.name}</MenuItem>
+            );
+          })}
         </Select>
         {/*<FormHelperText>Required</FormHelperText>*/}
       </FormControl>

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@apollo/react-hooks";
-import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -14,7 +13,7 @@ import { TableSortLabel } from "@material-ui/core";
 
 import Grid from "@material-ui/core/Grid";
 
-import CreateStrike from "./CreateStrike";
+import CreateBlock from "./CreateBlock";
 
 import RankSelectFilter from "./RankListSelect";
 
@@ -37,15 +36,16 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const GET_STRIKES = gql`
+const GET_BLOCKS = gql`
   {
-    Strike {
+    Block {
       name
     }
   }
 `;
 
-export default function Strike() {
+
+export default function Block() {
   const classes = useStyles();
 
   const [order, setOrder] = useState("asc");
@@ -69,7 +69,7 @@ export default function Strike() {
     : (a, b) => (a[orderBy] < b[orderBy] ? -1 : 1);
   };
 
-  const { loading, error, data } = useQuery(GET_STRIKES);
+  const { loading, error, data } = useQuery(GET_BLOCKS);
 
   if (loading) return "Loading...";
   if (error) return `Error ${error.message}`;
@@ -98,7 +98,7 @@ export default function Strike() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.Strike //.slice()
+              {data.Block //.slice()
                 .sort(getSorting(order, orderBy))
                 .map(n => {
                   return (
@@ -114,7 +114,7 @@ export default function Strike() {
         </Grid>
         <Grid item /*xs={12}*/ sm={6}>
           <RankSelectFilter />
-          <CreateStrike data={data} GET_STRIKES={GET_STRIKES} />
+          <CreateBlock data={data} GET_BLOCKS={GET_BLOCKS} />
         </Grid>
       </Grid>
     </div>

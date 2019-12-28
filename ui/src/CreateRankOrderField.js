@@ -19,18 +19,20 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function CreateRankTextField({ name, setName }) {
+export default function CreateRankOrderField({ rankOrder, setRankOrder }) {
   const classes = useStyles();
 
   return (
     <TextField
-      id="outlined-rank"
-      label="Rank"
-      className={classes.textField}
-      onChange={e => setName(e.target.value)}
-      margin="normal"
+      id="outlined-number"
+      label="Number"
+      type="number"
+      InputLabelProps={{
+        shrink: true,
+      }}
+      onChange={e => setRankOrder(parseInt(e.target.value))}
       variant="outlined"
-      helperText="Enter rank name"
+      helperText="Enter order of rank"
     />
   );
 }

@@ -17,6 +17,7 @@ import Rank from "./Rank";
 // import CreateRank from "./CreateRank";
 
 import Strike from "./Strike";
+import Block from "./Block";
 
 import RankSelect from "./RankSelect";
 
@@ -34,7 +35,7 @@ function TabPanel(props) {
       // aria-labelledby={`scrollable-force-tab-${index}`}
       {...other}
     >
-      <Box p={3}>{children}</Box>
+      <Box p={8}>{children}</Box>
     </Typography>
   );
 }
@@ -90,7 +91,7 @@ export default function TabsWrappedLabel() {
         </Tabs>
       </AppBar>
       <TabPanel value={value} index="one">
-        Testing
+        {/*Testing*/}
         <RankSelect />
       </TabPanel>
       <TabPanel value={value} index="two">
@@ -103,19 +104,20 @@ export default function TabsWrappedLabel() {
         <Strike />
       </TabPanel>
       <TabPanel value={value} index="four">
-        Block
+        {/*Block*/}
+        <Block />
       </TabPanel>
       <TabPanel value={value} index="five">
-        Kick
+        {/*Kick*/}
       </TabPanel>
       <TabPanel value={value} index="six">
-        Stance
+        {/*Stance*/}
       </TabPanel>
       <TabPanel value={value} index="seven">
-        Movement
+        {/*Movement*/}
       </TabPanel>
       <TabPanel value={value} index="eight">
-        Turn
+        {/*Turn*/}
       </TabPanel>
       {/*<TabPanel value={value} index="eight">
         Kata

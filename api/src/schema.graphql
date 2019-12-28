@@ -1,7 +1,7 @@
 type Rank {
   # id: ID!
-  nameShort: String
-  nameLong: String
+  name: String!
+  rankOrder: Int!
   strike: [Strike] @relation(name: "REQUIRED_FOR", direction: "IN")
   block: [Block] @relation(name: "REQUIRED_FOR", direction: "IN")
   kick: [Kick] @relation(name: "REQUIRED_FOR", direction: "IN")
@@ -27,35 +27,47 @@ type StepDescription {
 }
 
 type Block {
-  name: ID!
+  # name: ID!
+  name: String!
   steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
   rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
 }
 
 type Kick {
-  name: ID!
+  # name: ID!
+  name: String!
   steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
   rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
 }
 
 type Stance {
-  name: ID!
+  # name: ID!
+  name: String!
   steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
   rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
 }
 
 type Movement {
-  name: ID!
+  # name: ID!
+  name: String!
   steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
   rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
 }
 
 type Turn {
-  name: ID!
+  # name: ID!
+  name: String!
   steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
   rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
 }
 
 # type Query {
-#     # usersBySubstring(substring: String, first: Int = 10, offset: Int = 0): [User] @cypher(statement: "MATCH (u:User) WHERE u.name CONTAINS $substring RETURN u")
+  
+#   connectStrikeToRank(ranks: [String]): @cypher(statement: """
+#     MERGE (this)
+#     UNWIND $ranks AS rank
+#     MERGE (this)-[:REQUIRED_FOR]->(rank)
+#     """
+#   )
+
 # }
