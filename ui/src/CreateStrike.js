@@ -4,17 +4,10 @@ import gql from "graphql-tag";
 import { makeStyles } from "@material-ui/core/styles";
 
 import Paper from "@material-ui/core/Paper";
-// import Typography from "@material-ui/core/Typography";
 
-// import Stepper from "@material-ui/core/Stepper";
-// import Step from "@material-ui/core/Step";
-// import StepLabel from "@material-ui/core/StepLabel";
-// import StepContent from "@material-ui/core/StepContent";
 import Button from "@material-ui/core/Button";
 
 import CreateStrikeTextField from "./CreateStrikeTextField";
-
-// import Grid from "@material-ui/core/Grid";
 
 const useStyles = makeStyles(theme => ({
   root: {
