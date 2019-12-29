@@ -8,7 +8,7 @@ import Typography from "@material-ui/core/Typography";
 
 import Button from "@material-ui/core/Button";
 
-import CreateBlockTextField from "./CreateBlockTextField";
+import CreateKickTextField from "./CreateKickTextField";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -31,27 +31,27 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const CREATE_BLOCK = gql`
-  mutation CreateBlock($name: String!) {
-    CreateBlock(name: $name) {
+const CREATE_KICK = gql`
+  mutation CreateKick($name: String!) {
+    CreateKick(name: $name) {
       name
     }
   }
 `;
 
-export default function CreateBlock({ data, GET_BLOCKS }) {
+export default function CreateKick({ data, GET_KICKS }) {
   const classes = useStyles();
 
   const [name, setName] = useState("");
 
-  const [CreateBlock] = useMutation(
-    CREATE_BLOCK,
+  const [CreateKick] = useMutation(
+    CREATE_KICK,
     {
-      update(cache, { data: { CreateBlock } }) {
-        const { Block } = cache.readQuery({ query: GET_BLOCKS });
+      update(cache, { data: { CreateKick } }) {
+        const { Kick } = cache.readQuery({ query: GET_KICKS });
         cache.writeQuery({
-          query: GET_BLOCKS,
-          data: { Block: Block.concat([CreateBlock]) },
+          query: GET_KICKS,
+          data: { Kick: Kick.concat([CreateKick]) },
         })
       }
     }
@@ -64,7 +64,7 @@ export default function CreateBlock({ data, GET_BLOCKS }) {
   return (
     <div className={classes.root} /*justifyContent="flex-start"*/>
       <form className={classes.container} noValidate autoComplete="off">
-        <CreateBlockTextField
+        <CreateKickTextField
           name={name}
           setName={setName}
         />
@@ -72,7 +72,7 @@ export default function CreateBlock({ data, GET_BLOCKS }) {
         
       <Button
         onClick={e => {
-          CreateBlock({
+          CreateKick({
             variables: { name: name }
           });
         }}

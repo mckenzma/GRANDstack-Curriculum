@@ -18,6 +18,7 @@ import Rank from "./Rank";
 
 import Strike from "./Strike";
 import Block from "./Block";
+import Kick from "./Kick";
 
 import RankSelect from "./RankSelect";
 
@@ -109,6 +110,7 @@ export default function TabsWrappedLabel() {
       </TabPanel>
       <TabPanel value={value} index="five">
         {/*Kick*/}
+        <Kick />
       </TabPanel>
       <TabPanel value={value} index="six">
         {/*Stance*/}
