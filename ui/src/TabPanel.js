@@ -19,6 +19,10 @@ import Rank from "./Rank";
 import Strike from "./Strike";
 import Block from "./Block";
 import Kick from "./Kick";
+import Stance from "./Stance";
+import Movement from "./Movement";
+import Turn from "./Turn";
+import Kata from "./Kata";
 
 import RankSelect from "./RankSelect";
 
@@ -30,13 +34,13 @@ function TabPanel(props) {
       component="div"
       role="tabpanel"
       hidden={value !== index}
-      id={`wrapped-tabpanel-${index}`}
-      aria-labelledby={`wrapped-tab-${index}`}
-      // id={`scrollable-force-tabpanel-${index}`}
-      // aria-labelledby={`scrollable-force-tab-${index}`}
+      // id={`wrapped-tabpanel-${index}`}
+      // aria-labelledby={`wrapped-tab-${index}`}
+      id={`scrollable-force-tabpanel-${index}`}
+      aria-labelledby={`scrollable-force-tab-${index}`}
       {...other}
     >
-      <Box p={8}>{children}</Box>
+      <Box p={9}>{children}</Box>
     </Typography>
   );
 }
@@ -47,16 +51,24 @@ TabPanel.propTypes = {
   value: PropTypes.any.isRequired
 };
 
+// function a11yProps(index) {
+//   return {
+//     id: `wrapped-tab-${index}`,
+//     "aria-controls": `wrapped-tabpanel-${index}`
+//   };
+// }
+
 function a11yProps(index) {
   return {
-    id: `wrapped-tab-${index}`,
-    "aria-controls": `wrapped-tabpanel-${index}`
+    id: `scrollable-auto-tab-${index}`,
+    'aria-controls': `scrollable-auto-tabpanel-${index}`,
   };
 }
 
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
+    width: '100%',
     backgroundColor: theme.palette.background.paper
   }
 }));
@@ -76,8 +88,8 @@ export default function TabsWrappedLabel() {
           value={value}
           onChange={handleChange}
           aria-label="wrapped label tabs example"
-          centered
-          // variant="scrollable"
+          // centered
+          variant="scrollable"
           // scrollButtons="on"
         >
           <Tab value="one" label="Testing" wrapped {...a11yProps("one")} />
@@ -88,7 +100,7 @@ export default function TabsWrappedLabel() {
           <Tab value="six" label="Stance" {...a11yProps("six")} />
           <Tab value="seven" label="Movement" {...a11yProps("seven")} />
           <Tab value="eight" label="Turn" {...a11yProps("eight")} />
-          {/*<Tab value="nine" label="Kata" {...a11yProps("nine")} />*/}
+          <Tab value="nine" label="Kata" {...a11yProps("nine")} />
         </Tabs>
       </AppBar>
       <TabPanel value={value} index="one">
@@ -114,16 +126,20 @@ export default function TabsWrappedLabel() {
       </TabPanel>
       <TabPanel value={value} index="six">
         {/*Stance*/}
+        <Stance />
       </TabPanel>
       <TabPanel value={value} index="seven">
         {/*Movement*/}
+        <Movement />
       </TabPanel>
       <TabPanel value={value} index="eight">
         {/*Turn*/}
+        <Turn />
       </TabPanel>
-      {/*<TabPanel value={value} index="eight">
-        Kata
-      </TabPanel>*/}
+      <TabPanel value={value} index="nine">
+        {/*Kata*/}
+        <Kata />
+      </TabPanel>
     </div>
   );
 }

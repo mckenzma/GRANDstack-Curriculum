@@ -61,6 +61,13 @@ type Turn {
   rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
 }
 
+type Kata {
+  # name: ID!
+  name: String!
+  # steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
+  # rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
+}
+
 # type Query {
   
 #   connectStrikeToRank(ranks: [String]): @cypher(statement: """
