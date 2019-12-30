@@ -14,6 +14,7 @@ import { TableSortLabel } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 
 import CreateKick from "./CreateKick";
+import DeleteKick from "./DeleteKick";
 
 import RankSelectFilter from "./RankListSelect";
 
@@ -95,6 +96,8 @@ export default function Kick() {
                     </TableSortLabel>
                   </Tooltip>
                 </TableCell>
+                <TableCell key="delete" />
+
               </TableRow>
             </TableHead>
             <TableBody>
@@ -106,6 +109,9 @@ export default function Kick() {
                       <TableCell component="th" scope="row">
                         {n.name}
                       </TableCell>
+                      <TableCell>
+                      <DeleteKick data={data} GET_KICKS={GET_KICKS} name={n.name} />
+                    </TableCell>
                     </TableRow>
                   );
                 })}

@@ -14,6 +14,7 @@ import { TableSortLabel } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 
 import CreateKata from "./CreateKata";
+import DeleteKata from "./DeleteKata";
 
 import RankSelectFilter from "./RankListSelect";
 
@@ -95,6 +96,8 @@ export default function Kata() {
                     </TableSortLabel>
                   </Tooltip>
                 </TableCell>
+                <TableCell key="delete" />
+
               </TableRow>
             </TableHead>
             <TableBody>
@@ -106,6 +109,9 @@ export default function Kata() {
                       <TableCell component="th" scope="row">
                         {n.name}
                       </TableCell>
+                      <TableCell>
+                      <DeleteKata data={data} GET_KATAS={GET_KATAS} name={n.name} />
+                    </TableCell>
                     </TableRow>
                   );
                 })}

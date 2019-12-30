@@ -14,6 +14,7 @@ import { TableSortLabel } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 
 import CreateMovement from "./CreateMovement";
+import DeleteMovement from "./DeleteMovement";
 
 import RankSelectFilter from "./RankListSelect";
 
@@ -95,6 +96,8 @@ export default function Movement() {
                     </TableSortLabel>
                   </Tooltip>
                 </TableCell>
+                <TableCell key="delete" />
+
               </TableRow>
             </TableHead>
             <TableBody>
@@ -106,6 +109,9 @@ export default function Movement() {
                       <TableCell component="th" scope="row">
                         {n.name}
                       </TableCell>
+                      <TableCell>
+                      <DeleteMovement data={data} GET_MOVEMENTS={GET_MOVEMENTS} name={n.name} />
+                    </TableCell>
                     </TableRow>
                   );
                 })}

@@ -14,6 +14,7 @@ import { TableSortLabel } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 
 import CreateStance from "./CreateStance";
+import DeleteStance from "./DeleteStance";
 
 import RankSelectFilter from "./RankListSelect";
 
@@ -95,6 +96,8 @@ export default function Stance() {
                     </TableSortLabel>
                   </Tooltip>
                 </TableCell>
+                <TableCell key="delete" />
+
               </TableRow>
             </TableHead>
             <TableBody>
@@ -106,6 +109,9 @@ export default function Stance() {
                       <TableCell component="th" scope="row">
                         {n.name}
                       </TableCell>
+                      <TableCell>
+                      <DeleteStance data={data} GET_STANCES={GET_STANCES} name={n.name} />
+                    </TableCell>
                     </TableRow>
                   );
                 })}

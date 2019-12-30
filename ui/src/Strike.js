@@ -15,6 +15,7 @@ import { TableSortLabel } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 
 import CreateStrike from "./CreateStrike";
+import DeleteStrike from "./DeleteStrike";
 
 import RankSelectFilter from "./RankListSelect";
 
@@ -95,6 +96,8 @@ export default function Strike() {
                     </TableSortLabel>
                   </Tooltip>
                 </TableCell>
+                <TableCell key="delete" />
+                
               </TableRow>
             </TableHead>
             <TableBody>
@@ -106,6 +109,9 @@ export default function Strike() {
                       <TableCell component="th" scope="row">
                         {n.name}
                       </TableCell>
+                      <TableCell>
+                      <DeleteStrike data={data} GET_STRIKES={GET_STRIKES} name={n.name} />
+                    </TableCell>
                     </TableRow>
                   );
                 })}

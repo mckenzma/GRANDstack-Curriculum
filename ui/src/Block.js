@@ -14,6 +14,7 @@ import { TableSortLabel } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 
 import CreateBlock from "./CreateBlock";
+import DeleteBlock from "./DeleteBlock";
 
 import RankSelectFilter from "./RankListSelect";
 
@@ -95,6 +96,8 @@ export default function Block() {
                     </TableSortLabel>
                   </Tooltip>
                 </TableCell>
+                <TableCell key="delete" />
+
               </TableRow>
             </TableHead>
             <TableBody>
@@ -105,6 +108,9 @@ export default function Block() {
                     <TableRow key={n.name}>
                       <TableCell component="th" scope="row">
                         {n.name}
+                      </TableCell>
+                      <TableCell>
+                        <DeleteBlock data={data} GET_BLOCKS={GET_BLOCKS} name={n.name} />
                       </TableCell>
                     </TableRow>
                   );
