@@ -14,6 +14,7 @@ import { TableSortLabel } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 
 import CreateRank from "./CreateRank";
+import DeleteRank from "./DeleteRank";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -69,6 +70,8 @@ export default function Rank() {
 
   const { loading, error, data } = useQuery(GET_RANKS);
 
+  console.log(data);
+
   if (loading) return "Loading...";
   if (error) return `Error ${error.message}`;
 
@@ -107,6 +110,7 @@ export default function Rank() {
                   </TableSortLabel>
                 </Tooltip>
               </TableCell>
+              <TableCell key="delete" />
               
             </TableRow>
           </TableHead>
@@ -121,6 +125,9 @@ export default function Rank() {
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {n.name}
+                    </TableCell>
+                    <TableCell>
+                      <DeleteRank data={data} GET_RANKS={GET_RANKS} name={n.name} />
                     </TableCell>
                   </TableRow>
                 );
