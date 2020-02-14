@@ -70,8 +70,6 @@ export default function Rank() {
 
   const { loading, error, data } = useQuery(GET_RANKS);
 
-  console.log(data);
-
   if (loading) return "Loading...";
   if (error) return `Error ${error.message}`;
 

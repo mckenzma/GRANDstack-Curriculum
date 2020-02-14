@@ -57,7 +57,7 @@ const useStyles = makeStyles(theme => ({
     // position: 'absolute',
     // position: 'flex',
     display: "flex",
-    width: "100%",
+    // width: "100%",
     flexGrow: 1
   },
   appBar: {

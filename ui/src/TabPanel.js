@@ -15,6 +15,7 @@ import Box from "@material-ui/core/Box";
 
 import Rank from "./Rank";
 // import CreateRank from "./CreateRank";
+import MaterialTableDemo from "./Rank2";
 
 import Strike from "./Strike";
 import Block from "./Block";
@@ -34,10 +35,8 @@ function TabPanel(props) {
       component="div"
       role="tabpanel"
       hidden={value !== index}
-      // id={`wrapped-tabpanel-${index}`}
-      // aria-labelledby={`wrapped-tab-${index}`}
-      id={`scrollable-force-tabpanel-${index}`}
-      aria-labelledby={`scrollable-force-tab-${index}`}
+      id={`wrapped-tabpanel-${index}`}
+      aria-labelledby={`wrapped-tab-${index}`}
       {...other}
     >
       <Box p={9}>{children}</Box>
@@ -51,17 +50,10 @@ TabPanel.propTypes = {
   value: PropTypes.any.isRequired
 };
 
-// function a11yProps(index) {
-//   return {
-//     id: `wrapped-tab-${index}`,
-//     "aria-controls": `wrapped-tabpanel-${index}`
-//   };
-// }
-
 function a11yProps(index) {
   return {
-    id: `scrollable-auto-tab-${index}`,
-    'aria-controls': `scrollable-auto-tabpanel-${index}`,
+    id: `wrapped-tab-${index}`,
+    "aria-controls": `wrapped-tabpanel-${index}`
   };
 }
 
@@ -88,8 +80,8 @@ export default function TabsWrappedLabel() {
           value={value}
           onChange={handleChange}
           aria-label="wrapped label tabs example"
-          // centered
-          variant="scrollable"
+          centered
+          // variant="scrollable"
           // scrollButtons="on"
         >
           <Tab value="one" label="Testing" wrapped {...a11yProps("one")} />
@@ -109,7 +101,8 @@ export default function TabsWrappedLabel() {
       </TabPanel>
       <TabPanel value={value} index="two">
         {/*Rank*/}
-        <Rank />
+        {/*<Rank />*/}
+        <MaterialTableDemo />
         {/*<CreateRank />*/}
       </TabPanel>
       <TabPanel value={value} index="three">

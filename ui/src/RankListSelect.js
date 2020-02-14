@@ -121,57 +121,57 @@ export default function RankSelectFilter() {
   // console.log(numSelectedRanks);
 
   return (
-      <FormControl required variant="outlined" className={classes.formControl}>
-        <InputLabel ref={inputLabel} id="demo-simple-select-outlined-label">
-          Rank
-        </InputLabel>
-        <Select
-          multiple
-          value={selectedRanks}
-          renderValue={selectedRanks => (
-            <div className={classes.chips}>
-              {selectedRanks.map(value => (
-                <Chip
-                  key={value}
-                  label={value}
-                />
-              ))}
-            </div>
-          )}
-        >
-          <MenuItem>
-            <Checkbox
-              // disabled
-              indeterminate={numSelectedRanks > 0 && numSelectedRanks < rowCount}
-              checked={numSelectedRanks === rowCount}
-              onChange={event =>
-                handleSelectAllClick(event, Object(data.Rank))
-              }
-              color="primary"
-            />
-            <ListItemText>Select All</ListItemText>
-          </MenuItem>
-          <Divider />
-        {data.Rank.slice()
-          .sort(getSorting(order, orderBy))
-          .map(n => {
-            return (
-              <MenuItem key={n.name} value={n.name}>
-                <Checkbox
-                  checked={selectedRanks.indexOf(n.name) !== -1}
-                  onChange={handleChange(n.name)}
-                  value={n.name}
-                  onClick={event =>
-                    handleClick(event, n.name)
-                  }
-                  color="primary"
-                />
-                <ListItemText>{n.name}</ListItemText>
-              </MenuItem>
-            );
-          })}
-        </Select>
-        {<FormHelperText>Select Ranks technique is required for</FormHelperText>}
-      </FormControl>
+    <FormControl required variant="outlined" className={classes.formControl}>
+      <InputLabel ref={inputLabel} id="demo-simple-select-outlined-label">
+        Rank
+      </InputLabel>
+      <Select
+        multiple
+        value={selectedRanks}
+        renderValue={selectedRanks => (
+          <div className={classes.chips}>
+            {selectedRanks.map(value => (
+              <Chip
+                key={value}
+                label={value}
+              />
+            ))}
+          </div>
+        )}
+      >
+        <MenuItem>
+          <Checkbox
+            // disabled
+            indeterminate={numSelectedRanks > 0 && numSelectedRanks < rowCount}
+            checked={numSelectedRanks === rowCount}
+            onChange={event =>
+              handleSelectAllClick(event, Object(data.Rank))
+            }
+            color="primary"
+          />
+          <ListItemText>Select All</ListItemText>
+        </MenuItem>
+        <Divider />
+      {data.Rank.slice()
+        .sort(getSorting(order, orderBy))
+        .map(n => {
+          return (
+            <MenuItem key={n.name} value={n.name}>
+              <Checkbox
+                checked={selectedRanks.indexOf(n.name) !== -1}
+                onChange={handleChange(n.name)}
+                value={n.name}
+                onClick={event =>
+                  handleClick(event, n.name)
+                }
+                color="primary"
+              />
+              <ListItemText>{n.name}</ListItemText>
+            </MenuItem>
+          );
+        })}
+      </Select>
+      {<FormHelperText>Select Ranks technique is required for</FormHelperText>}
+    </FormControl>
   );
 }
