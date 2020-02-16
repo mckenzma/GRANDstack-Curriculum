@@ -19,6 +19,7 @@ const useStyles = makeStyles(theme => ({
 const GET_RANKS = gql`
   {
     Rank {
+      _id
       name
       rankOrder
     }
@@ -29,6 +30,16 @@ const CREATE_RANK = gql`
   mutation CreateRank($name: String!, $rankOrder: Int!) 
   {
     CreateRank(name: $name, rankOrder: $rankOrder) {
+      name
+      rankOrder
+    }
+  }
+`;
+
+const UPDATE_RANK = gql`
+  mutation UpdateRank($name: String!, $rankOrder: Int!) 
+  {
+    UpdateRank(name: $name, rankOrder: $rankOrder) {
       name
       rankOrder
     }
@@ -52,11 +63,12 @@ export default function MaterialTableDemo() {
 
   const [state, setState] = React.useState({
     columns: [
+      // { title: 'Internal ID', field: '_id' },
       { title: 'Name', field: 'name',
         editComponent: props => (
           <TextField
             type="text"
-            // value={value}
+            // value={name} // TODO value needs to equal "" when creating, and the current item when updating
             onChange={e => setName(e.target.value)}
             // id="outlined-rank"
             // label="Rank"
@@ -78,7 +90,7 @@ export default function MaterialTableDemo() {
               shrink: true,
             }}
             onChange={e => setRankOrder(parseInt(e.target.value))}
-            variant="outlined"
+            // variant="outlined"
             helperText="Enter order of rank"
           />
         )
@@ -108,6 +120,8 @@ export default function MaterialTableDemo() {
 
   const [DeleteRank] = useMutation(DELETE_RANK);
 
+  const [UpdateRank] = useMutation(UPDATE_RANK);
+
   const { loading, error, data } = useQuery(GET_RANKS);
 
   if (loading) return "Loading...";
@@ -136,17 +150,49 @@ export default function MaterialTableDemo() {
                     });
                   }, 600);
                 }),
-              onRowUpdate: (newData, oldData) =>
+              onRowUpdate: (newData, oldData) => 
                 new Promise(resolve => {
+                  console.log("update");
                   setTimeout(() => {
                     resolve();
+                    console.log("oldData.name: " + oldData.name);
+                    console.log("newData.name: " + newData.name);
                     // if (oldData) {
-                    //   setState(prevState => {
-                    //     const data = [...prevState.data];
-                    //     data[data.indexOf(oldData)] = newData;
-                    //     return { ...prevState, data };
-                    //   });
+                    //   console.log(oldData);
+                    //   console.log(newData);
+                    //   // setState(prevState => {
+                    //   //   const data = [...prevState.data];
+                    //   //   data[data.indexOf(oldData)] = newData;
+                    //   //   return { ...prevState, data };
+                    //   // });
                     // }
+                      UpdateRank({
+                        variables: { 
+                          from: {name: oldData.name, rankOrder: oldData.rankOrder },
+                          to: {name: newData.name, rankOrder: newData.rankOrder}
+                        },
+                        update: (cache) => {
+                          console.log("Update");
+                          console.log(oldData);
+                          console.log(newData);
+                          const existingRanks = cache.readQuery({ query: GET_RANKS });
+                          const newRanks = existingRanks.Rank.map(r => {
+                            if (r.name === oldData.name) {
+                              console.log("if");
+                              console.log(r);
+                              return {...r, name: newData.name, rankOrder: newData.rankOrder};
+                            } else {
+                              console.log("else");
+                              console.log(r);
+                              return r;
+                            }
+                          });
+                          cache.writeQuery({
+                            query: GET_RANKS,
+                            data: { Rank: newRanks }
+                          })
+                        }
+                      });
                   }, 600);
                 }),
               onRowDelete: oldData =>
@@ -159,12 +205,10 @@ export default function MaterialTableDemo() {
                     //   return { ...prevState, data };
                     // });
                     DeleteRank({
+                      // TODO - update this to be like CreateRank. i.e. move this to function like CreateRank
                       variables: { name: oldData.name },
                       update: (cache) => {
-                        console.log("Delete");
-                        console.log(oldData);
                         const existingRanks = cache.readQuery({ query: GET_RANKS });
-                        console.log(existingRanks);
                         const newRanks = existingRanks.Rank.filter(r => (r.name !== oldData.name));
                         cache.writeQuery({
                           query: GET_RANKS,
