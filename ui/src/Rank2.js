@@ -26,10 +26,20 @@ const GET_RANKS = gql`
 `;
 
 const CREATE_RANK = gql`
-  mutation CreateRank($name: String!, $rankOrder: Int!) {
+  mutation CreateRank($name: String!, $rankOrder: Int!) 
+  {
     CreateRank(name: $name, rankOrder: $rankOrder) {
       name
       rankOrder
+    }
+  }
+`;
+
+const DELETE_RANK = gql`
+  mutation CreateRank($name: String!) 
+  {
+    DeleteRank(name: $name) {
+      name
     }
   }
 `;
@@ -96,7 +106,7 @@ export default function MaterialTableDemo() {
     }
   );
 
-  console.log(name);
+  const [DeleteRank] = useMutation(DELETE_RANK);
 
   const { loading, error, data } = useQuery(GET_RANKS);
 
@@ -148,6 +158,20 @@ export default function MaterialTableDemo() {
                     //   data.splice(data.indexOf(oldData), 1);
                     //   return { ...prevState, data };
                     // });
+                    DeleteRank({
+                      variables: { name: oldData.name },
+                      update: (cache) => {
+                        console.log("Delete");
+                        console.log(oldData);
+                        const existingRanks = cache.readQuery({ query: GET_RANKS });
+                        console.log(existingRanks);
+                        const newRanks = existingRanks.Rank.filter(r => (r.name !== oldData.name));
+                        cache.writeQuery({
+                          query: GET_RANKS,
+                          data: { Rank: newRanks }
+                        });
+                      }
+                    });
                   }, 600);
                 }),
             }}
