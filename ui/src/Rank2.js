@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
 const GET_RANKS = gql`
   {
     Rank {
-      _id
+      id
       name
       rankOrder
     }
@@ -30,6 +30,7 @@ const CREATE_RANK = gql`
   mutation CreateRank($name: String!, $rankOrder: Int!) 
   {
     CreateRank(name: $name, rankOrder: $rankOrder) {
+      id
       name
       rankOrder
     }
@@ -37,9 +38,10 @@ const CREATE_RANK = gql`
 `;
 
 const UPDATE_RANK = gql`
-  mutation UpdateRank($name: String!, $rankOrder: Int!) 
+  mutation UpdateRank($id: ID!, $name: String!, $rankOrder: Int!) 
   {
-    UpdateRank(name: $name, rankOrder: $rankOrder) {
+    UpdateRank(id: $id, name: $name, rankOrder: $rankOrder) {
+      id
       name
       rankOrder
     }
@@ -47,10 +49,10 @@ const UPDATE_RANK = gql`
 `;
 
 const DELETE_RANK = gql`
-  mutation CreateRank($name: String!) 
+  mutation CreateRank($id: ID!) 
   {
-    DeleteRank(name: $name) {
-      name
+    DeleteRank(id: $id) {
+      id
     }
   }
 `;
@@ -60,10 +62,11 @@ export default function MaterialTableDemo() {
 
   const [name, setName] = useState("");
   const [rankOrder, setRankOrder] = useState(0);
+  const [id, setId] = useState("");
 
   const [state, setState] = React.useState({
     columns: [
-      // { title: 'Internal ID', field: '_id' },
+      //{ title: 'ID', field: 'id' },
       { title: 'Name', field: 'name',
         editComponent: props => (
           <TextField
@@ -105,18 +108,20 @@ export default function MaterialTableDemo() {
     ],
   });
 
-  const [CreateRank] = useMutation(
-    CREATE_RANK,
-    {
-      update(cache, { data: { CreateRank } }) {
-        const { Rank } = cache.readQuery({ query: GET_RANKS });
-        cache.writeQuery({
-          query: GET_RANKS,
-          data: { Rank: Rank.concat([CreateRank]) },
-        })
-      }
-    }
-  );
+  const [CreateRank] = useMutation(CREATE_RANK);
+  // const [CreateRank] = useMutation(
+  //   CREATE_RANK,
+  //   {
+  //     update(cache, { data: { CreateRank } }) {
+  //     // update: (cache) => {
+  //       const { Rank } = cache.readQuery({ query: GET_RANKS });
+  //       cache.writeQuery({
+  //         query: GET_RANKS,
+  //         data: { Rank: Rank.concat([CreateRank]) },
+  //       })
+  //     }
+  //   }
+  // );
 
   const [DeleteRank] = useMutation(DELETE_RANK);
 
@@ -146,53 +151,72 @@ export default function MaterialTableDemo() {
                     //   return { ...prevState, data };
                     // });
                     CreateRank({
-                      variables: { name: name, rankOrder: rankOrder }
+                      variables: {
+                        name: name, 
+                        rankOrder: rankOrder 
+                      },
+                      update: (cache, { data: { CreateRank } }) => {
+                        const { Rank } = cache.readQuery({ query: GET_RANKS });
+                        // const existingRanks = cache.readQuery({ query: GET_RANKS });
+                        // console.log(existingRanks.Rank);
+                        // const newRanks = existingRanks.Rank.concat([CreateRank]);
+                        // console.log(newRanks);
+                        cache.writeQuery({
+                          query: GET_RANKS,
+                          data: { Rank: Rank.concat([CreateRank]) },
+                          // data: { Rank: Rank },
+                          // data: { Rank: Rank.push([CreateRank]) },
+                          // data: { Rank: newRanks }
+                        })
+                      }
                     });
                   }, 600);
                 }),
               onRowUpdate: (newData, oldData) => 
                 new Promise(resolve => {
-                  console.log("update");
                   setTimeout(() => {
                     resolve();
-                    console.log("oldData.name: " + oldData.name);
-                    console.log("newData.name: " + newData.name);
                     // if (oldData) {
-                    //   console.log(oldData);
-                    //   console.log(newData);
                     //   // setState(prevState => {
                     //   //   const data = [...prevState.data];
                     //   //   data[data.indexOf(oldData)] = newData;
                     //   //   return { ...prevState, data };
                     //   // });
-                    // }
                       UpdateRank({
                         variables: { 
-                          from: {name: oldData.name, rankOrder: oldData.rankOrder },
-                          to: {name: newData.name, rankOrder: newData.rankOrder}
+                          id: oldData.id,
+                          // name: newData.name, 
+                          name: name, 
+                          // rankOrder: newData.rankOrder
+                          rankOrder: rankOrder
                         },
                         update: (cache) => {
-                          console.log("Update");
-                          console.log(oldData);
-                          console.log(newData);
+                          // console.log("Update");
+                          // console.log(oldData);
+                          // console.log(newData);
                           const existingRanks = cache.readQuery({ query: GET_RANKS });
+                          console.log(existingRanks);
                           const newRanks = existingRanks.Rank.map(r => {
-                            if (r.name === oldData.name) {
-                              console.log("if");
-                              console.log(r);
-                              return {...r, name: newData.name, rankOrder: newData.rankOrder};
+                            // if (r.id === oldData.id) {
+                            if (r.id === oldData.id) {
+                              // console.log("if");
+                              // console.log(r);
+                              // return {...r, name: newData.name, rankOrder: newData.rankOrder};
+                              return {...r, name: name, rankOrder: rankOrder};
                             } else {
-                              console.log("else");
-                              console.log(r);
+                              // console.log("else");
+                              // console.log(r);
                               return r;
                             }
                           });
+                          console.log(newRanks);
                           cache.writeQuery({
                             query: GET_RANKS,
                             data: { Rank: newRanks }
                           })
                         }
                       });
+                    // }
                   }, 600);
                 }),
               onRowDelete: oldData =>
@@ -206,10 +230,13 @@ export default function MaterialTableDemo() {
                     // });
                     DeleteRank({
                       // TODO - update this to be like CreateRank. i.e. move this to function like CreateRank
-                      variables: { name: oldData.name },
+                      // variables: { name: oldData.name },
+                      variables: { id: oldData.id },
+                      // variables: { name: oldData.name, rankOrder: oldData.rankOrder },
                       update: (cache) => {
                         const existingRanks = cache.readQuery({ query: GET_RANKS });
-                        const newRanks = existingRanks.Rank.filter(r => (r.name !== oldData.name));
+                        // const newRanks = existingRanks.Rank.filter(r => (r.name !== oldData.name));
+                        const newRanks = existingRanks.Rank.filter(r => (r.id !== oldData.id));
                         cache.writeQuery({
                           query: GET_RANKS,
                           data: { Rank: newRanks }
@@ -221,7 +248,14 @@ export default function MaterialTableDemo() {
             }}
             // actions={[
             //   {
-
+            //     icon: 'save',
+            //     tooltip: 'Save User',
+            //     onClick: (event, rowData) => alert("You saved " + rowData.name)
+            //   },
+            //   {
+            //     icon: 'delete',
+            //     tooltip: 'Delete User',
+            //     onClick: (event, rowData) => alert("You want to delete " + rowData.name)
             //   }
             // ]}
           />

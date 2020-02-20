@@ -100,37 +100,29 @@ export default function TabsWrappedLabel() {
         <RankSelect />
       </TabPanel>
       <TabPanel value={value} index="two">
-        {/*Rank*/}
         {/*<Rank />*/}
         <MaterialTableDemo />
         {/*<CreateRank />*/}
       </TabPanel>
       <TabPanel value={value} index="three">
-        {/*Strike*/}
         <Strike />
       </TabPanel>
       <TabPanel value={value} index="four">
-        {/*Block*/}
         <Block />
       </TabPanel>
       <TabPanel value={value} index="five">
-        {/*Kick*/}
         <Kick />
       </TabPanel>
       <TabPanel value={value} index="six">
-        {/*Stance*/}
         <Stance />
       </TabPanel>
       <TabPanel value={value} index="seven">
-        {/*Movement*/}
         <Movement />
       </TabPanel>
       <TabPanel value={value} index="eight">
-        {/*Turn*/}
         <Turn />
       </TabPanel>
       <TabPanel value={value} index="nine">
-        {/*Kata*/}
         <Kata />
       </TabPanel>
     </div>
