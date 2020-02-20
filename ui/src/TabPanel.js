@@ -13,9 +13,9 @@ import Box from "@material-ui/core/Box";
 // import CompetitorList from "./CompetitorList";
 // import Summary from "./Summary";
 
-import Rank from "./Rank";
+// import Rank from "./Rank";
 // import CreateRank from "./CreateRank";
-import MaterialTableDemo from "./Rank2";
+import Rank from "./Rank2";
 
 import Strike from "./Strike";
 import Block from "./Block";
@@ -101,7 +101,7 @@ export default function TabsWrappedLabel() {
       </TabPanel>
       <TabPanel value={value} index="two">
         {/*<Rank />*/}
-        <MaterialTableDemo />
+        <Rank />
         {/*<CreateRank />*/}
       </TabPanel>
       <TabPanel value={value} index="three">
