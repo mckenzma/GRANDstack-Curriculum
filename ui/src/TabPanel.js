@@ -17,13 +17,14 @@ import Box from "@material-ui/core/Box";
 // import CreateRank from "./CreateRank";
 import Rank from "./Rank2";
 
-import Strike from "./Strike";
-import Block from "./Block";
-import Kick from "./Kick";
-import Stance from "./Stance";
-import Movement from "./Movement";
-import Turn from "./Turn";
-import Kata from "./Kata";
+// import Strike from "./Strike";
+import Strike from "./Strike2";
+// import Block from "./Block";
+// import Kick from "./Kick";
+// import Stance from "./Stance";
+// import Movement from "./Movement";
+// import Turn from "./Turn";
+// import Kata from "./Kata";
 
 import RankSelect from "./RankSelect";
 
@@ -108,22 +109,22 @@ export default function TabsWrappedLabel() {
         <Strike />
       </TabPanel>
       <TabPanel value={value} index="four">
-        <Block />
+        {/*<Block />*/}
       </TabPanel>
       <TabPanel value={value} index="five">
-        <Kick />
+        {/*<Kick />*/}
       </TabPanel>
       <TabPanel value={value} index="six">
-        <Stance />
+        {/*<Stance />*/}
       </TabPanel>
       <TabPanel value={value} index="seven">
-        <Movement />
+        {/*<Movement />*/}
       </TabPanel>
       <TabPanel value={value} index="eight">
-        <Turn />
+        {/*<Turn />*/}
       </TabPanel>
       <TabPanel value={value} index="nine">
-        <Kata />
+        {/*<Kata />*/}
       </TabPanel>
     </div>
   );
