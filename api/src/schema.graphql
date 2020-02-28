@@ -9,10 +9,12 @@ type Rank {
 }
 
 type Strike {
-  # name: ID!
+  id: ID!
   name: String!
+  description: String!
+
   steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
-  rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
+  ranks: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
 } 
 
 type StepDescription {
@@ -69,13 +71,29 @@ type Kata {
   # rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
 }
 
+type Mutation {
+  MergeStrikeRank(fromStrikeID: ID!, toRankID: ID!): Rank @cypher(
+    statement:
+    """
+    MATCH (strike:Strike {id: $fromStrikeID})
+    MATCH (rank:Rank {id: $toRankID})
+    MERGE (strike)-[:REQUIRED_FOR]->(rank)
+    RETURN rank
+    """
+  )
+
+  MergeStrikeRanks(fromStrikeID: ID!, toRankIDs: [ID!]): [Rank] @cypher(
+    statement:
+    """
+    MATCH (strike: Strike {id: $fromStrikeID})
+    UNWIND $toRankIDs AS toRankID
+    MATCH (rank:Rank {id: toRankID})
+    MERGE (strike)-[:REQUIRED_FOR]->(rank)
+    RETURN rank
+    """
+  )
+}
+
 # type Query {
-  
-#   connectStrikeToRank(ranks: [String]): @cypher(statement: """
-#     MERGE (this)
-#     UNWIND $ranks AS rank
-#     MERGE (this)-[:REQUIRED_FOR]->(rank)
-#     """
-#   )
 
 # }

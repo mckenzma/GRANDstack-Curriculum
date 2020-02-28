@@ -1,11 +1,11 @@
-import React, { Component, useState } from "react";
+import React, { /*Component,*/ useState } from "react";
 import "./App.css";
 import clsx from "clsx";
 
 // import React from 'react';
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 // import classNames from "classnames";
-import { withStyles } from "@material-ui/core/styles";
+// import { withStyles } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
@@ -168,12 +168,12 @@ export default function App() {
     setOpen(false);
   };
 
-  const handleChangeAnchor = event => {
-    // this.setState({
-    //   anchor: event.target.value
-    // });
-    setAnchor(event.target.value);
-  };
+  // const handleChangeAnchor = event => {
+  //   // this.setState({
+  //   //   anchor: event.target.value
+  //   // });
+  //   setAnchor(event.target.value);
+  // };
 
   // render() {
     // const { classes, theme } = this.props;
