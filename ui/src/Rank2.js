@@ -50,7 +50,7 @@ const UPDATE_RANK = gql`
 `;
 
 const DELETE_RANK = gql`
-  mutation CreateRank($id: ID!) 
+  mutation DeleteRank($id: ID!) 
   {
     DeleteRank(id: $id) {
       id
@@ -61,9 +61,8 @@ const DELETE_RANK = gql`
 export default function Rank() {
   const classes = useStyles();
 
-  const [name, setName] = useState("");
+  // const [name, setName] = useState("");
   const [rankOrder, setRankOrder] = useState(0);
-  const [id, setId] = useState("");
 
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("rankOrder");
@@ -71,7 +70,7 @@ export default function Rank() {
   const [state, setState] = React.useState({
     columns: [
       { title: 'Order', field: 'rankOrder', 
-        editComponent: rankOrder => (
+        editComponent: props => (
           <TextField
             id="outlined-number"
             label="Number"
@@ -85,21 +84,21 @@ export default function Rank() {
           />
         )
       },
-      { title: 'Name', field: 'name',
-        editComponent: props => (
-          <TextField
-            type="text"
-            // value={name} // TODO value needs to equal "" when creating, and the current item when updating
-            onChange={e => setName(e.target.value)}
-            // id="outlined-rank"
-            // label="Rank"
-            // className={classes.textField}
-            // onChange={e => setName(e.target.value)}
-            // margin="normal"
-            // variant="outlined"
-            // helperText="Enter rank name"
-          />
-        )
+      { title: 'Name', field: 'name'//,
+        // editComponent: props => (
+        //   <TextField
+        //     type="text"
+        //     // value={name} // TODO value needs to equal "" when creating, and the current item when updating
+        //     onChange={e => setName(e.target.value)}
+        //     // id="outlined-rank"
+        //     // label="Rank"
+        //     // className={classes.textField}
+        //     // onChange={e => setName(e.target.value)}
+        //     // margin="normal"
+        //     // variant="outlined"
+        //     // helperText="Enter rank name"
+        //   />
+        // )
       },
       // { title: 'Birth Year', field: 'birthYear', type: 'numeric' },
       // {
@@ -150,12 +149,14 @@ export default function Rank() {
             editable={{
               onRowAdd: newData =>
                 new Promise(resolve => {
-                  setTimeout(() => {
+                  setTimeout(() => { 
                     resolve();
                     CreateRank({
                       variables: {
-                        name: name, 
+                        // name: name, 
+                        name: newData.name,
                         rankOrder: rankOrder 
+                        // rankOrder: newData.rankOrder
                       },
                       update: (cache, { data: { CreateRank } }) => {
                         const { Rank } = cache.readQuery({ query: GET_RANKS });
@@ -173,25 +174,27 @@ export default function Rank() {
                     resolve();
                     UpdateRank({
                       variables: { 
-                        id: oldData.id,
-                        name: name, 
+                        // id: oldData.id,
+                        id: newData.id,
+                        // name: name, 
+                        name: newData.name, 
                         rankOrder: rankOrder
+                        // rankOrder: newData.rankOrder
                       },
                       update: (cache) => {
                         const existingRanks = cache.readQuery({ query: GET_RANKS });
-                        console.log(existingRanks);
                         const newRanks = existingRanks.Rank.map(r => {
                           if (r.id === oldData.id) {
                             return {
                               ...r, 
-                              name: name, 
+                              // name: name, 
+                              name: newData.name, 
                               rankOrder: rankOrder
                             };
                           } else {
                             return r;
                           }
                         });
-                        console.log(newRanks);
                         cache.writeQuery({
                           query: GET_RANKS,
                           data: { Rank: newRanks }
