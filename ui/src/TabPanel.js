@@ -26,7 +26,9 @@ import Strike from "./Strike2";
 // import Turn from "./Turn";
 // import Kata from "./Kata";
 
-import RankSelect from "./RankSelect";
+import Testing from "./Testing";
+
+// import RankSelect from "./RankSelect";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -98,7 +100,8 @@ export default function TabsWrappedLabel() {
       </AppBar>
       <TabPanel value={value} index="one">
         {/*Testing*/}
-        <RankSelect />
+        {/*<RankSelect />*/}
+        <Testing />
       </TabPanel>
       <TabPanel value={value} index="two">
         {/*<Rank />*/}
