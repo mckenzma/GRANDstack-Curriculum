@@ -8,6 +8,8 @@ import Paper from "@material-ui/core/Paper";
 
 import TextField from "@material-ui/core/TextField";
 
+import RankListFilter from './RankListFilter';
+
 const useStyles = makeStyles(theme => ({
   root: {
     maxWidth: "auto",
@@ -99,61 +101,32 @@ const MERGE_STRIKE_RANKS_RELS = gql`
 export default function Strike() {
   const classes = useStyles();
 
-  const [name, setName] = useState("");
+  // const [name, setName] = useState("");
   const [description, setDescription] = useState("0");
   const [ranks, setRanks] = useState("");
 
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("name");
 
+  const [selectedRanks, setSelectedRanks] = useState([]);
+
+  const [ranksToSelect, setRanksToSelect] = useState({ 0: 'rank1', 1: 'rank2' });
+
   const [state, setState] = React.useState({
     columns: [
-      { title: 'Name', field: 'name'//, 
-        // editComponent: props => (
-        //   <TextField
-        //     type="text"
-        //     // value={name} // TODO value needs to equal "" when creating, and the current item when updating
-        //     onChange={e => setName(e.target.value)}
-        //     // id="outlined-rank"
-        //     // label="Rank"
-        //     // className={classes.textField}
-        //     // onChange={e => setName(e.target.value)}
-        //     // margin="normal"
-        //     // variant="outlined"
-        //     // helperText="Enter rank name"
-        //   />
-        // )
+      { title: 'Name', field: 'name' },
+      { title: 'Description', field: 'description' },
+      { title: 'Ranks', field: 'ranksString',
+        editComponent: props => (
+         <RankListFilter selectedRanks={selectedRanks} setSelectedRanks={setSelectedRanks} /> 
+        )
       },
-      { title: 'Description', field: 'description'//,
-        // editComponent: props => (
-        //   <TextField
-        //     type="text"
-        //     // value={name} // TODO value needs to equal "" when creating, and the current item when updating
-        //     onChange={e => setDescription(e.target.value)}
-        //     // id="outlined-rank"
-        //     // label="Rank"
-        //     // className={classes.textField}
-        //     // onChange={e => setName(e.target.value)}
-        //     // margin="normal"
-        //     // variant="outlined"
-        //     // helperText="Enter rank name"
-        //   />
-        // )
+      {
+        title: 'Birth Place',
+        field: 'birthCity',
+        // lookup: { 34: 'İstanbul', 63: 'Şanlıurfa' },
+        lookup: ranksToSelect,
       },
-      // { title: 'Ranks', field: 'ranks.name'//, type: 'string'//,
-      { title: 'Ranks', field: 'ranksString'//, type: 'string'//,
-        // editComponent: props => (
-        //   <TextField
-        //     type="text"
-        //     onChange={e => setRanks(e.target.value)}
-        //   />
-        // )
-      },
-      // {
-      //   title: 'Birth Place',
-      //   field: 'birthCity',
-      //   lookup: { 34: 'İstanbul', 63: 'Şanlıurfa' },
-      // },
     ],
   });
 
@@ -190,6 +163,7 @@ export default function Strike() {
   return (
     <Paper className={classes.root} elevation={3}>
       <Grid container>
+    {/*<RankListFilter selectedRanks={selectedRanks} setSelectedRanks={setSelectedRanks} /> */}
         <Grid item xs={12}>
           <MaterialTable
             title="Strike"
@@ -209,9 +183,7 @@ export default function Strike() {
                     resolve();
                     CreateStrike({
                       variables: {
-                        // name: name, 
                         name: newData.name,
-                        // description: description 
                         description: newData.description
                       },
                       update: (cache, { data: { CreateStrike } }) => {
@@ -243,8 +215,8 @@ export default function Strike() {
                           if (r.id === oldData.id) {
                             return {
                               ...r, 
-                              name: name, 
-                              description: description
+                              name: newData.name, 
+                              description: newData.description
                             };
                           } else {
                             return r;

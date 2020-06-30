@@ -21,13 +21,14 @@ const useStyles = makeStyles(theme => ({
 const GET_RANKS = gql`
   {
     Rank {
+      id
       name
       rankOrder
     }
   }
 `;
 
-export default function RankSelect() {
+export default function RankSelect({ rankID, setRankID }) {
   const classes = useStyles();
 
   const [order, setOrder] = useState("asc");
@@ -36,7 +37,7 @@ export default function RankSelect() {
   const inputLabel = React.useRef(null);
   const [labelWidth, setLabelWidth] = React.useState(0);
 
-  const [rank, setRank] = useState("");
+  // const [rank, setRank] = useState("");
 
   const getSorting = (order, orderBy) => {
   return order === "desc"
@@ -58,8 +59,8 @@ export default function RankSelect() {
         <Select
           labelId="demo-simple-select-outlined-label"
           id="demo-simple-select-outlined"
-          value={rank}
-          onChange={e => setRank(e.target.value)}
+          value={rankID}
+          onChange={e => setRankID(e.target.value)}
           labelWidth={labelWidth}
         >
         {/*<MenuItem value="">
@@ -69,7 +70,7 @@ export default function RankSelect() {
           .sort(getSorting(order, orderBy))
           .map(n => {
             return (
-              <MenuItem key={n.name} value={n.name}>{n.name}</MenuItem>
+              <MenuItem key={n.id} value={n.id}>{n.name}</MenuItem>
             );
           })}
         </Select>
