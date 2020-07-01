@@ -7,6 +7,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
+import Divider from '@material-ui/core/Divider';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -51,7 +52,7 @@ export default function RankSelect({ rankID, setRankID }) {
   if (error) return `Error ${error.message}`;
 
   return (
-    <div>
+    // <div>
       <FormControl required variant="outlined" className={classes.formControl}>
         <InputLabel ref={inputLabel} id="demo-simple-select-outlined-label">
           Rank
@@ -63,9 +64,10 @@ export default function RankSelect({ rankID, setRankID }) {
           onChange={e => setRankID(e.target.value)}
           labelWidth={labelWidth}
         >
-        {/*<MenuItem value="">
-            <em>None</em>
-          </MenuItem>*/}
+        <MenuItem value="select">
+          Select Rank
+        </MenuItem>
+        <Divider />
         {data.Rank
           .sort(getSorting(order, orderBy))
           .map(n => {
@@ -77,7 +79,7 @@ export default function RankSelect({ rankID, setRankID }) {
         {/*<FormHelperText>Required</FormHelperText>*/}
       </FormControl>
 
-      {/* Need to set rankGroup based on rank */}
-    </div>
+      //{/* Need to set rankGroup based on rank */}
+    // </div>
   );
 }

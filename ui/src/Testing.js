@@ -17,8 +17,15 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const GET_TESTING_REQUIREMENTS = gql`
+	query rankQuery(
+		$rankID: ID!
+	)
 	{
-    Rank {
+    Rank(
+      filter: {
+        id: $rankID
+      }
+    ) {
       name
       rankOrder
       strikes {
@@ -66,10 +73,16 @@ export default function Testing({headerHeight}) {
 	      //(tabHeaderRef.current ? tabHeaderRef.current.offsetHeight : 0)
 	  };
 
-	const { loading, error, data } = useQuery(GET_TESTING_REQUIREMENTS)
+	const { loading, error, data } = useQuery(GET_TESTING_REQUIREMENTS, {
+    variables: {
+      rankID
+    }
+  });
 
 	if (loading) return "Loading...";
 	if (error) return `Error ${error.message}`;
+
+	console.log(data);
 
 	return (
 		<div style={style} /*className={classes.root}*/>
@@ -77,18 +90,29 @@ export default function Testing({headerHeight}) {
 				<Grid item sm={12}>
 					<RankSelect rankID={rankID} setRankID={setRankID} />
 				</Grid>
+			</Grid>
 				
-				{/*{data.Rank.map(r => {
-					return (*/}
+				{data.Rank.map(r => {
+					return (
+
+			<Grid container spacing={3}>
+
+				{r.strikes.length > 0 && 
+					<Grid item sm={12}>
+						<Paper elevation={2}>
+							Strikes
+							{r.strikes.map(s => {
+								return (
+									<p>{s.name}</p>
+								);
+							})}
+						</Paper>
+					</Grid>
+				}
+
 
 				<Grid item sm={12}>
-					<Paper elevation={2}>
-						Strikes
-					</Paper>
-				</Grid>
-
-				<Grid item sm={12}>
-				 <Paper elevation={2}>
+				 	<Paper elevation={2}>
 						Blocks
 					</Paper>
 				</Grid>
@@ -123,10 +147,12 @@ export default function Testing({headerHeight}) {
 					</Paper>
 				</Grid>
 
-				{/*});
-				})}*/}
-
 			</Grid>
+
+				);
+				})}
+
+			{/*</Grid>*/}
 
 		</div>
 	);

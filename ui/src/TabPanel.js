@@ -99,7 +99,7 @@ export default function TabsWrappedLabel({headerHeight}) {
 
   return (
     <div style={style} className={classes.root} ref={tabHeaderRef}>
-      <AppBar /*position="static"*/ style={style2}>
+      <AppBar position="absolute" style={style2}>
         <Tabs
           value={value}
           onChange={handleChange}
