@@ -4,6 +4,14 @@ import gql from "graphql-tag";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
+import Typography from '@material-ui/core/Typography';
+
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+// import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+// import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import ListItemText from '@material-ui/core/ListItemText';
 
 import RankSelect from "./RankSelect";
 
@@ -98,14 +106,19 @@ export default function Testing({headerHeight}) {
 				{r.strikes.length > 0 && 
 					<Grid item sm={12}>
 						<Paper elevation={2}>
-							<h3>Strikes</h3>
+							<Typography variant="h3">Strikes</Typography>
+							<List>
 							{r.strikes.map(s => {
 								return (
-									<div>
-										<p><b>{s.name}:</b> {s.description}</p>
-									</div>
+									<ListItem>
+										<ListItemText
+											primary={s.name}
+											secondary={s.description}
+										/>
+									</ListItem>
 								);
 							})}
+							</List>
 						</Paper>
 					</Grid>
 				}
