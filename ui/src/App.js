@@ -1,4 +1,4 @@
-import React, { /*Component,*/ useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./App.css";
 import clsx from "clsx";
 
@@ -241,7 +241,14 @@ export default function App() {
       after = drawer;
     }
 
-
+    const [headerHeight, setHeaderHeight] = useState(0);
+    const headerRef = useRef(null);
+    useEffect(() => {
+      if (headerRef) {
+        setHeaderHeight(headerRef.current.offsetHeight);
+      }
+      // window.temp = headerRef.current;
+    });
 
 
     return (
@@ -266,6 +273,7 @@ export default function App() {
         </TextField>*/}
           <div className={classes.appFrame}>
             <AppBar
+              ref={headerRef}
               // className={classNames(classes.appBar, {
               className={clsx(classes.appBar, {
                 [classes.appBarShift]: open,
@@ -301,10 +309,10 @@ export default function App() {
                 })
               }
             >
-              <div className={classes.drawerHeader} />
+              {/*<div className={classes.drawerHeader} />*/}
 
 
-              <TabPanel />
+              <TabPanel headerHeight={headerHeight}/>
 
             </main>
             {after}

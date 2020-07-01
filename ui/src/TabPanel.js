@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
@@ -34,7 +34,7 @@ function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
   return (
-    <Typography
+    /*<Typography
       component="div"
       role="tabpanel"
       hidden={value !== index}
@@ -43,7 +43,20 @@ function TabPanel(props) {
       {...other}
     >
       <Box p={9}>{children}</Box>
-    </Typography>
+    </Typography>*/
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`scrollable-force-tabpanel-${index}`}
+      aria-labelledby={`scrollable-force-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box p={3}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
   );
 }
 
@@ -55,8 +68,8 @@ TabPanel.propTypes = {
 
 function a11yProps(index) {
   return {
-    id: `wrapped-tab-${index}`,
-    "aria-controls": `wrapped-tabpanel-${index}`
+    id: `scrollable-force-tab-${index}`,
+    "aria-controls": `scrollable-force-tabpanel-${index}`
   };
 }
 
@@ -68,65 +81,75 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function TabsWrappedLabel() {
+export default function TabsWrappedLabel({headerHeight}) {
   const classes = useStyles();
-  const [value, setValue] = React.useState("one");
+  const [value, setValue] = React.useState(0);
+
+  const tabHeaderRef = useRef(null);
+  const style = { top: headerHeight };
+  const style2 = {
+    marginTop:
+      headerHeight// +
+      //(tabHeaderRef.current ? tabHeaderRef.current.offsetHeight : 0)
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
   return (
-    <div className={classes.root}>
-      <AppBar position="static">
+    <div style={style} className={classes.root} ref={tabHeaderRef}>
+      <AppBar /*position="static"*/ style={style2}>
         <Tabs
           value={value}
           onChange={handleChange}
-          aria-label="wrapped label tabs example"
-          centered
-          // variant="scrollable"
+          // aria-label="wrapped label tabs example"
+          aria-label="scrollable force tabs example"
+          // centered
+          scrollButtons="on"
+          variant="scrollable"
           // scrollButtons="on"
         >
-          <Tab value="one" label="Testing" wrapped {...a11yProps("one")} />
-          <Tab value="two" label="Rank" wrapped {...a11yProps("two")} />
-          <Tab value="three" label="Strike" {...a11yProps("three")} />
-          <Tab value="four" label="Block" {...a11yProps("four")} />
-          <Tab value="five" label="Kick" {...a11yProps("five")} />
-          <Tab value="six" label="Stance" {...a11yProps("six")} />
-          <Tab value="seven" label="Movement" {...a11yProps("seven")} />
-          <Tab value="eight" label="Turn" {...a11yProps("eight")} />
-          <Tab value="nine" label="Kata" {...a11yProps("nine")} />
+          <Tab /*value="one"*/ label="Testing" {...a11yProps(0)} />
+          <Tab /*value="two"*/ label="Rank" {...a11yProps(1)} />
+          <Tab /*value="three"*/ label="Strike" {...a11yProps(2)} />
+          <Tab /*value="four"*/ label="Block" {...a11yProps(3)} />
+          <Tab /*value="five"*/ label="Kick" {...a11yProps(4)} />
+          <Tab /*value="six"*/ label="Stance" {...a11yProps(5)} />
+          <Tab /*value="seven"*/ label="Movement" {...a11yProps(6)} />
+          <Tab /*value="eight"*/ label="Turn" {...a11yProps(7)} />
+          <Tab /*value="nine"*/ label="Kata" {...a11yProps(8)} />
         </Tabs>
       </AppBar>
-      <TabPanel value={value} index="one">
+      <TabPanel value={value} index={0}>
         {/*Testing*/}
         {/*<RankSelect />*/}
         <Testing />
       </TabPanel>
-      <TabPanel value={value} index="two">
+      <TabPanel value={value} index={1}>
         {/*<Rank />*/}
         <Rank />
         {/*<CreateRank />*/}
       </TabPanel>
-      <TabPanel value={value} index="three">
+      <TabPanel value={value} index={2}>
         <Strike />
       </TabPanel>
-      <TabPanel value={value} index="four">
+      <TabPanel value={value} index={3}>
         {/*<Block />*/}
       </TabPanel>
-      <TabPanel value={value} index="five">
+      <TabPanel value={value} index={4}>
         {/*<Kick />*/}
       </TabPanel>
-      <TabPanel value={value} index="six">
+      <TabPanel value={value} index={5}>
         {/*<Stance />*/}
       </TabPanel>
-      <TabPanel value={value} index="seven">
+      <TabPanel value={value} index={6}>
         {/*<Movement />*/}
       </TabPanel>
-      <TabPanel value={value} index="eight">
+      <TabPanel value={value} index={7}>
         {/*<Turn />*/}
       </TabPanel>
-      <TabPanel value={value} index="nine">
+      <TabPanel value={value} index={8}>
         {/*<Kata />*/}
       </TabPanel>
     </div>
