@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { makeStyles } from "@material-ui/core/styles";
@@ -58,7 +58,7 @@ const DELETE_RANK = gql`
   }
 `;
 
-export default function Rank() {
+export default function Rank({headerHeight}) {
   const classes = useStyles();
 
   // const [name, setName] = useState("");
@@ -133,14 +133,22 @@ export default function Rank() {
 
   const [DeleteRank] = useMutation(DELETE_RANK);
 
+  const tabHeaderRef = useRef(null);
+  const style = { top: headerHeight };
+  const style2 = {
+    marginTop:
+      headerHeight// +
+      //(tabHeaderRef.current ? tabHeaderRef.current.offsetHeight : 0)
+  };
+
   const { loading, error, data } = useQuery(GET_RANKS);
 
   if (loading) return "Loading...";
   if (error) return `Error ${error.message}`;
 
   return (
-    <Paper className={classes.root} elevation={3}>
-      <Grid container>
+    <Paper style={style2} className={classes.root} elevation={3}>
+      <Grid container /*style={style2}*/>
         <Grid item xs={12}>
           <MaterialTable
             title="Rank"

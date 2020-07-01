@@ -124,15 +124,15 @@ export default function TabsWrappedLabel({headerHeight}) {
       <TabPanel value={value} index={0}>
         {/*Testing*/}
         {/*<RankSelect />*/}
-        <Testing />
+        <Testing headerHeight={headerHeight}/>
       </TabPanel>
       <TabPanel value={value} index={1}>
         {/*<Rank />*/}
-        <Rank />
+        <Rank headerHeight={headerHeight}/>
         {/*<CreateRank />*/}
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <Strike />
+        <Strike headerHeight={headerHeight}/>
       </TabPanel>
       <TabPanel value={value} index={3}>
         {/*<Block />*/}

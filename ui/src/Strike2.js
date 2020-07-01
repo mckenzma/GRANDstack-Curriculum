@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { makeStyles } from "@material-ui/core/styles";
@@ -98,7 +98,7 @@ const MERGE_STRIKE_RANKS_RELS = gql`
   }
 `;
 
-export default function Strike() {
+export default function Strike({headerHeight}) {
   const classes = useStyles();
 
   // const [name, setName] = useState("");
@@ -129,6 +129,14 @@ export default function Strike() {
       },
     ],
   });
+
+  const tabHeaderRef = useRef(null);
+  const style = { top: headerHeight };
+  const style2 = {
+    marginTop:
+      headerHeight// +
+      //(tabHeaderRef.current ? tabHeaderRef.current.offsetHeight : 0)
+  };
 
   const handleSortRequest = property => {
     const newOrderBy = property;
@@ -161,7 +169,7 @@ export default function Strike() {
   if (error) return `Error ${error.message}`;
 
   return (
-    <Paper className={classes.root} elevation={3}>
+    <Paper className={classes.root} elevation={3} style={style2}>
       <Grid container>
     {/*<RankListFilter selectedRanks={selectedRanks} setSelectedRanks={setSelectedRanks} /> */}
         <Grid item xs={12}>
