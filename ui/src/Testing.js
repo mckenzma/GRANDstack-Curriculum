@@ -82,8 +82,6 @@ export default function Testing({headerHeight}) {
 	if (loading) return "Loading...";
 	if (error) return `Error ${error.message}`;
 
-	console.log(data);
-
 	return (
 		<div style={style} /*className={classes.root}*/>
 			<Grid style={style2} container spacing={3}>
@@ -100,8 +98,49 @@ export default function Testing({headerHeight}) {
 				{r.strikes.length > 0 && 
 					<Grid item sm={12}>
 						<Paper elevation={2}>
-							Strikes
+							<h3>Strikes</h3>
 							{r.strikes.map(s => {
+								return (
+									<div>
+										<p><b>{s.name}:</b> {s.description}</p>
+									</div>
+								);
+							})}
+						</Paper>
+					</Grid>
+				}
+
+				{r.blocks.length > 0 && 
+					<Grid item sm={12}>
+					 	<Paper elevation={2}>
+							<h3>Blocks</h3>
+							{r.blocks.map(b => {
+								return (
+									<p>{b.name}</p>
+								);
+							})}
+						</Paper>
+					</Grid>
+				}
+
+				{r.kicks.length > 0 && 
+					<Grid item sm={12}>
+						<Paper elevation={2}>
+							<h3>Kicks</h3>
+							{r.kicks.map(k => {
+								return (
+									<p>{k.name}</p>
+								);
+							})}
+						</Paper>
+					</Grid>
+				}
+
+				{r.stances.length > 0 && 
+					<Grid item sm={12}>
+						<Paper elevation={2}>
+							<h3>Stances</h3>
+							{r.stances.map(s => {
 								return (
 									<p>{s.name}</p>
 								);
@@ -110,42 +149,44 @@ export default function Testing({headerHeight}) {
 					</Grid>
 				}
 
+				{r.movements.length > 0 && 
+					<Grid item sm={12}>
+						<Paper elevation={2}>
+							<h3>Movements</h3>
+							{r.movements.map(m => {
+								return (
+									<p>{m.name}</p>
+								);
+							})}
+						</Paper>
+					</Grid>
+				}
 
-				<Grid item sm={12}>
-				 	<Paper elevation={2}>
-						Blocks
-					</Paper>
-				</Grid>
+				{r.turns.length > 0 && 
+					<Grid item sm={12}>
+						<Paper elevation={2}>
+							<h3>Turns</h3>
+							{r.turns.map(t => {
+								return (
+									<p>{t.name}</p>
+								);
+							})}
+						</Paper>
+					</Grid>
+				}
 
-				<Grid item sm={12}>
-					<Paper elevation={2}>
-						Kicks
-					</Paper>
-				</Grid>
-
-				<Grid item sm={12}>
-					<Paper elevation={2}>
-						Stances
-					</Paper>
-				</Grid>
-
-				<Grid item sm={12}>
-					<Paper elevation={2}>
-						Movements
-					</Paper>
-				</Grid>
-
-				<Grid item sm={12}>
-					<Paper elevation={2}>
-						Turns
-					</Paper>
-				</Grid>
-
-				<Grid item sm={12}>
-					<Paper elevation={2}>
-						Katas
-					</Paper>
-				</Grid>
+				{r.katas.length > 0 && 
+					<Grid item sm={12}>
+						<Paper elevation={2}>
+							<h3>Katas</h3>
+							{r.katas.map(k => {
+								return (
+									<p>{k.name}</p>
+								);
+							})}
+						</Paper>
+					</Grid>
+				}
 
 			</Grid>
 
