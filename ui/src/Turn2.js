@@ -45,7 +45,7 @@ const GET_TURNS = gql`
 `;
 
 const CREATE_TURN = gql`
-  mutation CreateTurn($name: String!, $description: String!) 
+  mutation CreateTurn($name: String!, $description: String) 
   {
     CreateTurn(name: $name, description: $description) {
       id
@@ -61,7 +61,7 @@ const CREATE_TURN = gql`
 `;
 
 const UPDATE_TURN = gql`
-  mutation UpdateTurn($id: ID!, $name: String!, $description: String!) 
+  mutation UpdateTurn($id: ID!, $name: String!, $description: String) 
   {
     UpdateTurn(id: $id, name: $name, description: $description) {
       id
