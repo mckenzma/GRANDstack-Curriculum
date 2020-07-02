@@ -28,6 +28,7 @@ import Stance from "./Stance2";
 // import Movement from "./Movement";
 import Movement from "./Movement2";
 // import Turn from "./Turn";
+import Turn from "./Turn2";
 // import Kata from "./Kata";
 
 import Testing from "./Testing";
@@ -152,7 +153,7 @@ export default function TabsWrappedLabel({headerHeight}) {
         <Movement headerHeight={headerHeight}/>
       </TabPanel>
       <TabPanel value={value} index={7}>
-        {/*<Turn />*/}
+        <Turn headerHeight={headerHeight}/>
       </TabPanel>
       <TabPanel value={value} index={8}>
         {/*<Kata />*/}
