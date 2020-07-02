@@ -198,7 +198,7 @@ export default function App() {
           </IconButton>
         </div>
         <Divider />
-        <ListItem button>
+        {/*<ListItem button>
           <ListItemIcon>
             <HomeIcon />
           </ListItemIcon>
@@ -225,7 +225,7 @@ export default function App() {
           </ListItemIcon>
           <ListItemText primary="Competitors" />
         </ListItem>
-        <Divider />
+        <Divider />*/}
         {/*<List>{mailFolderListItems}</List>
         <Divider />
         <List>{otherMailFolderListItems}</List>*/}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { makeStyles } from "@material-ui/core/styles";
@@ -46,11 +46,19 @@ const GET_BLOCKS = gql`
 `;
 
 
-export default function Block() {
+export default function Block({headerHeight}) {
   const classes = useStyles();
 
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("name");
+
+  const tabHeaderRef = useRef(null);
+  const style = { top: headerHeight };
+  const style2 = {
+    marginTop:
+      headerHeight// +
+      //(tabHeaderRef.current ? tabHeaderRef.current.offsetHeight : 0)
+  };
 
   const handleSortRequest = property => {
     const newOrderBy = property;
@@ -76,7 +84,7 @@ export default function Block() {
   if (error) return `Error ${error.message}`;
 
   return (
-    <div className={classes.root}>
+    <div className={classes.root} style={style2}>
       <Grid container spacing={3}>
         <Grid item /*xs={12}*/ sm={6}>
           <Table className={classes.table}>
