@@ -62,7 +62,6 @@ const GET_TESTING_REQUIREMENTS = gql`
       }
       katas {
       	name
-      	description
       }
     }
   }

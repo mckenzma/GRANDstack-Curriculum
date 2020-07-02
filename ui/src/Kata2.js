@@ -34,7 +34,6 @@ const GET_KATAS = gql`
     Kata {
       id
       name
-      description
       ranks {
         id
         rankOrder
@@ -45,12 +44,11 @@ const GET_KATAS = gql`
 `;
 
 const CREATE_KATA = gql`
-  mutation CreateKata($name: String!, $description: String!) 
+  mutation CreateKata($name: String!) 
   {
-    CreateKata(name: $name, description: $description) {
+    CreateKata(name: $name) {
       id
       name
-      description
       ranks {
         id
         rankOrder
@@ -61,12 +59,11 @@ const CREATE_KATA = gql`
 `;
 
 const UPDATE_KATA = gql`
-  mutation UpdateKata($id: ID!, $name: String!, $description: String!) 
+  mutation UpdateKata($id: ID!, $name: String!) 
   {
-    UpdateKata(id: $id, name: $name, description: $description) {
+    UpdateKata(id: $id, name: $name) {
       id
       name
-      description
     }
   }
 `;
@@ -102,7 +99,6 @@ export default function Kata({headerHeight}) {
   const classes = useStyles();
 
   // const [name, setName] = useState("");
-  const [description, setDescription] = useState("0");
   const [ranks, setRanks] = useState("");
 
   const [order, setOrder] = useState("asc");
@@ -115,17 +111,10 @@ export default function Kata({headerHeight}) {
   const [state, setState] = React.useState({
     columns: [
       { title: 'Name', field: 'name' },
-      { title: 'Description', field: 'description' },
       { title: 'Ranks', field: 'ranksString',
         editComponent: props => (
          <RankListFilter selectedRanks={selectedRanks} setSelectedRanks={setSelectedRanks} /> 
         )
-      // },
-      // {
-      //   title: 'Birth Place',
-      //   field: 'birthCity',
-      //   // lookup: { 34: 'İstanbul', 63: 'Şanlıurfa' },
-      //   lookup: ranksToSelect,
       },
     ],
   });
@@ -191,8 +180,7 @@ export default function Kata({headerHeight}) {
                     resolve();
                     CreateKata({
                       variables: {
-                        name: newData.name,
-                        description: newData.description
+                        name: newData.name
                       },
                       update: (cache, { data: { CreateKata } }) => {
                         const { Kata } = cache.readQuery({ query: GET_KATAS });
@@ -214,8 +202,6 @@ export default function Kata({headerHeight}) {
                         id: newData.id,
                         // name: name, 
                         name: newData.name,
-                        // description: description
-                        description: newData.description
                       },
                       update: (cache) => {
                         const existingKatas = cache.readQuery({ query: GET_KATAS });
@@ -223,8 +209,7 @@ export default function Kata({headerHeight}) {
                           if (r.id === oldData.id) {
                             return {
                               ...r, 
-                              name: newData.name, 
-                              description: newData.description
+                              name: newData.name
                             };
                           } else {
                             return r;
