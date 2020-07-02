@@ -45,7 +45,7 @@ const GET_MOVEMENTS = gql`
 `;
 
 const CREATE_MOVEMENT = gql`
-  mutation CreateMovement($name: String!, $description: String!) 
+  mutation CreateMovement($name: String!, $description: String) 
   {
     CreateMovement(name: $name, description: $description) {
       id
@@ -61,7 +61,7 @@ const CREATE_MOVEMENT = gql`
 `;
 
 const UPDATE_MOVEMENT = gql`
-  mutation UpdateMovement($id: ID!, $name: String!, $description: String!) 
+  mutation UpdateMovement($id: ID!, $name: String!, $description: String) 
   {
     UpdateMovement(id: $id, name: $name, description: $description) {
       id
