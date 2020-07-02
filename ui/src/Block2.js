@@ -45,7 +45,7 @@ const GET_BLOCKS = gql`
 `;
 
 const CREATE_BLOCK = gql`
-  mutation CreateBlock($name: String!, $description: String!) 
+  mutation CreateBlock($name: String!, $description: String) 
   {
     CreateBlock(name: $name, description: $description) {
       id
@@ -61,7 +61,7 @@ const CREATE_BLOCK = gql`
 `;
 
 const UPDATE_BLOCK = gql`
-  mutation UpdateBlock($id: ID!, $name: String!, $description: String!) 
+  mutation UpdateBlock($id: ID!, $name: String!, $description: String) 
   {
     UpdateBlock(id: $id, name: $name, description: $description) {
       id

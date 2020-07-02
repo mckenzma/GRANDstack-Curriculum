@@ -45,7 +45,7 @@ const GET_STRIKES = gql`
 `;
 
 const CREATE_STRIKE = gql`
-  mutation CreateStrike($name: String!, $description: String!) 
+  mutation CreateStrike($name: String!, $description: String) 
   {
     CreateStrike(name: $name, description: $description) {
       id
@@ -61,7 +61,7 @@ const CREATE_STRIKE = gql`
 `;
 
 const UPDATE_STRIKE = gql`
-  mutation UpdateStrike($id: ID!, $name: String!, $description: String!) 
+  mutation UpdateStrike($id: ID!, $name: String!, $description: String) 
   {
     UpdateStrike(id: $id, name: $name, description: $description) {
       id

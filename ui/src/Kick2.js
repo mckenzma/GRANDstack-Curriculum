@@ -45,7 +45,7 @@ const GET_KICKS = gql`
 `;
 
 const CREATE_KICK = gql`
-  mutation CreateKick($name: String!, $description: String!) 
+  mutation CreateKick($name: String!, $description: String) 
   {
     CreateKick(name: $name, description: $description) {
       id
@@ -61,7 +61,7 @@ const CREATE_KICK = gql`
 `;
 
 const UPDATE_KICK = gql`
-  mutation UpdateKick($id: ID!, $name: String!, $description: String!) 
+  mutation UpdateKick($id: ID!, $name: String!, $description: String) 
   {
     UpdateKick(id: $id, name: $name, description: $description) {
       id

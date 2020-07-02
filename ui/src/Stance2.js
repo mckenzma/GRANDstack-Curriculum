@@ -45,7 +45,7 @@ const GET_STANCES = gql`
 `;
 
 const CREATE_STANCE = gql`
-  mutation CreateStance($name: String!, $description: String!) 
+  mutation CreateStance($name: String!, $description: String) 
   {
     CreateStance(name: $name, description: $description) {
       id
@@ -61,7 +61,7 @@ const CREATE_STANCE = gql`
 `;
 
 const UPDATE_STANCE = gql`
-  mutation UpdateStance($id: ID!, $name: String!, $description: String!) 
+  mutation UpdateStance($id: ID!, $name: String!, $description: String) 
   {
     UpdateStance(id: $id, name: $name, description: $description) {
       id
