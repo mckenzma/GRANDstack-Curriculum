@@ -64,8 +64,9 @@ type Movement {
   id: ID!
   name: String!
   description: String
+
   steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
-  rank: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
+  ranks: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
 }
 
 type Turn {
