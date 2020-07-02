@@ -60,7 +60,7 @@ export default function RankListFilter({
 }) {
   const classes = useStyles();
 
-  console.log(selectedRanks);
+  // console.log(selectedRanks);
 
   const { loading, error, data } = useQuery(GET_RANKS);
   
