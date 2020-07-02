@@ -22,6 +22,7 @@ import Strike from "./Strike2";
 // import Block from "./Block";
 import Block from "./Block2";
 // import Kick from "./Kick";
+import Kick from "./Kick2";
 // import Stance from "./Stance";
 // import Movement from "./Movement";
 // import Turn from "./Turn";
@@ -140,7 +141,7 @@ export default function TabsWrappedLabel({headerHeight}) {
         <Block headerHeight={headerHeight}/>
       </TabPanel>
       <TabPanel value={value} index={4}>
-        {/*<Kick />*/}
+        <Kick headerHeight={headerHeight}/>
       </TabPanel>
       <TabPanel value={value} index={5}>
         {/*<Stance />*/}
