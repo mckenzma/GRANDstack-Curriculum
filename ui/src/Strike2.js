@@ -120,12 +120,12 @@ export default function Strike({headerHeight}) {
         editComponent: props => (
          <RankListFilter selectedRanks={selectedRanks} setSelectedRanks={setSelectedRanks} /> 
         )
-      },
-      {
-        title: 'Birth Place',
-        field: 'birthCity',
-        // lookup: { 34: 'İstanbul', 63: 'Şanlıurfa' },
-        lookup: ranksToSelect,
+      // },
+      // {
+      //   title: 'Birth Place',
+      //   field: 'birthCity',
+      //   // lookup: { 34: 'İstanbul', 63: 'Şanlıurfa' },
+      //   lookup: ranksToSelect,
       },
     ],
   });

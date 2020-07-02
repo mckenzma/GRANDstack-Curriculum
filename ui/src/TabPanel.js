@@ -20,6 +20,7 @@ import Rank from "./Rank2";
 // import Strike from "./Strike";
 import Strike from "./Strike2";
 // import Block from "./Block";
+import Block from "./Block2";
 // import Kick from "./Kick";
 // import Stance from "./Stance";
 // import Movement from "./Movement";
@@ -119,6 +120,7 @@ export default function TabsWrappedLabel({headerHeight}) {
           <Tab /*value="seven"*/ label="Movement" {...a11yProps(6)} />
           <Tab /*value="eight"*/ label="Turn" {...a11yProps(7)} />
           <Tab /*value="nine"*/ label="Kata" {...a11yProps(8)} />
+          <Tab /*value="nine"*/ label="MDS" {...a11yProps(9)} />
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
@@ -135,7 +137,7 @@ export default function TabsWrappedLabel({headerHeight}) {
         <Strike headerHeight={headerHeight}/>
       </TabPanel>
       <TabPanel value={value} index={3}>
-        {/*<Block />*/}
+        <Block headerHeight={headerHeight}/>
       </TabPanel>
       <TabPanel value={value} index={4}>
         {/*<Kick />*/}
@@ -150,6 +152,9 @@ export default function TabsWrappedLabel({headerHeight}) {
         {/*<Turn />*/}
       </TabPanel>
       <TabPanel value={value} index={8}>
+        {/*<Kata />*/}
+      </TabPanel>
+      <TabPanel value={value} index={9}>
         {/*<Kata />*/}
       </TabPanel>
     </div>
