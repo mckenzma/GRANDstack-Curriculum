@@ -22,28 +22,31 @@ const GET_RANKS = gql`
     Rank {
       id
       name
+      abbreviation
       rankOrder
     }
   }
 `;
 
 const CREATE_RANK = gql`
-  mutation CreateRank($name: String!, $rankOrder: Int!) 
+  mutation CreateRank($name: String!, $rankOrder: Int!, $abbreviation: String!) 
   {
-    CreateRank(name: $name, rankOrder: $rankOrder) {
+    CreateRank(name: $name, rankOrder: $rankOrder, abbreviation: $abbreviation) {
       id
       name
+      abbreviation
       rankOrder
     }
   }
 `;
 
 const UPDATE_RANK = gql`
-  mutation UpdateRank($id: ID!, $name: String!, $rankOrder: Int!) 
+  mutation UpdateRank($id: ID!, $name: String!, $rankOrder: Int!,$abbreviation: String!) 
   {
-    UpdateRank(id: $id, name: $name, rankOrder: $rankOrder) {
+    UpdateRank(id: $id, name: $name, rankOrder: $rankOrder, abbreviation: $abbreviation) {
       id
       name
+      abbreviation
       rankOrder
     }
   }
@@ -100,6 +103,7 @@ export default function Rank({headerHeight}) {
         //   />
         // )
       },
+      { title: 'Abbreviation', field: 'abbreviation'},
       // { title: 'Birth Year', field: 'birthYear', type: 'numeric' },
       // {
       //   title: 'Birth Place',
@@ -163,6 +167,7 @@ export default function Rank({headerHeight}) {
                       variables: {
                         // name: name, 
                         name: newData.name,
+                        abbreviation: newData.abbreviation,
                         rankOrder: rankOrder 
                         // rankOrder: newData.rankOrder
                       },
@@ -186,6 +191,7 @@ export default function Rank({headerHeight}) {
                         id: newData.id,
                         // name: name, 
                         name: newData.name, 
+                        abbreviation: newData.abbreviation, 
                         rankOrder: rankOrder
                         // rankOrder: newData.rankOrder
                       },
@@ -197,6 +203,7 @@ export default function Rank({headerHeight}) {
                               ...r, 
                               // name: name, 
                               name: newData.name, 
+                              abbreviation: newData.abbreviation, 
                               rankOrder: rankOrder
                             };
                           } else {
