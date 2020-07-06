@@ -125,7 +125,7 @@ export default function TabsWrappedLabel({headerHeight}) {
           <Tab /*value="seven"*/ label="Movement" {...a11yProps(6)} />
           <Tab /*value="eight"*/ label="Turn" {...a11yProps(7)} />
           <Tab /*value="nine"*/ label="Kata" {...a11yProps(8)} />
-          <Tab /*value="nine"*/ label="MDS" {...a11yProps(9)} />
+          {/*<Tab /*value="nine"* / label="MDS" {...a11yProps(9)} />*/}
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
@@ -159,9 +159,9 @@ export default function TabsWrappedLabel({headerHeight}) {
       <TabPanel value={value} index={8}>
         <Kata headerHeight={headerHeight}/>
       </TabPanel>
-      <TabPanel value={value} index={9}>
-        {/*<Kata />*/}
-      </TabPanel>
+      {/*<TabPanel value={value} index={9}>
+        
+      </TabPanel>*/}
     </div>
   );
 }

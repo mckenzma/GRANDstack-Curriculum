@@ -10,7 +10,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 // import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 // import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+// import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 
 import RankSelect from "./RankSelect";
@@ -90,8 +90,8 @@ export default function Testing({headerHeight}) {
 	if (error) return `Error ${error.message}`;
 
 	return (
-		<div /*style={style}*/ style={style2} /*className={classes.root}*/>
-			<Grid /*style={style2}*/ container spacing={3}>
+		<div style={style} /*style={style2}*/ /*className={classes.root}*/>
+			<Grid style={style2} container spacing={3}>
 				<Grid item sm={12}>
 					<RankSelect rankID={rankID} setRankID={setRankID} />
 				</Grid>
