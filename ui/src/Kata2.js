@@ -10,6 +10,8 @@ import TextField from "@material-ui/core/TextField";
 
 import RankListFilter from './RankListFilter';
 
+import KataDialog from './KataDialog';
+
 const useStyles = makeStyles(theme => ({
   root: {
     maxWidth: "auto",
@@ -139,6 +141,20 @@ export default function Kata({headerHeight}) {
     setOrderBy(newOrderBy);
   };
 
+  const [open, setOpen] = useState(false);
+  const [selectedKata, setSelectedKata] = useState("");
+
+  const handleClickOpen = (event,rowData) => {
+    setOpen(true);
+    // console.log(rowData);
+    setSelectedKata(rowData.id);
+    console.log(rowData.id);
+  };
+
+  // const handleClose = event => {
+  //   setOpen(false);
+  // };
+
   const getSorting = (order, orderBy) => {
   return order === "desc"
     ? (a, b) => (b[orderBy] < a[orderBy] ? -1 : 1)
@@ -157,7 +173,11 @@ export default function Kata({headerHeight}) {
   if (loading) return "Loading...";
   if (error) return `Error ${error.message}`;
 
+  console.log(data);
+
   return (
+    <div>
+    <KataDialog open={open} setOpen={setOpen} selectedKata={selectedKata} setSelectedKata={setSelectedKata}/>
     <Paper className={classes.root} elevation={3} style={style2}>
       <Grid container>
     {/*<RankListFilter selectedRanks={selectedRanks} setSelectedRanks={setSelectedRanks} /> */}
@@ -173,6 +193,7 @@ export default function Kata({headerHeight}) {
                 }
               })
             }
+            onRowClick={handleClickOpen}
             editable={{
               onRowAdd: newData =>
                 new Promise(resolve => {
@@ -245,5 +266,6 @@ export default function Kata({headerHeight}) {
         </Grid>
       </Grid>
     </Paper>
+    </div>
   );
 }
