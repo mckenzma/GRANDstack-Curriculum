@@ -86,6 +86,46 @@ type Kata {
 
   steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
   ranks: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
+  moves: [Move] @relation(name: "HAS_MOVE", direction: "OUT")
+  orderedMoves: [Move] @cypher(
+    statement: 
+    """
+    MATCH (this)-[:HAS_MOVE]->(start)
+    WHERE NOT ()-[:NEXT_MOVE]->(start)
+    WITH [(start)-[:NEXT_MOVE*0..]->(move) | move] AS moves
+    UNWIND moves AS move
+    RETURN move
+    """
+  )
+}
+
+type Move {
+  id: ID!
+  name: String!
+
+  kata: Kata @relation(name: "HAS_MOVE", direction: "IN")
+  nextMove: Move @relation(name: "NEXT_MOVE", direction: "OUT")
+  prevMove: Move @relation(name: "NEXT_MOVE", direction: "IN")
+  steps: [Step] @relation(name: "HAS_STEP", direction: "OUT")
+  orderedSteps: [Step] @cypher(
+    statement: 
+    """
+    MATCH (this)-[:HAS_STEP]->(start)
+    WHERE NOT ()-[:NEXT_STEP]->(start)
+    WITH [(start)-[:NEXT_STEP*0..]->(step) | step] AS steps
+    UNWIND steps AS step
+    RETURN step
+    """
+  )
+}
+
+type Step {
+  id: ID!
+  name: String!
+
+  move: Move @relation(name: "HAS_STEP", direction: "IN")
+  nextStep: Step @relation(name: "NEXT_STEP", direction: "OUT")
+  prevStep: Step @relation(name: "NEXT_STEP", direction: "IN")
 }
 
 type Mutation {
