@@ -17,6 +17,8 @@ import ListItemText from "@material-ui/core/ListItemText";
 
 import MaterialTable from 'material-table';
 
+import SingleLineGridList from './StepList';
+
 const GET_KATA_MOVES = gql`
   query kataMovesQuery(
     $selectedKata: ID!
@@ -102,7 +104,7 @@ export default function KataDialog({open, setOpen, selectedKata, setSelectedKata
 
   const handleClose = event => {
     setOpen(false);
-    // setSelectedKata("");
+    setSelectedKata("");
   };
 
   const [state, setState] = React.useState({
@@ -111,7 +113,7 @@ export default function KataDialog({open, setOpen, selectedKata, setSelectedKata
       { title: 'Steps', field: 'stepsString'}
     ],
   });
-  console.log(selectedKata);
+  // console.log(selectedKata);
 
   const { loading, error, data } = useQuery(GET_KATA_MOVES, {
     variables: {
@@ -131,7 +133,7 @@ export default function KataDialog({open, setOpen, selectedKata, setSelectedKata
   if (loading) return "Loading...";
   if (error) return `Error ${error.message}`;
 
-  console.log("kata data: ", data.Kata);
+  // console.log("kata data: ", data.Kata);
 
   return (
     <div>
@@ -150,7 +152,7 @@ export default function KataDialog({open, setOpen, selectedKata, setSelectedKata
         {/*<DialogContent>*/}
 
         <MaterialTable
-            title="Kata name goes here"
+            title={kata.name}
             columns={state.columns}
             data={
               //data.Kata/*.sort(getSorting(order,orderBy))*/.map(s => {
@@ -166,6 +168,7 @@ export default function KataDialog({open, setOpen, selectedKata, setSelectedKata
                     // return {
                       // ...m
                       name: m.name,
+                      steps: m.orderedSteps,
                       stepsString: m.orderedSteps/*.sort(getSorting("asc","rankOrder"))*/.map(r => { return r.name }).flat(2).join(', ')
 
                     // }
@@ -174,8 +177,17 @@ export default function KataDialog({open, setOpen, selectedKata, setSelectedKata
 
               })
             }
+            detailPanel={rowData => {
+              console.log(rowData);
+              return (
+                // <div>
+                //   row data
+                // </div>
+                <SingleLineGridList move={rowData}/>
+              )
+            }}
           // }
-            // onRowClick={handleClickOpen}
+            onRowClick={(event, rowData, togglePanel) => togglePanel()}
             
             // editable={{
             //   onRowAdd: newData =>
