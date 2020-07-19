@@ -13,70 +13,90 @@ type Rank {
   katas: [Kata] @relation(name: "REQUIRED_FOR", direction: "IN")
 }
 
+# TODO - Figure out how to use a shared Technique label
+# interface Technique {
+#   id: ID!
+#   name: String!
+
+#   # steps: [Step] @relation(name: "USES", direction: "IN")
+# }
+
 type Strike {
+# type Strike implements Technique {
   id: ID!
   name: String!
   description: String
 
-  steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
+  # steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
   ranks: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
+  steps: [Step] @relation(name: "USES", direction: "IN")
 } 
 
-type StepDescription {
-  id: ID!
-  text: String
-  number: String
-  strike: [Strike] @relation(name: "STEP_FOR", direction: "OUT")
-  block: [Block] @relation(name: "STEP_FOR", direction: "OUT")
-  kick: [Kick] @relation(name: "STEP_FOR", direction: "OUT")
-  stance: [Stance] @relation(name: "STEP_FOR", direction: "OUT")
-  movement: [Movement] @relation(name: "STEP_FOR", direction: "OUT")
-  turn: [Turn] @relation(name: "STEP_FOR", direction: "OUT")
-}
+# type StepDescription {
+#   id: ID!
+#   text: String
+#   number: String
+#   strike: [Strike] @relation(name: "STEP_FOR", direction: "OUT")
+#   block: [Block] @relation(name: "STEP_FOR", direction: "OUT")
+#   kick: [Kick] @relation(name: "STEP_FOR", direction: "OUT")
+#   stance: [Stance] @relation(name: "STEP_FOR", direction: "OUT")
+#   movement: [Movement] @relation(name: "STEP_FOR", direction: "OUT")
+#   turn: [Turn] @relation(name: "STEP_FOR", direction: "OUT")
+# }
 
 type Block {
+# type Block implements Technique {
   id: ID!
   name: String!
   description: String
 
-  steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
+  # steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
   ranks: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
+  steps: [Step] @relation(name: "USES", direction: "IN")
 }
 
 type Kick {
+# type Kick implements Technique {
   id: ID!
   name: String!
   description: String
 
-  steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
+  # steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
   ranks: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
+  steps: [Step] @relation(name: "USES", direction: "IN")
 }
 
 type Stance {
+# type Stance implements Technique {
   id: ID!
   name: String!
   description: String
 
-  steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
+  # steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
   ranks: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
+  steps: [Step] @relation(name: "USES", direction: "IN")
 }
 
 type Movement {
+# type Movement implements Technique {
   id: ID!
   name: String!
   description: String
 
-  steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
+  # steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
   ranks: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
+  steps: [Step] @relation(name: "USES", direction: "IN")
 }
 
 type Turn {
+# type Turn implements Technique {
   id: ID!
   name: String!
   description: String
 
-  steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
+  # steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
   ranks: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
+  steps: [Step] @relation(name: "USES", direction: "IN")
 }
 
 type Kata {
@@ -84,7 +104,7 @@ type Kata {
   name: String!
   # description: String
 
-  steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
+  # steps: [StepDescription] @relation(name: "STEP_FOR", direction: "IN")
   ranks: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
   moves: [Move] @relation(name: "HAS_MOVE", direction: "OUT")
   orderedMoves: [Move] @cypher(
@@ -126,31 +146,111 @@ type Step {
   move: Move @relation(name: "HAS_STEP", direction: "IN")
   nextStep: Step @relation(name: "NEXT_STEP", direction: "OUT")
   prevStep: Step @relation(name: "NEXT_STEP", direction: "IN")
+
+  # technique: Technique @relation(name: "USES", direction: "OUT")
+  block: Block @relation(name: "USES", direction: "OUT")
+  strike: Strike @relation(name: "USES", direction: "OUT")
+  kick: Kick @relation(name: "USES", direction: "OUT")
+  stance: Stance @relation(name: "USES", direction: "OUT")
+  turn: Turn @relation(name: "USES", direction: "OUT")
+  movement: Movement @relation(name: "USES", direction: "OUT")
 }
 
 type Mutation {
-  MergeStrikeRank(fromStrikeID: ID!, toRankID: ID!): Rank @cypher(
-    statement:
-    """
-    MATCH (strike:Strike {id: $fromStrikeID})
-    MATCH (rank:Rank {id: $toRankID})
-    MERGE (strike)-[:REQUIRED_FOR]->(rank)
-    RETURN rank
-    """
-  )
+  # MergeStrikeRank(fromStrikeID: ID!, toRankID: ID!): Rank @cypher(
+  #   statement:
+  #   """
+  #   MATCH (strike:Strike {id: $fromStrikeID})
+  #   MATCH (rank:Rank {id: $toRankID})
+  #   MERGE (strike)-[:REQUIRED_FOR]->(rank)
+  #   RETURN rank
+  #   """
+  # )
 
   MergeStrikeRanks(fromStrikeID: ID!, toRankIDs: [ID!]): [Rank] @cypher(
     statement:
     """
-    MATCH (strike: Strike {id: $fromStrikeID})
+    MATCH (strike:Strike {id: $fromStrikeID})
     UNWIND $toRankIDs AS toRankID
     MATCH (rank:Rank {id: toRankID})
     MERGE (strike)-[:REQUIRED_FOR]->(rank)
     RETURN rank
     """
   )
+
+  # MergeStrikeRanks(from: _StrikeInput!, to: [_RankInput!]): [Rank] @cypher(
+  #   statement:
+  #   """
+  #   MATCH (strike:Strike {id: $from.id})
+  #   UNWIND $to AS rank
+  #   MATCH (rank:Rank {id: rank.id})
+  #   MERGE (strike)-[:REQUIRED_FOR]->(rank)
+  #   RETURN rank
+  #   """
+  # )
+
+
+  # CreateStepConnectToMove(fromMoveID: ID!): Step @cypher(
+  #   statement:
+  #   """
+  #   CREATE (newStep:Step)
+  #   SET newStep.name = ''
+  #       newStep.id = apoc.create.uuid()
+  #   WITH newStep
+  #   MATCH (move:Move {id: $fromMoveID})
+  #   MERGE (move)-[:HAS_STEP]->(newStep)
+  #   RETURN newStep
+  #   """
+  # )
+
+  # ConnectMoveToStep(fromMoveID: ID!, toStepID: ID!): Step @cypher(
+  #   statement:
+  #   """
+  #   MATCH (move:Move {id: $fromMoveID})
+  #   MATCH (step:Step {id: $toStepID})
+  #   MERGE (move)-[:HAS_STEP]->(step)
+  #   RETURN step
+  #   """
+  # )
+
+  # ConnectStepToTechnique(fromStepID: ID!, toTechniqueID: ID!): Step @cypher(
+  #   statement:
+  #   """
+  #   MATCH (step:Step {id: $fromStepID})
+  #   MATCH (tech:Technique {id: $toTechniqueID})
+  #   MERGE (step)-[:USES]->(tech)
+  #   """
+  # )
+
+  # InsertStepBetween(prevStepID: ID!, newStepID: ID!, nextStepID: ID!): Step @cypher(
+  #   statement:
+  #   """
+  #   MATCH(prev:Step {id: $prevStepID})-[r:NEXT_STEP]->(next:Step {id: $nextStepID})
+  #   WITH prev, r, next
+  #   DELETE r
+  #   WITH prev, next
+  #   MATCH (new:Step {id: $newStepID})
+  #   MERGE (prev)-[:NEXT_STEP]->(new)-[:NEXT_STEP]->(next)
+  #   RETURN new
+  #   """
+  # )
+
+  # InsertStepNextTo(prevStepID: ID!, nextStepID: ID!): Step @cypher(
+  #   statement:
+  #   """
+  #   MATCH (prev:Step {id: $prevStepID})
+  #   MATCH (next:Step {id: $nextStepID})
+  #   MERGE (prev)-[:NEXT_STEP]->(next)
+  #   """
+  # )
+
+  # DeleteStepBetween(prevStepID: ID!, nextStepID: ID!): [Step] @cypher(
+  #   statement:
+  #   """
+  #   MATCH (prev:Step {id: $prevStepID})
+  #   MATCH (next:Step {id: $nextStepID})
+  #   MERGE (prev)-[:NEXT_STEP]->(next)
+  #   RETURN prev, next
+  #   """
+  # )
 }
-
-# type Query {
-
-# }

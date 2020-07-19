@@ -10,13 +10,22 @@ import TextField from "@material-ui/core/TextField";
 
 import RankListFilter from './RankListFilter';
 
+import Chip from "@material-ui/core/Chip";
+
 const useStyles = makeStyles(theme => ({
   root: {
     maxWidth: "auto",
     marginTop: theme.spacing(3),
     overflowX: "auto",
     margin: "auto"
-  }
+  },
+  chips: {
+    display: "flex",
+    flexWrap: "wrap"
+  },
+  chip: {
+    margin: theme.spacing(0.25)
+  },
 }));
 
 const GET_RANKS = gql`
@@ -60,6 +69,25 @@ const CREATE_STRIKE = gql`
   }
 `;
 
+const ADD_STRIKE_RANKS = gql`
+  mutation AddStrikeRanks(
+    $from: _StrikeInput!,
+    $to: _RankInput!
+  ) {
+    AddStrikeRanks(from: $from, to: $to) {
+      from {
+        id
+#        name
+      }
+      to {
+        id
+        name
+        rankOrder
+      }
+    }
+  }
+`;
+
 const UPDATE_STRIKE = gql`
   mutation UpdateStrike($id: ID!, $name: String!, $description: String) 
   {
@@ -80,23 +108,24 @@ const DELETE_STRIKE = gql`
   }
 `;
 
-const MERGE_STRIKE_RANK_REL = gql`
-  mutation MergeStrikeRank($strikeID: ID!, $rankID: ID!)
-  {
-    MergeStrikeRank(fromStrikeID: $strikeID, toRankID: $rankID) {
-      id
-    }
-  }
-`;
+// const MERGE_STRIKE_RANK_REL = gql`
+//   mutation MergeStrikeRank($strikeID: ID!, $rankID: ID!)
+//   {
+//     MergeStrikeRank(fromStrikeID: $strikeID, toRankID: $rankID) {
+//       id
+//     }
+//   }
+// `;
 
-const MERGE_STRIKE_RANKS_RELS = gql`
-  mutation MergeStrikeRanks($strikeID: ID!, $rankIDs:[ID!])
-  {
-    MergeStrikeRanks(fromStrikeID:$strikeID, toRankIDs: $rankIDs){
-      id
-    }
-  }
-`;
+// const MERGE_STRIKE_RANKS_RELS = gql`
+//   mutation MergeStrikeRanks($strikeID: ID!, $rankIDs:[ID!])
+//   {
+//     MergeStrikeRanks(fromStrikeID:$strikeID, toRankIDs: $rankIDs){
+//       id
+//     }
+//   }
+// `;
+
 
 export default function Strike({headerHeight}) {
   const classes = useStyles();
@@ -110,23 +139,64 @@ export default function Strike({headerHeight}) {
 
   const [selectedRanks, setSelectedRanks] = useState([]);
 
-  const [ranksToSelect, setRanksToSelect] = useState({ 0: 'rank1', 1: 'rank2' });
+  const updateRanks = (ranks) => {
+    // console.log(selectedRanks);
+    setSelectedRanks(ranks);
+  }
+
+  // const [ranksToSelect, setRanksToSelect] = useState({ 0: 'rank1', 1: 'rank2' });
 
   const [state, setState] = React.useState({
     columns: [
       { title: 'Name', field: 'name' },
       { title: 'Description', field: 'description' },
-      { title: 'Ranks', field: 'ranksString',
-        editComponent: props => (
-         <RankListFilter selectedRanks={selectedRanks} setSelectedRanks={setSelectedRanks} /> 
-        )
-      // },
-      // {
-      //   title: 'Birth Place',
-      //   field: 'birthCity',
-      //   // lookup: { 34: 'İstanbul', 63: 'Şanlıurfa' },
-      //   lookup: ranksToSelect,
-      },
+      // { title: 'Ranks', field: 'ranksString',
+      //   editComponent: props => {
+      //     // console.log(props);
+      //     // if (props.rowData.ranks !== undefined) {
+      //     //   if (props.rowData.ranks.length !== 0 ) {
+      //     //     console.log(props.rowData.ranks.map(r => r.name));
+      //     //     // console.log(props.rowData.ranks);
+      //     //     // updateRanks(props.rowData.ranks.map(r => r.name));
+      //     //     // setSelectedRanks(props.rowData.ranks.map(r => r.name));
+      //     //   }
+      //     // }
+      //   return(
+      //    // <RankListFilter _selectedRanks={_selectedRanks} _setSelectedRanks={_setSelectedRanks} /> 
+      //    <RankListFilter onRanksUpdate={updateRanks} selectedRanks={selectedRanks}/> 
+      //   )}
+      // // },
+      { title: 'Ranks', field: 'ranks', render: rowData => (
+          <div className={classes.chips}>
+            {rowData.ranks.map(rank => (
+              <Chip
+                key={rank.name}
+                label={rank.name}
+              />
+            ))}
+            </div>),
+        editComponent: props => {
+          // console.log(props);
+          // console.log(props.value);
+
+          // updateRanks(props.value.map(value => value.name));
+          if (props.value !== undefined) {
+            // setSelectedRanks(props.value.map(value => value.name));
+            return(
+              // <RankListFilter onRanksUpdate={updateRanks} selectedRanks={selectedRanks} /> 
+              <RankListFilter onRanksUpdate={updateRanks} selectedRanks={props.value.map(value => value.name)}/> 
+              // <RankListFilter onRanksUpdate={updateRanks} selectedRanks={props.value.map(value => value.name)} onChange={e => props.onChange(e.target.map(value => value.name))}/> 
+            )
+          } else {
+            // setSelectedRanks([]);
+            return(
+              // <RankListFilter onRanksUpdate={updateRanks} selectedRanks={selectedRanks}/> 
+              <RankListFilter onRanksUpdate={updateRanks} selectedRanks={[]}/> 
+            )
+          }
+          
+        }
+      }
     ],
   });
 
@@ -156,8 +226,11 @@ export default function Strike({headerHeight}) {
     : (a, b) => (a[orderBy] < b[orderBy] ? -1 : 1);
   };
 
+  // const [newStikeId, setNewStrikeId] = useState("");
+
   const [CreateStrike] = useMutation(CREATE_STRIKE);
-  const [MergeStrikeRanks] = useMutation(MERGE_STRIKE_RANKS_RELS);
+  const [AddStrikeRanks] = useMutation(ADD_STRIKE_RANKS);
+  // const [MergeStrikeRanks] = useMutation(MERGE_STRIKE_RANKS_RELS);
 
   const [UpdateStrike] = useMutation(UPDATE_STRIKE);
 
@@ -192,14 +265,23 @@ export default function Strike({headerHeight}) {
                     CreateStrike({
                       variables: {
                         name: newData.name,
-                        description: newData.description
+                        description: (newData.description !== null ? newData.description : ""),
                       },
                       update: (cache, { data: { CreateStrike } }) => {
                         const { Strike } = cache.readQuery({ query: GET_STRIKES });
-                        cache.writeQuery({
-                          query: GET_STRIKES,
-                          data: { Strike: Strike.concat([CreateStrike]) },
-                        })
+                        AddStrikeRanks({
+                          variables: {
+                            from: {id: CreateStrike.id},
+                            to: {id: "cd4abd01-03ab-4204-b706-87390a509c3d"}
+                          },
+                          update: (cache, { data: { AddStrikeRanks } }) => {
+                            CreateStrike.ranks = CreateStrike.ranks.concat([AddStrikeRanks.to])
+                            cache.writeQuery({
+                              query: GET_STRIKES,
+                              data: { Strike: Strike.concat([CreateStrike]) },
+                            })
+                          }
+                        });
                       }
                     });
                   }, 600);
@@ -207,6 +289,7 @@ export default function Strike({headerHeight}) {
               onRowUpdate: (newData, oldData) => 
                 new Promise(resolve => {
                   setTimeout(() => {
+                    // console.log(oldData);
                     resolve();
                     UpdateStrike({
                       variables: { 
@@ -215,16 +298,19 @@ export default function Strike({headerHeight}) {
                         // name: name, 
                         name: newData.name,
                         // description: description
-                        description: newData.description
+                        description: newData.description,
+                        // ranks: newData.ranks
                       },
                       update: (cache) => {
                         const existingStrikes = cache.readQuery({ query: GET_STRIKES });
                         const newStrikes = existingStrikes.Strike.map(r => {
                           if (r.id === oldData.id) {
+                            // console.log(r);
                             return {
                               ...r, 
                               name: newData.name, 
-                              description: newData.description
+                              description: newData.description,
+                              // ranks: newData.ranks
                             };
                           } else {
                             return r;
