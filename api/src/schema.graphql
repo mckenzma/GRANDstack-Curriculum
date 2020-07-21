@@ -167,12 +167,13 @@ type Mutation {
   #   """
   # )
 
-  MergeStrikeRanks(fromStrikeID: ID!, toRankIDs: [ID!]): [Rank] @cypher(
+  # TODO - update to use IDs
+  MergeStrikeRanks(fromStrikeName: String!, toRankNames: [String!]): [Rank] @cypher(
     statement:
     """
-    MATCH (strike:Strike {id: $fromStrikeID})
-    UNWIND $toRankIDs AS toRankID
-    MATCH (rank:Rank {id: toRankID})
+    MATCH (strike:Strike {name: $fromStrikeName})
+    UNWIND $toRankNames AS toRankName
+    MATCH (rank:Rank {name: toRankName})
     MERGE (strike)-[:REQUIRED_FOR]->(rank)
     RETURN rank
     """

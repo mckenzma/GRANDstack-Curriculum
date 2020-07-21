@@ -117,14 +117,16 @@ const DELETE_STRIKE = gql`
 //   }
 // `;
 
-// const MERGE_STRIKE_RANKS_RELS = gql`
-//   mutation MergeStrikeRanks($strikeID: ID!, $rankIDs:[ID!])
-//   {
-//     MergeStrikeRanks(fromStrikeID:$strikeID, toRankIDs: $rankIDs){
-//       id
-//     }
-//   }
-// `;
+const MERGE_STRIKE_RANKS_RELS = gql`
+  mutation MergeStrikeRanks($fromStrikeName: String!, $toRankNames:[String!])
+  {
+    MergeStrikeRanks(fromStrikeName:$fromStrikeName, toRankNames: $toRankNames){
+      id
+      name
+      rankOrder
+    }
+  }
+`;
 
 
 export default function Strike({headerHeight}) {
@@ -176,8 +178,8 @@ export default function Strike({headerHeight}) {
             ))}
             </div>),
         editComponent: props => {
-          // console.log(props);
-          // console.log(props.value);
+          console.log(props);
+          console.log(props.value);
 
           // updateRanks(props.value.map(value => value.name));
           if (props.value !== undefined) {
@@ -189,6 +191,7 @@ export default function Strike({headerHeight}) {
             )
           } else {
             // setSelectedRanks([]);
+            // props.value = "";
             return(
               // <RankListFilter onRanksUpdate={updateRanks} selectedRanks={selectedRanks}/> 
               <RankListFilter onRanksUpdate={updateRanks} selectedRanks={[]}/> 
@@ -230,6 +233,7 @@ export default function Strike({headerHeight}) {
 
   const [CreateStrike] = useMutation(CREATE_STRIKE);
   const [AddStrikeRanks] = useMutation(ADD_STRIKE_RANKS);
+  const [MergeStrikeRanks] = useMutation(MERGE_STRIKE_RANKS_RELS);
   // const [MergeStrikeRanks] = useMutation(MERGE_STRIKE_RANKS_RELS);
 
   const [UpdateStrike] = useMutation(UPDATE_STRIKE);
@@ -253,7 +257,7 @@ export default function Strike({headerHeight}) {
               data.Strike.sort(getSorting(order,orderBy)).map(s => {
                 return {
                   ...s,
-                  ranksString: s.ranks.sort(getSorting("asc","rankOrder")).map(r => { return r.name }).flat(2).join(', ')
+                  // ranksString: s.ranks.sort(getSorting("asc","rankOrder")).map(r => { return r.name }).flat(2).join(', ')
                 }
               })
             }
@@ -261,27 +265,49 @@ export default function Strike({headerHeight}) {
               onRowAdd: newData =>
                 new Promise(resolve => {
                   setTimeout(() => {
+                    console.log(newData);
                     resolve();
                     CreateStrike({
                       variables: {
                         name: newData.name,
-                        description: (newData.description !== null ? newData.description : ""),
+                        // description: (newData.description !== null ? newData.description : ""),
+                        description: (newData.description !== undefined ? newData.description : ""),
                       },
                       update: (cache, { data: { CreateStrike } }) => {
                         const { Strike } = cache.readQuery({ query: GET_STRIKES });
-                        AddStrikeRanks({
+
+                        MergeStrikeRanks({
                           variables: {
-                            from: {id: CreateStrike.id},
-                            to: {id: "cd4abd01-03ab-4204-b706-87390a509c3d"}
+                            // fromStrikeID: CreateStrike.id,
+                            fromStrikeName: CreateStrike.name,
+                            // toRankIDs: selectedRanks
+                            toRankNames: selectedRanks
                           },
-                          update: (cache, { data: { AddStrikeRanks } }) => {
-                            CreateStrike.ranks = CreateStrike.ranks.concat([AddStrikeRanks.to])
+                          update: (cache, { data: { MergeStrikeRanks } }) => {
+                            console.log(MergeStrikeRanks);
+                            CreateStrike.ranks = CreateStrike.ranks.concat(MergeStrikeRanks)
                             cache.writeQuery({
                               query: GET_STRIKES,
                               data: { Strike: Strike.concat([CreateStrike]) },
                             })
                           }
                         });
+
+                        // AddStrikeRanks({
+                        //   variables: {
+                        //     from: {id: CreateStrike.id},
+                        //     to: {id: "cd4abd01-03ab-4204-b706-87390a509c3d"}
+                        //   },
+                        //   update: (cache, { data: { AddStrikeRanks } }) => {
+                        //     CreateStrike.ranks = CreateStrike.ranks.concat([AddStrikeRanks.to])
+                        //     cache.writeQuery({
+                        //       query: GET_STRIKES,
+                        //       data: { Strike: Strike.concat([CreateStrike]) },
+                        //     })
+                        //   }
+                        // });
+
+
                       }
                     });
                   }, 600);
@@ -289,7 +315,6 @@ export default function Strike({headerHeight}) {
               onRowUpdate: (newData, oldData) => 
                 new Promise(resolve => {
                   setTimeout(() => {
-                    // console.log(oldData);
                     resolve();
                     UpdateStrike({
                       variables: { 
