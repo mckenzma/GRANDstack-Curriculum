@@ -146,6 +146,11 @@ export default function Strike({headerHeight}) {
     setSelectedRanks(ranks);
   }
 
+  // function handleRowClick (event, rowData) {
+  //   console.log(rowData);
+  //   setSelectedRanks(rowData.ranks);
+  // };
+
   // const [ranksToSelect, setRanksToSelect] = useState({ 0: 'rank1', 1: 'rank2' });
 
   const [state, setState] = React.useState({
@@ -180,24 +185,22 @@ export default function Strike({headerHeight}) {
         editComponent: props => {
           console.log(props);
           console.log(props.value);
-
-          // updateRanks(props.value.map(value => value.name));
+          console.log(selectedRanks);
           if (props.value !== undefined) {
             // setSelectedRanks(props.value.map(value => value.name));
+            console.log("here");
+            console.log(props.value.map(value => value.name));
             return(
               // <RankListFilter onRanksUpdate={updateRanks} selectedRanks={selectedRanks} /> 
-              <RankListFilter onRanksUpdate={updateRanks} selectedRanks={props.value.map(value => value.name)}/> 
+              <RankListFilter onRanksUpdate={updateRanks} setSelectedRanks={setSelectedRanks} selectedRanks={props.value.map(value => value.name)}/> 
               // <RankListFilter onRanksUpdate={updateRanks} selectedRanks={props.value.map(value => value.name)} onChange={e => props.onChange(e.target.map(value => value.name))}/> 
             )
           } else {
-            // setSelectedRanks([]);
-            // props.value = "";
             return(
               // <RankListFilter onRanksUpdate={updateRanks} selectedRanks={selectedRanks}/> 
-              <RankListFilter onRanksUpdate={updateRanks} selectedRanks={[]}/> 
+              <RankListFilter onRanksUpdate={updateRanks} setSelectedRanks={setSelectedRanks} selectedRanks={[]}/> 
             )
           }
-          
         }
       }
     ],
@@ -253,6 +256,8 @@ export default function Strike({headerHeight}) {
           <MaterialTable
             title="Strike"
             columns={state.columns}
+            // onRowClick={(event,rowData) => handleRowClick(event, rowData)}
+            onRowClick={rowData => setSelectedRanks(rowData.ranks)}
             data={
               data.Strike.sort(getSorting(order,orderBy)).map(s => {
                 return {
