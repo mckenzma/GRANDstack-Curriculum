@@ -139,10 +139,20 @@ export default function Strike({headerHeight}) {
   const [orderBy, setOrderBy] = useState("name");
 
   const [selectedRanks, setSelectedRanks] = useState([]);
+  // const [tempSelectedRanks, setTempSelectedRank] = useState([]);
+  let tempSelectedRanks = [];
 
-  // const updateRanks = (ranks) => {
-  //   setSelectedRanks(ranks);
-  // }
+  console.log("selectedRanks: ", selectedRanks);
+
+  const updateRanks = (ranks) => {
+    tempSelectedRanks = ranks;
+    // setSelectedRanks(ranks);
+    // setTempSelectedRank(ranks);
+    console.log("tempSelectedRanks: ", tempSelectedRanks);
+  }
+
+
+  // console.log("tempSelectedRanks: ", tempSelectedRanks);
 
   const [state, setState] = React.useState({
     columns: [
@@ -158,16 +168,16 @@ export default function Strike({headerHeight}) {
             ))}
             </div>),
         editComponent: props => {
-          console.log("Time to edit ranks");
-          console.log("props: ", props);
+          // console.log("Time to edit ranks");
+          // console.log("props: ", props);
           if (props.value !== undefined) {
-            console.log("props.value NOT undefined");
+            // console.log("props.value NOT undefined");
             return(
-              <RankListFilter /*onRanksUpdate={updateRanks}*/ setSelectedRanks={setSelectedRanks} selectedRanks={props.value.map(value => value.name)}/> 
+              <RankListFilter onRanksUpdate={updateRanks} /*setSelectedRanks={setSelectedRanks}*/ selectedRanks={props.value.map(value => value.name)}/> 
             )
           } else {
             return(
-              <RankListFilter /*onRanksUpdate={updateRanks}*/ setSelectedRanks={setSelectedRanks} selectedRanks={[]}/> 
+              <RankListFilter onRanksUpdate={updateRanks} /*setSelectedRanks={setSelectedRanks}*/ selectedRanks={[]}/> 
             )
           }
         }
@@ -222,8 +232,7 @@ export default function Strike({headerHeight}) {
           <MaterialTable
             title="Strike"
             columns={state.columns}
-            // onRowClick={(event,rowData) => handleRowClick(event, rowData)}
-            onRowClick={rowData => setSelectedRanks(rowData.ranks)}
+            // onRowClick={rowData => setSelectedRanks(rowData.ranks)}
             data={
               data.Strike.sort(getSorting(order,orderBy)).map(s => {
                 return {
@@ -233,7 +242,7 @@ export default function Strike({headerHeight}) {
               })
             }
             editable={{
-              onRowAdd: newData =>
+              onRowAdd: (newData, tempSelectedRanks) =>
                 new Promise(resolve => {
                   setTimeout(() => {
                     console.log(newData);
@@ -245,7 +254,8 @@ export default function Strike({headerHeight}) {
                       },
                       update: (cache, { data: { CreateStrike } }) => {
                         const { Strike } = cache.readQuery({ query: GET_STRIKES });
-                        console.log(selectedRanks);
+
+                        console.log("tempSelectedRanks:", tempSelectedRanks);
                         if (selectedRanks !== []) {
                           MergeStrikeRanks({
                             variables: {
