@@ -57,11 +57,9 @@ const GET_RANKS = gql`
 export default function RankListFilter({
   selectedRanks,
   setSelectedRanks,
-  onRanksUpdate
+  /*onRanksUpdate*/
 }) {
   const classes = useStyles();
-
-  // console.log(selectedRanks);
 
   const { loading, error, data } = useQuery(GET_RANKS);
   
@@ -71,12 +69,10 @@ export default function RankListFilter({
   const [state, setState] = useState(null);
 
   const [selected, setSelected] = useState("");
-  // const [selected, setSelected] = useState(selectedRanks);
   const [numSelected, setNumSelected] = useState(0);
   const [numSelectedRanks, setNumSelectedRanks] = useState(
-    // _selectedRanks.length
-    selectedRanks.length
     // selected.length
+    selectedRanks.length
   );
 
   const handleChange = name => event => {
@@ -87,61 +83,39 @@ export default function RankListFilter({
 
   function handleClick(event, name) {
     setSelected(selectedRanks);
-    // console.log(selectedRanks);
-    // onRanksUpdate(selectedRanks);
     const selectedIndex = selectedRanks.indexOf(name);
-    // const selectedIndex = selected.indexOf(name);
-    // console.log(selectedIndex);
     let newSelected = [];
 
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selectedRanks, name);
-      // newSelected = newSelected.concat(selected, name);
     } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selectedRanks.slice(1));
-      // newSelected = newSelected.concat(selected.slice(1));
+      newSelected = newSelected.concat(selectedRanks.slice(1));;
     } else if (selectedIndex === selectedRanks.length - 1) {
-    // } else if (selectedIndex === selected.length - 1) {
       newSelected = newSelected.concat(selectedRanks.slice(0, -1));
-      // newSelected = newSelected.concat(selected.slice(0, -1));
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
         selectedRanks.slice(0, selectedIndex),
-        // selected.slice(0, selectedIndex),
         selectedRanks.slice(selectedIndex + 1)
-        // selected.slice(selectedIndex + 1)
       );
     }
-    // console.log(newSelected);
+
     setSelectedRanks(newSelected.sort());
-    // onRanksUpdate(newSelected.sort());
-    // setSelected(newSelected.sort()); 
-    // setSelectedRanks(_selectedRanks);
     setNumSelectedRanks(newSelected.length);
   }
 
-  console.log(selected);
-  console.log(selectedRanks);
-
   const handleSelectAllClick = (event, data) => {
+    console.log('RankListFilter: handleSelectAllClick', selectedRanks);
     let newSelected = [];
 
     if (event.target.checked) {
       newSelected = data.map(n => n.name);
       setSelectedRanks(newSelected.sort());
-      // onRanksUpdate(newSelected.sort());
-      // setSelected(newSelected.sort());
       setNumSelectedRanks(rowCount);
       return;
     }
     setSelectedRanks([]);
-    // onRanksUpdate([]);
-    // setSelected([]);
     setNumSelected(0);
-    // setNumSelectedRanks(0);
   };
-
-  // onRanksUpdate(selected);
 
   function getSorting(order, orderBy) {
     return order === "desc"
@@ -160,13 +134,9 @@ export default function RankListFilter({
       <Select
         multiple
         value={selectedRanks}
-        // value={selected}
         renderValue={selectedRanks => (
-        // renderValue={selected => (
           <div className={classes.chips}>
-            {/*_selectedRanks.map(value => (*/}
             {selectedRanks.map(value => (
-            // {selected.map(value => (
               // TODO - need chips to remain ordered
               <Chip
                 key={value}
@@ -197,7 +167,6 @@ export default function RankListFilter({
               <MenuItem key={n.name} value={n.name}>
                 <Checkbox
                   checked={selectedRanks.indexOf(n.name) !== -1}
-                  // checked={selected.indexOf(n.name) !== -1}
                   onChange={handleChange(n.name)}
                   value={n.name}
                   onClick={event =>

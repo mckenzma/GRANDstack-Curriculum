@@ -132,7 +132,6 @@ const MERGE_STRIKE_RANKS_RELS = gql`
 export default function Strike({headerHeight}) {
   const classes = useStyles();
 
-  // const [name, setName] = useState("");
   const [description, setDescription] = useState("0");
   const [ranks, setRanks] = useState("");
 
@@ -141,38 +140,14 @@ export default function Strike({headerHeight}) {
 
   const [selectedRanks, setSelectedRanks] = useState([]);
 
-  const updateRanks = (ranks) => {
-    // console.log(selectedRanks);
-    setSelectedRanks(ranks);
-  }
-
-  // function handleRowClick (event, rowData) {
-  //   console.log(rowData);
-  //   setSelectedRanks(rowData.ranks);
-  // };
-
-  // const [ranksToSelect, setRanksToSelect] = useState({ 0: 'rank1', 1: 'rank2' });
+  // const updateRanks = (ranks) => {
+  //   setSelectedRanks(ranks);
+  // }
 
   const [state, setState] = React.useState({
     columns: [
       { title: 'Name', field: 'name' },
       { title: 'Description', field: 'description' },
-      // { title: 'Ranks', field: 'ranksString',
-      //   editComponent: props => {
-      //     // console.log(props);
-      //     // if (props.rowData.ranks !== undefined) {
-      //     //   if (props.rowData.ranks.length !== 0 ) {
-      //     //     console.log(props.rowData.ranks.map(r => r.name));
-      //     //     // console.log(props.rowData.ranks);
-      //     //     // updateRanks(props.rowData.ranks.map(r => r.name));
-      //     //     // setSelectedRanks(props.rowData.ranks.map(r => r.name));
-      //     //   }
-      //     // }
-      //   return(
-      //    // <RankListFilter _selectedRanks={_selectedRanks} _setSelectedRanks={_setSelectedRanks} /> 
-      //    <RankListFilter onRanksUpdate={updateRanks} selectedRanks={selectedRanks}/> 
-      //   )}
-      // // },
       { title: 'Ranks', field: 'ranks', render: rowData => (
           <div className={classes.chips}>
             {rowData.ranks.map(rank => (
@@ -183,22 +158,16 @@ export default function Strike({headerHeight}) {
             ))}
             </div>),
         editComponent: props => {
-          console.log(props);
-          console.log(props.value);
-          console.log(selectedRanks);
+          console.log("Time to edit ranks");
+          console.log("props: ", props);
           if (props.value !== undefined) {
-            // setSelectedRanks(props.value.map(value => value.name));
-            console.log("here");
-            console.log(props.value.map(value => value.name));
+            console.log("props.value NOT undefined");
             return(
-              // <RankListFilter onRanksUpdate={updateRanks} selectedRanks={selectedRanks} /> 
-              <RankListFilter onRanksUpdate={updateRanks} setSelectedRanks={setSelectedRanks} selectedRanks={props.value.map(value => value.name)}/> 
-              // <RankListFilter onRanksUpdate={updateRanks} selectedRanks={props.value.map(value => value.name)} onChange={e => props.onChange(e.target.map(value => value.name))}/> 
+              <RankListFilter /*onRanksUpdate={updateRanks}*/ setSelectedRanks={setSelectedRanks} selectedRanks={props.value.map(value => value.name)}/> 
             )
           } else {
             return(
-              // <RankListFilter onRanksUpdate={updateRanks} selectedRanks={selectedRanks}/> 
-              <RankListFilter onRanksUpdate={updateRanks} setSelectedRanks={setSelectedRanks} selectedRanks={[]}/> 
+              <RankListFilter /*onRanksUpdate={updateRanks}*/ setSelectedRanks={setSelectedRanks} selectedRanks={[]}/> 
             )
           }
         }
@@ -232,12 +201,9 @@ export default function Strike({headerHeight}) {
     : (a, b) => (a[orderBy] < b[orderBy] ? -1 : 1);
   };
 
-  // const [newStikeId, setNewStrikeId] = useState("");
-
   const [CreateStrike] = useMutation(CREATE_STRIKE);
   const [AddStrikeRanks] = useMutation(ADD_STRIKE_RANKS);
   const [MergeStrikeRanks] = useMutation(MERGE_STRIKE_RANKS_RELS);
-  // const [MergeStrikeRanks] = useMutation(MERGE_STRIKE_RANKS_RELS);
 
   const [UpdateStrike] = useMutation(UPDATE_STRIKE);
 
@@ -275,28 +241,29 @@ export default function Strike({headerHeight}) {
                     CreateStrike({
                       variables: {
                         name: newData.name,
-                        // description: (newData.description !== null ? newData.description : ""),
                         description: (newData.description !== undefined ? newData.description : ""),
                       },
                       update: (cache, { data: { CreateStrike } }) => {
                         const { Strike } = cache.readQuery({ query: GET_STRIKES });
-
-                        MergeStrikeRanks({
-                          variables: {
-                            // fromStrikeID: CreateStrike.id,
-                            fromStrikeName: CreateStrike.name,
-                            // toRankIDs: selectedRanks
-                            toRankNames: selectedRanks
-                          },
-                          update: (cache, { data: { MergeStrikeRanks } }) => {
-                            console.log(MergeStrikeRanks);
-                            CreateStrike.ranks = CreateStrike.ranks.concat(MergeStrikeRanks)
-                            cache.writeQuery({
-                              query: GET_STRIKES,
-                              data: { Strike: Strike.concat([CreateStrike]) },
-                            })
-                          }
-                        });
+                        console.log(selectedRanks);
+                        if (selectedRanks !== []) {
+                          MergeStrikeRanks({
+                            variables: {
+                              // fromStrikeID: CreateStrike.id,
+                              fromStrikeName: CreateStrike.name,
+                              // toRankIDs: selectedRanks
+                              toRankNames: selectedRanks
+                            },
+                            update: (cache, { data: { MergeStrikeRanks } }) => {
+                              console.log(MergeStrikeRanks);
+                              CreateStrike.ranks = CreateStrike.ranks.concat(MergeStrikeRanks)
+                              cache.writeQuery({
+                                query: GET_STRIKES,
+                                data: { Strike: Strike.concat([CreateStrike]) },
+                              })
+                            }
+                          });
+                        }
 
                         // AddStrikeRanks({
                         //   variables: {
@@ -323,24 +290,18 @@ export default function Strike({headerHeight}) {
                     resolve();
                     UpdateStrike({
                       variables: { 
-                        // id: oldData.id,
                         id: newData.id,
-                        // name: name, 
                         name: newData.name,
-                        // description: description
                         description: newData.description,
-                        // ranks: newData.ranks
                       },
                       update: (cache) => {
                         const existingStrikes = cache.readQuery({ query: GET_STRIKES });
                         const newStrikes = existingStrikes.Strike.map(r => {
                           if (r.id === oldData.id) {
-                            // console.log(r);
                             return {
                               ...r, 
                               name: newData.name, 
                               description: newData.description,
-                              // ranks: newData.ranks
                             };
                           } else {
                             return r;
