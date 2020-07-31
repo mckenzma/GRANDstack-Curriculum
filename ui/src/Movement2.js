@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { makeStyles } from "@material-ui/core/styles";
@@ -10,13 +10,22 @@ import TextField from "@material-ui/core/TextField";
 
 import RankListFilter from './RankListFilter';
 
+import Chip from "@material-ui/core/Chip";
+
 const useStyles = makeStyles(theme => ({
   root: {
     maxWidth: "auto",
     marginTop: theme.spacing(3),
     overflowX: "auto",
     margin: "auto"
-  }
+  },
+  chips: {
+    display: "flex",
+    flexWrap: "wrap"
+  },
+  chip: {
+    margin: theme.spacing(0.25)
+  },
 }));
 
 const GET_RANKS = gql`
@@ -24,6 +33,7 @@ const GET_RANKS = gql`
     Rank {
       id
       name
+      abbreviation
       rankOrder
     }
   }
@@ -39,6 +49,7 @@ const GET_MOVEMENTS = gql`
         id
         rankOrder
         name
+        abbreviation
       }
     }
   }
@@ -55,6 +66,7 @@ const CREATE_MOVEMENT = gql`
         id
         rankOrder
         name
+        abbreviation
       }
     }
   }
@@ -80,20 +92,26 @@ const DELETE_MOVEMENT = gql`
   }
 `;
 
-const MERGE_MOVEMENT_RANK_REL = gql`
-  mutation MergeMovementRank($movementID: ID!, $rankID: ID!)
+const MERGE_MOVEMENT_RANKS_RELS = gql`
+  mutation MergeMovementRanks($fromMovementID: ID!, $toRankIDs: [ID!])
   {
-    MergeMovementRank(fromMovementID: $movementID, toRankID: $rankID) {
+    MergeMovementRanks(fromMovementID: $fromMovementID, toRankIDs: $toRankIDs) {
       id
+      name
+      rankOrder
+      abbreviation
     }
   }
 `;
 
-const MERGE_MOVEMENT_RANKS_RELS = gql`
-  mutation MergeMovementRanks($movementID: ID!, $rankIDs:[ID!])
+const DELETE_MOVEMENT_RANKS_RELS = gql`
+  mutation DeleteMovementRanks($fromMovementID: ID!, $toRankIDs: [ID!])
   {
-    MergeMovementRanks(fromMovementID:$movementID, toRankIDs: $rankIDs){
+    DeleteMovementRanks(fromMovementID: $fromMovementID, toRankIDs: $toRankIDs) {
       id
+      name
+      rankOrder
+      abbreviation
     }
   }
 `;
@@ -101,32 +119,37 @@ const MERGE_MOVEMENT_RANKS_RELS = gql`
 export default function Movement({headerHeight}) {
   const classes = useStyles();
 
-  // const [name, setName] = useState("");
   const [description, setDescription] = useState("0");
   const [ranks, setRanks] = useState("");
 
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("name");
 
-  const [selectedRanks, setSelectedRanks] = useState([]);
-
-  const [ranksToSelect, setRanksToSelect] = useState({ 0: 'rank1', 1: 'rank2' });
-
   const [state, setState] = React.useState({
     columns: [
       { title: 'Name', field: 'name' },
       { title: 'Description', field: 'description' },
-      { title: 'Ranks', field: 'ranksString',
-        editComponent: props => (
-         <RankListFilter selectedRanks={selectedRanks} setSelectedRanks={setSelectedRanks} /> 
-        )
-      // },
-      // {
-      //   title: 'Birth Place',
-      //   field: 'birthCity',
-      //   // lookup: { 34: 'İstanbul', 63: 'Şanlıurfa' },
-      //   lookup: ranksToSelect,
-      },
+      { title: 'Ranks', field: 'ranks', render: rowData => (
+          <div className={classes.chips}>
+            {rowData.ranks.sort(getSorting("asc","rankOrder")).map(rank => (
+              <Chip
+                key={rank.id}
+                label={rank.abbreviation} // abbreviation vs name
+              />
+            ))}
+            </div>),
+        editComponent: props => {
+          if (props.value !== undefined) {
+            return(
+              <RankListFilter value={props.value} onChange={props.onChange}  /> 
+            )
+          } else {
+            return(
+              <RankListFilter value={[]} onChange={props.onChange} /> 
+            )
+          }
+        }
+      }
     ],
   });
 
@@ -157,11 +180,10 @@ export default function Movement({headerHeight}) {
   };
 
   const [CreateMovement] = useMutation(CREATE_MOVEMENT);
-  const [MergeMovementRanks] = useMutation(MERGE_MOVEMENT_RANKS_RELS);
-
   const [UpdateMovement] = useMutation(UPDATE_MOVEMENT);
-
   const [DeleteMovement] = useMutation(DELETE_MOVEMENT);
+  const [MergeMovementRanks] = useMutation(MERGE_MOVEMENT_RANKS_RELS);
+  const [DeleteMovementRanks] = useMutation(DELETE_MOVEMENT_RANKS_RELS);
 
   const { loading, error, data } = useQuery(GET_MOVEMENTS);
 
@@ -171,7 +193,6 @@ export default function Movement({headerHeight}) {
   return (
     <Paper className={classes.root} elevation={3} style={style2}>
       <Grid container>
-    {/*<RankListFilter selectedRanks={selectedRanks} setSelectedRanks={setSelectedRanks} /> */}
         <Grid item xs={12}>
           <MaterialTable
             title="Movement"
@@ -180,7 +201,6 @@ export default function Movement({headerHeight}) {
               data.Movement.sort(getSorting(order,orderBy)).map(s => {
                 return {
                   ...s,
-                  ranksString: s.ranks.sort(getSorting("asc","rankOrder")).map(r => { return r.name }).flat(2).join(', ')
                 }
               })
             }
@@ -192,14 +212,26 @@ export default function Movement({headerHeight}) {
                     CreateMovement({
                       variables: {
                         name: newData.name,
-                        description: newData.description
+                        description: (newData.description !== undefined ? newData.description : ""),
                       },
                       update: (cache, { data: { CreateMovement } }) => {
                         const { Movement } = cache.readQuery({ query: GET_MOVEMENTS });
-                        cache.writeQuery({
-                          query: GET_MOVEMENTS,
-                          data: { Movement: Movement.concat([CreateMovement]) },
-                        })
+
+                        if (newData.ranks.length !== 0) {
+                          MergeMovementRanks({
+                            variables: {
+                              fromMovementID: CreateMovement.id,
+                              toRankIDs: newData.ranks.map(r => r.id)
+                            },
+                            update: (cache, { data: { MergeMovementRanks } }) => {
+                              CreateMovement.ranks = CreateMovement.ranks.concat(MergeMovementRanks)
+                              cache.writeQuery({
+                                query: GET_MOVEMENTS,
+                                data: { Movement: Movement.concat([CreateMovement]) },
+                              })
+                            }
+                          });
+                        }
                       }
                     });
                   }, 600);
@@ -210,30 +242,72 @@ export default function Movement({headerHeight}) {
                     resolve();
                     UpdateMovement({
                       variables: { 
-                        // id: oldData.id,
                         id: newData.id,
-                        // name: name, 
                         name: newData.name,
-                        // description: description
-                        description: newData.description
+                        description: newData.description,
                       },
-                      update: (cache) => {
+                      update: (cache, { data: { UpdateMovement } }) => {
+                        let relsToAdd = [];
+                        let relsToDelete = [];
+
+                        if (newData.ranks !== oldData.ranks) {
+                          relsToAdd = relsToAdd.concat(newData.ranks.filter(r => !oldData.ranks.some(r2 => r2.id === r.id)));
+                          relsToDelete = relsToDelete.concat(oldData.ranks.filter(r => !newData.ranks.some(r2 => r2.id === r.id)));
+                        };
+                        
+                        if (relsToAdd.length !== 0){
+                          MergeMovementRanks({
+                            variables: {
+                              fromMovementID: newData.id,
+                              toRankIDs: relsToAdd.map(rel => rel.id)
+                            },
+                            update: (cache, { data: { MergeMovementRanks } }) => {
+                              const existingMovements = cache.readQuery({ query: GET_MOVEMENTS });
+                              const newMovements = existingMovements.Movement.filter(r => (r.id !== oldData.id));
+                              cache.writeQuery({
+                                query: GET_MOVEMENTS,
+                                data: { Movement: newMovements.concat(newData) }
+                              });
+                            }
+                          });
+                        }
+
+                        if (relsToDelete.length !== 0){
+                          DeleteMovementRanks({
+                            variables: {
+                              fromMovementID: newData.id,
+                              toRankIDs: relsToDelete.map(rel => rel.id)
+                            },
+                            update: (cache, {data: { DeleteMovementRanks } }) => {
+                              const existingMovements = cache.readQuery({ query: GET_MOVEMENTS });
+                              const newMovements = existingMovements.Movement.filter(r => (r.id !== oldData.id));
+                              cache.writeQuery({
+                                query: GET_MOVEMENTS,
+                                data: { Movement: newMovements.concat(newData) }
+                              });
+                            }
+                          })
+                        }
+
+                        // is this needed? here -->
                         const existingMovements = cache.readQuery({ query: GET_MOVEMENTS });
                         const newMovements = existingMovements.Movement.map(r => {
                           if (r.id === oldData.id) {
                             return {
                               ...r, 
                               name: newData.name, 
-                              description: newData.description
+                              description: newData.description,
                             };
                           } else {
                             return r;
                           }
                         });
-                        cache.writeQuery({
-                          query: GET_MOVEMENTS,
-                          data: { Movement: newMovements }
-                        })
+                        // cache.writeQuery({
+                        //   query: GET_MOVEMENTS,
+                        //   data: { Movement: newMovements }
+                        // })
+                        // <-- to here?
+
                       }
                     });
                   }, 600);

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { makeStyles } from "@material-ui/core/styles";
@@ -10,13 +10,22 @@ import TextField from "@material-ui/core/TextField";
 
 import RankListFilter from './RankListFilter';
 
+import Chip from "@material-ui/core/Chip";
+
 const useStyles = makeStyles(theme => ({
   root: {
     maxWidth: "auto",
     marginTop: theme.spacing(3),
     overflowX: "auto",
     margin: "auto"
-  }
+  },
+  chips: {
+    display: "flex",
+    flexWrap: "wrap"
+  },
+  chip: {
+    margin: theme.spacing(0.25)
+  },
 }));
 
 const GET_RANKS = gql`
@@ -24,6 +33,7 @@ const GET_RANKS = gql`
     Rank {
       id
       name
+      abbreviation
       rankOrder
     }
   }
@@ -39,6 +49,7 @@ const GET_STANCES = gql`
         id
         rankOrder
         name
+        abbreviation
       }
     }
   }
@@ -55,6 +66,7 @@ const CREATE_STANCE = gql`
         id
         rankOrder
         name
+        abbreviation
       }
     }
   }
@@ -80,20 +92,26 @@ const DELETE_STANCE = gql`
   }
 `;
 
-const MERGE_STANCE_RANK_REL = gql`
-  mutation MergeStanceRank($stanceID: ID!, $rankID: ID!)
+const MERGE_STANCE_RANKS_RELS = gql`
+  mutation MergeStanceRanks($fromStanceID: ID!, $toRankIDs: [ID!])
   {
-    MergeStanceRank(fromStanceID: $stanceID, toRankID: $rankID) {
+    MergeStanceRanks(fromStanceID: $fromStanceID, toRankIDs: $toRankIDs) {
       id
+      name
+      rankOrder
+      abbreviation
     }
   }
 `;
 
-const MERGE_STANCE_RANKS_RELS = gql`
-  mutation MergeStanceRanks($stanceID: ID!, $rankIDs:[ID!])
+const DELETE_STANCE_RANKS_RELS = gql`
+  mutation DeleteStanceRanks($fromStanceID: ID!, $toRankIDs: [ID!])
   {
-    MergeStanceRanks(fromStanceID:$stanceID, toRankIDs: $rankIDs){
+    DeleteStanceRanks(fromStanceID: $fromStanceID, toRankIDs: $toRankIDs) {
       id
+      name
+      rankOrder
+      abbreviation
     }
   }
 `;
@@ -101,32 +119,37 @@ const MERGE_STANCE_RANKS_RELS = gql`
 export default function Stance({headerHeight}) {
   const classes = useStyles();
 
-  // const [name, setName] = useState("");
   const [description, setDescription] = useState("0");
   const [ranks, setRanks] = useState("");
 
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("name");
 
-  const [selectedRanks, setSelectedRanks] = useState([]);
-
-  const [ranksToSelect, setRanksToSelect] = useState({ 0: 'rank1', 1: 'rank2' });
-
   const [state, setState] = React.useState({
     columns: [
       { title: 'Name', field: 'name' },
       { title: 'Description', field: 'description' },
-      { title: 'Ranks', field: 'ranksString',
-        editComponent: props => (
-         <RankListFilter selectedRanks={selectedRanks} setSelectedRanks={setSelectedRanks} /> 
-        )
-      // },
-      // {
-      //   title: 'Birth Place',
-      //   field: 'birthCity',
-      //   // lookup: { 34: 'İstanbul', 63: 'Şanlıurfa' },
-      //   lookup: ranksToSelect,
-      },
+      { title: 'Ranks', field: 'ranks', render: rowData => (
+          <div className={classes.chips}>
+            {rowData.ranks.sort(getSorting("asc","rankOrder")).map(rank => (
+              <Chip
+                key={rank.id}
+                label={rank.abbreviation} // abbreviation vs name
+              />
+            ))}
+            </div>),
+        editComponent: props => {
+          if (props.value !== undefined) {
+            return(
+              <RankListFilter value={props.value} onChange={props.onChange}  /> 
+            )
+          } else {
+            return(
+              <RankListFilter value={[]} onChange={props.onChange} /> 
+            )
+          }
+        }
+      }
     ],
   });
 
@@ -157,11 +180,10 @@ export default function Stance({headerHeight}) {
   };
 
   const [CreateStance] = useMutation(CREATE_STANCE);
-  const [MergeStanceRanks] = useMutation(MERGE_STANCE_RANKS_RELS);
-
   const [UpdateStance] = useMutation(UPDATE_STANCE);
-
   const [DeleteStance] = useMutation(DELETE_STANCE);
+  const [MergeStanceRanks] = useMutation(MERGE_STANCE_RANKS_RELS);
+  const [DeleteStanceRanks] = useMutation(DELETE_STANCE_RANKS_RELS);
 
   const { loading, error, data } = useQuery(GET_STANCES);
 
@@ -171,7 +193,6 @@ export default function Stance({headerHeight}) {
   return (
     <Paper className={classes.root} elevation={3} style={style2}>
       <Grid container>
-    {/*<RankListFilter selectedRanks={selectedRanks} setSelectedRanks={setSelectedRanks} /> */}
         <Grid item xs={12}>
           <MaterialTable
             title="Stance"
@@ -180,7 +201,6 @@ export default function Stance({headerHeight}) {
               data.Stance.sort(getSorting(order,orderBy)).map(s => {
                 return {
                   ...s,
-                  ranksString: s.ranks.sort(getSorting("asc","rankOrder")).map(r => { return r.name }).flat(2).join(', ')
                 }
               })
             }
@@ -192,14 +212,26 @@ export default function Stance({headerHeight}) {
                     CreateStance({
                       variables: {
                         name: newData.name,
-                        description: newData.description
+                        description: (newData.description !== undefined ? newData.description : ""),
                       },
                       update: (cache, { data: { CreateStance } }) => {
                         const { Stance } = cache.readQuery({ query: GET_STANCES });
-                        cache.writeQuery({
-                          query: GET_STANCES,
-                          data: { Stance: Stance.concat([CreateStance]) },
-                        })
+
+                        if (newData.ranks.length !== 0) {
+                          MergeStanceRanks({
+                            variables: {
+                              fromStanceID: CreateStance.id,
+                              toRankIDs: newData.ranks.map(r => r.id)
+                            },
+                            update: (cache, { data: { MergeStanceRanks } }) => {
+                              CreateStance.ranks = CreateStance.ranks.concat(MergeStanceRanks)
+                              cache.writeQuery({
+                                query: GET_STANCES,
+                                data: { Stance: Stance.concat([CreateStance]) },
+                              })
+                            }
+                          });
+                        }
                       }
                     });
                   }, 600);
@@ -210,30 +242,72 @@ export default function Stance({headerHeight}) {
                     resolve();
                     UpdateStance({
                       variables: { 
-                        // id: oldData.id,
                         id: newData.id,
-                        // name: name, 
                         name: newData.name,
-                        // description: description
-                        description: newData.description
+                        description: newData.description,
                       },
-                      update: (cache) => {
+                      update: (cache, { data: { UpdateStance } }) => {
+                        let relsToAdd = [];
+                        let relsToDelete = [];
+
+                        if (newData.ranks !== oldData.ranks) {
+                          relsToAdd = relsToAdd.concat(newData.ranks.filter(r => !oldData.ranks.some(r2 => r2.id === r.id)));
+                          relsToDelete = relsToDelete.concat(oldData.ranks.filter(r => !newData.ranks.some(r2 => r2.id === r.id)));
+                        };
+                        
+                        if (relsToAdd.length !== 0){
+                          MergeStanceRanks({
+                            variables: {
+                              fromStanceID: newData.id,
+                              toRankIDs: relsToAdd.map(rel => rel.id)
+                            },
+                            update: (cache, { data: { MergeStanceRanks } }) => {
+                              const existingStances = cache.readQuery({ query: GET_STANCES });
+                              const newStances = existingStances.Stance.filter(r => (r.id !== oldData.id));
+                              cache.writeQuery({
+                                query: GET_STANCES,
+                                data: { Stance: newStances.concat(newData) }
+                              });
+                            }
+                          });
+                        }
+
+                        if (relsToDelete.length !== 0){
+                          DeleteStanceRanks({
+                            variables: {
+                              fromStanceID: newData.id,
+                              toRankIDs: relsToDelete.map(rel => rel.id)
+                            },
+                            update: (cache, {data: { DeleteStanceRanks } }) => {
+                              const existingStances = cache.readQuery({ query: GET_STANCES });
+                              const newStances = existingStances.Stance.filter(r => (r.id !== oldData.id));
+                              cache.writeQuery({
+                                query: GET_STANCES,
+                                data: { Stance: newStances.concat(newData) }
+                              });
+                            }
+                          })
+                        }
+
+                        // is this needed? here -->
                         const existingStances = cache.readQuery({ query: GET_STANCES });
                         const newStances = existingStances.Stance.map(r => {
                           if (r.id === oldData.id) {
                             return {
                               ...r, 
                               name: newData.name, 
-                              description: newData.description
+                              description: newData.description,
                             };
                           } else {
                             return r;
                           }
                         });
-                        cache.writeQuery({
-                          query: GET_STANCES,
-                          data: { Stance: newStances }
-                        })
+                        // cache.writeQuery({
+                        //   query: GET_STANCES,
+                        //   data: { Stance: newStances }
+                        // })
+                        // <-- to here?
+
                       }
                     });
                   }, 600);
