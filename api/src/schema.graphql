@@ -157,28 +157,6 @@ type Step {
 }
 
 type Mutation {
-  # MergeStrikeRank(fromStrikeID: ID!, toRankID: ID!): Rank @cypher(
-  #   statement:
-  #   """
-  #   MATCH (strike:Strike {id: $fromStrikeID})
-  #   MATCH (rank:Rank {id: $toRankID})
-  #   MERGE (strike)-[:REQUIRED_FOR]->(rank)
-  #   RETURN rank
-  #   """
-  # )
-
-  # TODO - update to use IDs
-  # MergeStrikeRanks(fromStrikeName: String!, toRankNames: [String!]): [Rank] @cypher(
-  #   statement:
-  #   """
-  #   MATCH (strike:Strike {name: $fromStrikeName})
-  #   UNWIND $toRankNames AS toRankName
-  #   MATCH (rank:Rank {name: toRankName})
-  #   MERGE (strike)-[:REQUIRED_FOR]->(rank)
-  #   RETURN rank
-  #   """
-  # )
-
   MergeStrikeRanks(fromStrikeID: ID!, toRankIDs: [ID!]): [Rank] @cypher(
     statement:
     """
@@ -200,16 +178,26 @@ type Mutation {
     """
   )
 
-  # MergeStrikeRanks(from: _StrikeInput!, to: [_RankInput!]): [Rank] @cypher(
-  #   statement:
-  #   """
-  #   MATCH (strike:Strike {id: $from.id})
-  #   UNWIND $to AS rank
-  #   MATCH (rank:Rank {id: rank.id})
-  #   MERGE (strike)-[:REQUIRED_FOR]->(rank)
-  #   RETURN rank
-  #   """
-  # )
+  MergeBlockRanks(fromBlockID: ID!, toRankIDs: [ID!]): [Rank] @cypher(
+    statement:
+    """
+    MATCH (block:Block {id: $fromBlockID})
+    UNWIND $toRankIDs AS toRankID
+    MATCH (rank:Rank {id: toRankID})
+    MERGE (block)-[:REQUIRED_FOR]->(rank)
+    RETURN rank
+    """
+  )
+
+  DeleteBlockRanks(fromBlockID: ID!, toRankIDs: [ID!]): [Rank] @cypher(
+    statement:
+    """
+    MATCH (block:Block {id: $fromBlockID})-[r:REQUIRED_FOR]->(rank:Rank)
+    WHERE rank.id IN $toRankIDs
+    DELETE r
+    RETURN rank
+    """
+  )
 
 
   # CreateStepConnectToMove(fromMoveID: ID!): Step @cypher(

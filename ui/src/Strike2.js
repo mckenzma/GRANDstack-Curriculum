@@ -72,26 +72,6 @@ const CREATE_STRIKE = gql`
   }
 `;
 
-const ADD_STRIKE_RANKS = gql`
-  mutation AddStrikeRanks(
-    $from: _StrikeInput!,
-    $to: _RankInput!
-  ) {
-    AddStrikeRanks(from: $from, to: $to) {
-      from {
-        id
-#        name
-      }
-      to {
-        id
-        name
-        rankOrder
-        abbreviation
-      }
-    }
-  }
-`;
-
 const UPDATE_STRIKE = gql`
   mutation UpdateStrike($id: ID!, $name: String!, $description: String) 
   {
@@ -200,13 +180,10 @@ export default function Strike({headerHeight}) {
   };
 
   const [CreateStrike] = useMutation(CREATE_STRIKE);
-  const [AddStrikeRanks] = useMutation(ADD_STRIKE_RANKS);
+  const [UpdateStrike] = useMutation(UPDATE_STRIKE);
+  const [DeleteStrike] = useMutation(DELETE_STRIKE);
   const [MergeStrikeRanks] = useMutation(MERGE_STRIKE_RANKS_RELS);
   const [DeleteStrikeRanks] = useMutation(DELETE_STRIKE_RANKS_RELS);
-
-  const [UpdateStrike] = useMutation(UPDATE_STRIKE);
-
-  const [DeleteStrike] = useMutation(DELETE_STRIKE);
 
   const { loading, error, data } = useQuery(GET_STRIKES);
 
@@ -255,7 +232,6 @@ export default function Strike({headerHeight}) {
                             }
                           });
                         }
-
                       }
                     });
                   }, 600);
@@ -297,8 +273,6 @@ export default function Strike({headerHeight}) {
                         }
 
                         if (relsToDelete.length !== 0){
-                          console.log("Delete rels");
-                          console.log(relsToDelete);
                           DeleteStrikeRanks({
                             variables: {
                               fromStrikeID: newData.id,
