@@ -279,7 +279,6 @@ export default function Strike({headerHeight}) {
                               toRankIDs: relsToDelete.map(rel => rel.id)
                             },
                             update: (cache, {data: { DeleteStrikeRanks } }) => {
-                              console.log(DeleteStrikeRanks);
                               const existingStrikes = cache.readQuery({ query: GET_STRIKES });
                               const newStrikes = existingStrikes.Strike.filter(r => (r.id !== oldData.id));
                               cache.writeQuery({

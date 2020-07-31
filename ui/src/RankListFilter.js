@@ -41,6 +41,7 @@ const GET_RANKS = gql`
     Rank {
       id
       name
+      abbreviation
       rankOrder
     }
   }

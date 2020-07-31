@@ -279,7 +279,6 @@ export default function Block({headerHeight}) {
                               toRankIDs: relsToDelete.map(rel => rel.id)
                             },
                             update: (cache, {data: { DeleteBlockRanks } }) => {
-                              console.log(DeleteBlockRanks);
                               const existingBlocks = cache.readQuery({ query: GET_BLOCKS });
                               const newBlocks = existingBlocks.Block.filter(r => (r.id !== oldData.id));
                               cache.writeQuery({

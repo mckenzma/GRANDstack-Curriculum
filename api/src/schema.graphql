@@ -199,6 +199,26 @@ type Mutation {
     """
   )
 
+  MergeKickRanks(fromKickID: ID!, toRankIDs: [ID!]): [Rank] @cypher(
+    statement:
+    """
+    MATCH (kick:Kick {id: $fromKickID})
+    UNWIND $toRankIDs AS toRankID
+    MATCH (rank:Rank {id: toRankID})
+    MERGE (kick)-[:REQUIRED_FOR]->(rank)
+    RETURN rank
+    """
+  )
+
+  DeleteKickRanks(fromKickID: ID!, toRankIDs: [ID!]): [Rank] @cypher(
+    statement:
+    """
+    MATCH (kick:Kick {id: $fromKickID})-[r:REQUIRED_FOR]->(rank:Rank)
+    WHERE rank.id IN $toRankIDs
+    DELETE r
+    RETURN rank
+    """
+  )
 
   # CreateStepConnectToMove(fromMoveID: ID!): Step @cypher(
   #   statement:
