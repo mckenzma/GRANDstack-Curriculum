@@ -34,33 +34,41 @@ const GET_TESTING_REQUIREMENTS = gql`
         id: $rankID
       }
     ) {
+    	id
       name
       rankOrder
       strikes {
+      	id
       	name
       	description
       }
       blocks {
+      	id
       	name
       	description
       }
       kicks {
+      	id
       	name
       	description
       }
       stances {
+      	id
       	name
       	description
       }
       movements {
+      	id
       	name
       	description
       }
       turns {
+      	id
       	name
       	description
       }
       katas {
+      	id
       	name
       }
     }
@@ -100,109 +108,139 @@ export default function Testing({headerHeight}) {
 				{data.Rank.map(r => {
 					return (
 
-			<Grid container spacing={3}>
+						<Grid container spacing={3} key={r.id}>
 
-				{r.strikes.length > 0 && 
-					<Grid item sm={12}>
-						<Paper elevation={2}>
-							<Typography variant="h3">Strikes</Typography>
-							<List>
-							{r.strikes.map(s => {
-								return (
-									<ListItem>
-										<ListItemText
-											primary={s.name}
-											secondary={s.description}
-										/>
-									</ListItem>
-								);
-							})}
-							</List>
-						</Paper>
-					</Grid>
-				}
+							{r.strikes.length > 0 && 
+								<Grid item sm={12}>
+									<Paper elevation={2}>
+										<Typography variant="h3">Strikes</Typography>
+										<List>
+										{r.strikes.map(s => {
+											return (
+												<ListItem key={s.id}>
+													<ListItemText
+														primary={s.name}
+														secondary={s.description}
+													/>
+												</ListItem>
+											);
+										})}
+										</List>
+									</Paper>
+								</Grid>
+							}
 
-				{r.blocks.length > 0 && 
-					<Grid item sm={12}>
-					 	<Paper elevation={2}>
-							<h3>Blocks</h3>
-							{r.blocks.map(b => {
-								return (
-									<p>{b.name}</p>
-								);
-							})}
-						</Paper>
-					</Grid>
-				}
+							{r.blocks.length > 0 && 
+								<Grid item sm={12}>
+								 	<Paper elevation={2}>
+										<Typography variant="h3">Blocks</Typography>
+										{r.blocks.map(b => {
+											return (
+												<ListItem key={b.id}>
+													<ListItemText
+														primary={b.name}
+														secondary={b.description}
+													/>
+												</ListItem>
+											);
+										})}
+									</Paper>
+								</Grid>
+							}
 
-				{r.kicks.length > 0 && 
-					<Grid item sm={12}>
-						<Paper elevation={2}>
-							<h3>Kicks</h3>
-							{r.kicks.map(k => {
-								return (
-									<p>{k.name}</p>
-								);
-							})}
-						</Paper>
-					</Grid>
-				}
+							{r.kicks.length > 0 && 
+								<Grid item sm={12}>
+									<Paper elevation={2}>
+										<Typography variant="h3">Kicks</Typography>
+										{r.kicks.map(k => {
+											return (
+												<ListItem key={k.id}>
+													<ListItemText
+														primary={k.name}
+														secondary={k.description}
+													/>
+												</ListItem>
+											);
+										})}
+									</Paper>
+								</Grid>
+							}
 
-				{r.stances.length > 0 && 
-					<Grid item sm={12}>
-						<Paper elevation={2}>
-							<h3>Stances</h3>
-							{r.stances.map(s => {
-								return (
-									<p>{s.name}</p>
-								);
-							})}
-						</Paper>
-					</Grid>
-				}
+							{r.stances.length > 0 && 
+								<Grid item sm={12}>
+									<Paper elevation={2}>
+										<Typography variant="h3">Stances</Typography>
+										{r.stances.map(s => {
+											return (
+												<ListItem key={s.id}>
+													<ListItemText
+														primary={s.name}
+														secondary={s.description}
+													/>
+												</ListItem>
+											);
+										})}
+									</Paper>
+								</Grid>
+							}
 
-				{r.movements.length > 0 && 
-					<Grid item sm={12}>
-						<Paper elevation={2}>
-							<h3>Movements</h3>
-							{r.movements.map(m => {
-								return (
-									<p>{m.name}</p>
-								);
-							})}
-						</Paper>
-					</Grid>
-				}
+							{r.movements.length > 0 && 
+								<Grid item sm={12}>
+									<Paper elevation={2}>
+										<Typography variant="h3">Movements</Typography>
+										{r.movements.map(m => {
+											return (
+												<ListItem key={m.id}>
+													<ListItemText
+														primary={m.name}
+														secondary={m.description}
+													/>
+												</ListItem>
+											);
+										})}
+									</Paper>
+								</Grid>
+							}
 
-				{r.turns.length > 0 && 
-					<Grid item sm={12}>
-						<Paper elevation={2}>
-							<h3>Turns</h3>
-							{r.turns.map(t => {
-								return (
-									<p>{t.name}</p>
-								);
-							})}
-						</Paper>
-					</Grid>
-				}
+							{r.turns.length > 0 && 
+								<Grid item sm={12}>
+									<Paper elevation={2}>
+										<Typography variant="h3">Turns</Typography>
+										{r.turns.map(t => {
+											return (
+												<ListItem key={t.id}>
+													<ListItemText
+														primary={t.name}
+														secondary={t.description}
+													/>
+												</ListItem>
+											);
+										})}
+									</Paper>
+								</Grid>
+							}
 
-				{r.katas.length > 0 && 
-					<Grid item sm={12}>
-						<Paper elevation={2}>
-							<h3>Katas</h3>
-							{r.katas.map(k => {
-								return (
-									<p>{k.name}</p>
-								);
-							})}
-						</Paper>
-					</Grid>
-				}
+							{r.katas.length > 0 && 
+								<Grid item sm={12}>
+									<Paper elevation={2}>
+										<Typography variant="h3">Katas</Typography>
+										{r.katas.map(k => {
+											return (
+												<ListItem key={k.id}>
+													<ListItemText
+														primary={k.name}
+														secondary={k.description}
+													/>
+												</ListItem>
+											);
+										})}
+									</Paper>
+								</Grid>
+							}
 
-			</Grid>
+						</Grid>
 
-				);
+					);
 				})}
 
 			{/*</Grid>*/}
