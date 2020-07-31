@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { makeStyles } from "@material-ui/core/styles";
@@ -33,6 +33,7 @@ const GET_RANKS = gql`
     Rank {
       id
       name
+      abbreviation
       rankOrder
     }
   }
@@ -48,6 +49,7 @@ const GET_STRIKES = gql`
         id
         rankOrder
         name
+        abbreviation
       }
     }
   }
@@ -64,6 +66,7 @@ const CREATE_STRIKE = gql`
         id
         rankOrder
         name
+        abbreviation
       }
     }
   }
@@ -83,6 +86,7 @@ const ADD_STRIKE_RANKS = gql`
         id
         name
         rankOrder
+        abbreviation
       }
     }
   }
@@ -108,26 +112,29 @@ const DELETE_STRIKE = gql`
   }
 `;
 
-// const MERGE_STRIKE_RANK_REL = gql`
-//   mutation MergeStrikeRank($strikeID: ID!, $rankID: ID!)
-//   {
-//     MergeStrikeRank(fromStrikeID: $strikeID, toRankID: $rankID) {
-//       id
-//     }
-//   }
-// `;
-
 const MERGE_STRIKE_RANKS_RELS = gql`
-  mutation MergeStrikeRanks($fromStrikeName: String!, $toRankNames:[String!])
+  mutation MergeStrikeRanks($fromStrikeID: ID!, $toRankIDs: [ID!])
   {
-    MergeStrikeRanks(fromStrikeName:$fromStrikeName, toRankNames: $toRankNames){
+    MergeStrikeRanks(fromStrikeID: $fromStrikeID, toRankIDs: $toRankIDs) {
       id
       name
       rankOrder
+      abbreviation
     }
   }
 `;
 
+const DELETE_STRIKE_RANKS_RELS = gql`
+  mutation DeleteStrikeRanks($fromStrikeID: ID!, $toRankIDs: [ID!])
+  {
+    DeleteStrikeRanks(fromStrikeID: $fromStrikeID, toRankIDs: $toRankIDs) {
+      id
+      name
+      rankOrder
+      abbreviation
+    }
+  }
+`;
 
 export default function Strike({headerHeight}) {
   const classes = useStyles();
@@ -138,46 +145,27 @@ export default function Strike({headerHeight}) {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("name");
 
-  const [selectedRanks, setSelectedRanks] = useState([]);
-  // const [tempSelectedRanks, setTempSelectedRank] = useState([]);
-  let tempSelectedRanks = [];
-
-  console.log("selectedRanks: ", selectedRanks);
-
-  const updateRanks = (ranks) => {
-    tempSelectedRanks = ranks;
-    // setSelectedRanks(ranks);
-    // setTempSelectedRank(ranks);
-    console.log("tempSelectedRanks: ", tempSelectedRanks);
-  }
-
-
-  // console.log("tempSelectedRanks: ", tempSelectedRanks);
-
   const [state, setState] = React.useState({
     columns: [
       { title: 'Name', field: 'name' },
       { title: 'Description', field: 'description' },
       { title: 'Ranks', field: 'ranks', render: rowData => (
           <div className={classes.chips}>
-            {rowData.ranks.map(rank => (
+            {rowData.ranks.sort(getSorting("asc","rankOrder")).map(rank => (
               <Chip
-                key={rank.name}
-                label={rank.name}
+                key={rank.id}
+                label={rank.abbreviation} // abbreviation vs name
               />
             ))}
             </div>),
         editComponent: props => {
-          // console.log("Time to edit ranks");
-          // console.log("props: ", props);
           if (props.value !== undefined) {
-            // console.log("props.value NOT undefined");
             return(
-              <RankListFilter onRanksUpdate={updateRanks} /*setSelectedRanks={setSelectedRanks}*/ selectedRanks={props.value.map(value => value.name)}/> 
+              <RankListFilter value={props.value} onChange={props.onChange}  /> 
             )
           } else {
             return(
-              <RankListFilter onRanksUpdate={updateRanks} /*setSelectedRanks={setSelectedRanks}*/ selectedRanks={[]}/> 
+              <RankListFilter value={[]} onChange={props.onChange} /> 
             )
           }
         }
@@ -214,6 +202,7 @@ export default function Strike({headerHeight}) {
   const [CreateStrike] = useMutation(CREATE_STRIKE);
   const [AddStrikeRanks] = useMutation(ADD_STRIKE_RANKS);
   const [MergeStrikeRanks] = useMutation(MERGE_STRIKE_RANKS_RELS);
+  const [DeleteStrikeRanks] = useMutation(DELETE_STRIKE_RANKS_RELS);
 
   const [UpdateStrike] = useMutation(UPDATE_STRIKE);
 
@@ -227,25 +216,21 @@ export default function Strike({headerHeight}) {
   return (
     <Paper className={classes.root} elevation={3} style={style2}>
       <Grid container>
-    {/*<RankListFilter selectedRanks={selectedRanks} setSelectedRanks={setSelectedRanks} /> */}
         <Grid item xs={12}>
           <MaterialTable
             title="Strike"
             columns={state.columns}
-            // onRowClick={rowData => setSelectedRanks(rowData.ranks)}
             data={
               data.Strike.sort(getSorting(order,orderBy)).map(s => {
                 return {
                   ...s,
-                  // ranksString: s.ranks.sort(getSorting("asc","rankOrder")).map(r => { return r.name }).flat(2).join(', ')
                 }
               })
             }
             editable={{
-              onRowAdd: (newData, tempSelectedRanks) =>
+              onRowAdd: newData =>
                 new Promise(resolve => {
                   setTimeout(() => {
-                    console.log(newData);
                     resolve();
                     CreateStrike({
                       variables: {
@@ -255,17 +240,13 @@ export default function Strike({headerHeight}) {
                       update: (cache, { data: { CreateStrike } }) => {
                         const { Strike } = cache.readQuery({ query: GET_STRIKES });
 
-                        console.log("tempSelectedRanks:", tempSelectedRanks);
-                        if (selectedRanks !== []) {
+                        if (newData.ranks.length !== 0) {
                           MergeStrikeRanks({
                             variables: {
-                              // fromStrikeID: CreateStrike.id,
-                              fromStrikeName: CreateStrike.name,
-                              // toRankIDs: selectedRanks
-                              toRankNames: selectedRanks
+                              fromStrikeID: CreateStrike.id,
+                              toRankIDs: newData.ranks.map(r => r.id)
                             },
                             update: (cache, { data: { MergeStrikeRanks } }) => {
-                              console.log(MergeStrikeRanks);
                               CreateStrike.ranks = CreateStrike.ranks.concat(MergeStrikeRanks)
                               cache.writeQuery({
                                 query: GET_STRIKES,
@@ -274,21 +255,6 @@ export default function Strike({headerHeight}) {
                             }
                           });
                         }
-
-                        // AddStrikeRanks({
-                        //   variables: {
-                        //     from: {id: CreateStrike.id},
-                        //     to: {id: "cd4abd01-03ab-4204-b706-87390a509c3d"}
-                        //   },
-                        //   update: (cache, { data: { AddStrikeRanks } }) => {
-                        //     CreateStrike.ranks = CreateStrike.ranks.concat([AddStrikeRanks.to])
-                        //     cache.writeQuery({
-                        //       query: GET_STRIKES,
-                        //       data: { Strike: Strike.concat([CreateStrike]) },
-                        //     })
-                        //   }
-                        // });
-
 
                       }
                     });
@@ -304,7 +270,53 @@ export default function Strike({headerHeight}) {
                         name: newData.name,
                         description: newData.description,
                       },
-                      update: (cache) => {
+                      update: (cache, { data: { UpdateStrike } }) => {
+                        let relsToAdd = [];
+                        let relsToDelete = [];
+
+                        if (newData.ranks !== oldData.ranks) {
+                          relsToAdd = relsToAdd.concat(newData.ranks.filter(r => !oldData.ranks.some(r2 => r2.id === r.id)));
+                          relsToDelete = relsToDelete.concat(oldData.ranks.filter(r => !newData.ranks.some(r2 => r2.id === r.id)));
+                        };
+                        
+                        if (relsToAdd.length !== 0){
+                          MergeStrikeRanks({
+                            variables: {
+                              fromStrikeID: newData.id,
+                              toRankIDs: relsToAdd.map(rel => rel.id)
+                            },
+                            update: (cache, { data: { MergeStrikeRanks } }) => {
+                              const existingStrikes = cache.readQuery({ query: GET_STRIKES });
+                              const newStrikes = existingStrikes.Strike.filter(r => (r.id !== oldData.id));
+                              cache.writeQuery({
+                                query: GET_STRIKES,
+                                data: { Strike: newStrikes.concat(newData) }
+                              });
+                            }
+                          });
+                        }
+
+                        if (relsToDelete.length !== 0){
+                          console.log("Delete rels");
+                          console.log(relsToDelete);
+                          DeleteStrikeRanks({
+                            variables: {
+                              fromStrikeID: newData.id,
+                              toRankIDs: relsToDelete.map(rel => rel.id)
+                            },
+                            update: (cache, {data: { DeleteStrikeRanks } }) => {
+                              console.log(DeleteStrikeRanks);
+                              const existingStrikes = cache.readQuery({ query: GET_STRIKES });
+                              const newStrikes = existingStrikes.Strike.filter(r => (r.id !== oldData.id));
+                              cache.writeQuery({
+                                query: GET_STRIKES,
+                                data: { Strike: newStrikes.concat(newData) }
+                              });
+                            }
+                          })
+                        }
+
+                        // is this needed? here -->
                         const existingStrikes = cache.readQuery({ query: GET_STRIKES });
                         const newStrikes = existingStrikes.Strike.map(r => {
                           if (r.id === oldData.id) {
@@ -317,10 +329,12 @@ export default function Strike({headerHeight}) {
                             return r;
                           }
                         });
-                        cache.writeQuery({
-                          query: GET_STRIKES,
-                          data: { Strike: newStrikes }
-                        })
+                        // cache.writeQuery({
+                        //   query: GET_STRIKES,
+                        //   data: { Strike: newStrikes }
+                        // })
+                        // <-- to here?
+
                       }
                     });
                   }, 600);
