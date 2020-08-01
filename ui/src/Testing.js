@@ -41,6 +41,7 @@ const GET_TESTING_REQUIREMENTS = gql`
       	id
       	name
       	description
+      	firstRank
       }
       blocks {
       	id
@@ -120,7 +121,7 @@ export default function Testing({headerHeight}) {
 												<ListItem key={s.id}>
 													<ListItemText
 														primary={s.name}
-														secondary={s.description}
+														secondary={ s.firstRank === r.id ? s.description : null }
 													/>
 												</ListItem>
 											);
@@ -139,7 +140,7 @@ export default function Testing({headerHeight}) {
 												<ListItem key={b.id}>
 													<ListItemText
 														primary={b.name}
-														secondary={b.description}
+														secondary={ b.firstRank === r.id ? b.description : null }
 													/>
 												</ListItem>
 											);
@@ -157,7 +158,7 @@ export default function Testing({headerHeight}) {
 												<ListItem key={k.id}>
 													<ListItemText
 														primary={k.name}
-														secondary={k.description}
+														secondary={ k.firstRank === r.id ? k.description : null }
 													/>
 												</ListItem>
 											);
@@ -175,7 +176,7 @@ export default function Testing({headerHeight}) {
 												<ListItem key={s.id}>
 													<ListItemText
 														primary={s.name}
-														secondary={s.description}
+														secondary={ s.firstRank === r.id ? s.description : null }
 													/>
 												</ListItem>
 											);
@@ -193,7 +194,7 @@ export default function Testing({headerHeight}) {
 												<ListItem key={m.id}>
 													<ListItemText
 														primary={m.name}
-														secondary={m.description}
+														secondary={ m.firstRank === r.id ? m.description : null }
 													/>
 												</ListItem>
 											);
@@ -211,7 +212,7 @@ export default function Testing({headerHeight}) {
 												<ListItem key={t.id}>
 													<ListItemText
 														primary={t.name}
-														secondary={t.description}
+														secondary={ t.firstRank === r.id ? t.description : null }
 													/>
 												</ListItem>
 											);
@@ -229,7 +230,7 @@ export default function Testing({headerHeight}) {
 												<ListItem key={k.id}>
 													<ListItemText
 														primary={k.name}
-														secondary={k.description}
+														secondary={ k.firstRank === r.id ? k.description : null }
 													/>
 												</ListItem>
 											);
