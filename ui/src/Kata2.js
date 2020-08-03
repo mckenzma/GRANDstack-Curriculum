@@ -10,6 +10,8 @@ import TextField from "@material-ui/core/TextField";
 
 import RankListFilter from './RankListFilter';
 
+import Chip from "@material-ui/core/Chip";
+
 import KataDialog from './KataDialog';
 
 const useStyles = makeStyles(theme => ({
@@ -18,7 +20,14 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(3),
     overflowX: "auto",
     margin: "auto"
-  }
+  },
+  chips: {
+    display: "flex",
+    flexWrap: "wrap"
+  },
+  chip: {
+    margin: theme.spacing(0.25)
+  },
 }));
 
 const GET_RANKS = gql`
@@ -26,6 +35,7 @@ const GET_RANKS = gql`
     Rank {
       id
       name
+      abbreviation
       rankOrder
     }
   }
@@ -40,6 +50,7 @@ const GET_KATAS = gql`
         id
         rankOrder
         name
+        abbreviation
       }
     }
   }
@@ -55,6 +66,7 @@ const CREATE_KATA = gql`
         id
         rankOrder
         name
+        abbreviation
       }
     }
   }
@@ -79,20 +91,22 @@ const DELETE_KATA = gql`
   }
 `;
 
-const MERGE_KATA_RANK_REL = gql`
-  mutation MergeKataRank($kataID: ID!, $rankID: ID!)
+const MERGE_KATA_RANKS_RELS = gql`
+  mutation MergeKataRanks($fromKataID: ID!, $toRankIDs:[ID!])
   {
-    MergeKataRank(fromKataID: $kataID, toRankID: $rankID) {
+    MergeKataRanks(fromKataID:$fromKataID, toRankIDs: $toRankIDs){
       id
+      name
     }
   }
 `;
 
-const MERGE_KATA_RANKS_RELS = gql`
-  mutation MergeKataRanks($kataID: ID!, $rankIDs:[ID!])
+const DELETE_KATA_RANK_RELS = gql`
+  mutation DeleteKataRanks($fromKataID: ID!, $toRankIDs: [ID!])
   {
-    MergeKataRanks(fromKataID:$kataID, toRankIDs: $rankIDs){
+    DeleteStrikeRanks(fromKataID: $fromKataID, toRankIDs: $toRankIDs) {
       id
+      name
     }
   }
 `;
@@ -100,24 +114,35 @@ const MERGE_KATA_RANKS_RELS = gql`
 export default function Kata({headerHeight}) {
   const classes = useStyles();
 
-  // const [name, setName] = useState("");
   const [ranks, setRanks] = useState("");
 
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("name");
 
-  const [selectedRanks, setSelectedRanks] = useState([]);
-
-  const [ranksToSelect, setRanksToSelect] = useState({ 0: 'rank1', 1: 'rank2' });
-
   const [state, setState] = React.useState({
     columns: [
       { title: 'Name', field: 'name' },
-      { title: 'Ranks', field: 'ranksString',
-        editComponent: props => (
-         <RankListFilter selectedRanks={selectedRanks} setSelectedRanks={setSelectedRanks} /> 
-        )
-      },
+      { title: 'Ranks', field: 'ranks', render: rowData => (
+          <div className={classes.chips}>
+            {rowData.ranks.sort(getSorting("asc","rankOrder")).map(rank => (
+              <Chip
+                key={rank.id}
+                label={rank.abbreviation} // abbreviation vs name
+              />
+            ))}
+            </div>),
+        editComponent: props => {
+          if (props.value !== undefined) {
+            return(
+              <RankListFilter value={props.value} onChange={props.onChange}  /> 
+            )
+          } else {
+            return(
+              <RankListFilter value={[]} onChange={props.onChange} /> 
+            )
+          }
+        }
+      }
     ],
   });
 
@@ -148,7 +173,7 @@ export default function Kata({headerHeight}) {
     setOpen(true);
     // console.log(rowData);
     setSelectedKata(rowData.id);
-    console.log(rowData.id);
+    // console.log(rowData.id);
   };
 
   // const handleClose = event => {
@@ -162,25 +187,21 @@ export default function Kata({headerHeight}) {
   };
 
   const [CreateKata] = useMutation(CREATE_KATA);
-  const [MergeKataRanks] = useMutation(MERGE_KATA_RANKS_RELS);
-
   const [UpdateKata] = useMutation(UPDATE_KATA);
-
   const [DeleteKata] = useMutation(DELETE_KATA);
+  const [MergeKataRanks] = useMutation(MERGE_KATA_RANKS_RELS);
+  const [DeleteKataRanks] = useMutation(DELETE_KATA_RANK_RELS);
 
   const { loading, error, data } = useQuery(GET_KATAS);
 
   if (loading) return "Loading...";
   if (error) return `Error ${error.message}`;
 
-  console.log(data);
-
   return (
     <div>
     <KataDialog open={open} setOpen={setOpen} selectedKata={selectedKata} setSelectedKata={setSelectedKata}/>
     <Paper className={classes.root} elevation={3} style={style2}>
       <Grid container>
-    {/*<RankListFilter selectedRanks={selectedRanks} setSelectedRanks={setSelectedRanks} /> */}
         <Grid item xs={12}>
           <MaterialTable
             title="Kata"
@@ -189,7 +210,6 @@ export default function Kata({headerHeight}) {
               data.Kata.sort(getSorting(order,orderBy)).map(s => {
                 return {
                   ...s,
-                  ranksString: s.ranks.sort(getSorting("asc","rankOrder")).map(r => { return r.name }).flat(2).join(', ')
                 }
               })
             }
@@ -205,10 +225,25 @@ export default function Kata({headerHeight}) {
                       },
                       update: (cache, { data: { CreateKata } }) => {
                         const { Kata } = cache.readQuery({ query: GET_KATAS });
-                        cache.writeQuery({
-                          query: GET_KATAS,
-                          data: { Kata: Kata.concat([CreateKata]) },
-                        })
+
+                        if(newData.ranks.length !== 0) {
+                          MergeKataRanks({
+                            variables: {
+                              fromKataID: CreateKata.id,
+                              toRankIDs: newData.ranks.map(r => r.id)
+                            },
+                            update: (cache, { data: { MergeKataRanks } }) => {
+                              cache.writeQuery({
+                                query: GET_KATAS,
+                                data: { Kata: Kata.concat([CreateKata]) },
+                              })
+                            }
+                          })
+                        }
+                        // cache.writeQuery({
+                        //   query: GET_KATAS,
+                        //   data: { Kata: Kata.concat([CreateKata]) },
+                        // })
                       }
                     });
                   }, 600);
@@ -219,32 +254,75 @@ export default function Kata({headerHeight}) {
                     resolve();
                     UpdateKata({
                       variables: { 
-                        // id: oldData.id,
                         id: newData.id,
-                        // name: name, 
                         name: newData.name,
                       },
-                      update: (cache) => {
+                      update: (cache, { data: { UpdateKata } }) => {
+                        let relsToAdd = [];
+                        let relsToDelete = [];
+
+                        if (newData.ranks !== oldData.ranks) {
+                          relsToAdd = relsToAdd.concat(newData.ranks.filter(r => !oldData.ranks.some(r2 => r2.id === r.id)));
+                          relsToDelete = relsToDelete.concat(oldData.ranks.filter(r => !newData.ranks.some(r2 => r2.id === r.id)));
+                        };
+
+                        if (relsToAdd.length !== 0) {
+                          MergeKataRanks({
+                            variables: {
+                              fromKataID: newData.id,
+                              toRankIDs: relsToAdd.map(rel => rel.id)
+                            },
+                            update: (cache, { data: { MergeKataRanks } }) => {
+                              const existingKatas = cache.readQuery({ query: GET_KATAS });
+                              const newKatas = existingKatas.Kata.filter(r => (r.id !== oldData.id));
+                              cache.writeQuery({
+                                query: GET_KATAS,
+                                data: { Kata: newKatas.concat(newData) }
+                              });
+                            }
+                          })
+                        }
+
+                        if (relsToDelete.length !== 0) {
+                          DeleteKataRanks({
+                            variables: {
+                              fromKataID: newData.id,
+                              toRankIDs: relsToDelete.map(rel => rel.id)
+                            },
+                            update: (cache, { data: {DeleteKataRanks } }) => {
+                              const existingKatas = cache.readQuery({ query: GET_KATAS });
+                              const newKatas = existingKatas.Kata.filter(r => (r.id !== oldData.id));
+                              cache.writeQuery({
+                                query: GET_KATAS,
+                                data: { Kata: newKatas.concat(newData) }
+                              });
+                            }
+                          })
+                        }
+
+                        // is this needed? here -->
                         const existingKatas = cache.readQuery({ query: GET_KATAS });
                         const newKatas = existingKatas.Kata.map(r => {
                           if (r.id === oldData.id) {
                             return {
                               ...r, 
-                              name: newData.name
+                              name: newData.name, 
                             };
                           } else {
                             return r;
                           }
                         });
-                        cache.writeQuery({
-                          query: GET_KATAS,
-                          data: { Kata: newKatas }
-                        })
+                        // cache.writeQuery({
+                        //   query: GET_STRIKES,
+                        //   data: { Strike: newStrikes }
+                        // })
+                        // <-- to here?
+
                       }
                     });
                   }, 600);
                 }),
-              onRowDelete: oldData =>
+                onRowDelete: oldData =>
                 new Promise(resolve => {
                   setTimeout(() => {
                     resolve();
