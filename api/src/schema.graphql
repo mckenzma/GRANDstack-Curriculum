@@ -14,15 +14,16 @@ type Rank {
 }
 
 # TODO - Figure out how to use a shared Technique label
-# interface Technique {
-#   id: ID!
-#   name: String!
+interface Technique {
+  id: ID!
+  name: String!
+  description: String
 
-#   # steps: [Step] @relation(name: "USES", direction: "IN")
-# }
+  # steps: [Step] @relation(name: "USES", direction: "IN")
+}
 
-type Strike {
-# type Strike implements Technique {
+# type Strike {
+type Strike implements Technique {
   id: ID!
   name: String!
   description: String
@@ -59,8 +60,8 @@ type Strike {
 #   turn: [Turn] @relation(name: "STEP_FOR", direction: "OUT")
 # }
 
-type Block {
-# type Block implements Technique {
+# type Block {
+type Block implements Technique {
   id: ID!
   name: String!
   description: String
@@ -85,8 +86,8 @@ type Block {
   steps: [Step] @relation(name: "USES", direction: "IN")
 }
 
-type Kick {
-# type Kick implements Technique {
+# type Kick {
+type Kick implements Technique {
   id: ID!
   name: String!
   description: String
@@ -111,8 +112,8 @@ type Kick {
   steps: [Step] @relation(name: "USES", direction: "IN")
 }
 
-type Stance {
-# type Stance implements Technique {
+# type Stance {
+type Stance implements Technique {
   id: ID!
   name: String!
   description: String
@@ -137,8 +138,8 @@ type Stance {
   steps: [Step] @relation(name: "USES", direction: "IN")
 }
 
-type Movement {
-# type Movement implements Technique {
+# type Movement {
+type Movement implements Technique {
   id: ID!
   name: String!
   description: String
@@ -163,8 +164,8 @@ type Movement {
   steps: [Step] @relation(name: "USES", direction: "IN")
 }
 
-type Turn {
-# type Turn implements Technique {
+# type Turn {
+type Turn implements Technique {
   id: ID!
   name: String!
   description: String
@@ -422,46 +423,58 @@ type Mutation {
   #   """
   # )
 
-  # ConnectMoveToStep(fromMoveID: ID!, toStepID: ID!): Step @cypher(
-  #   statement:
-  #   """
-  #   MATCH (move:Move {id: $fromMoveID})
-  #   MATCH (step:Step {id: $toStepID})
-  #   MERGE (move)-[:HAS_STEP]->(step)
-  #   RETURN step
-  #   """
-  # )
+  ConnectMoveToStep(fromMoveID: ID!, toStepID: ID!): Step @cypher(
+    statement:
+    """
+    MATCH (move:Move {id: $fromMoveID})
+    MATCH (step:Step {id: $toStepID})
+    MERGE (move)-[:HAS_STEP]->(step)
+    RETURN step
+    """
+  )
 
-  # ConnectStepToTechnique(fromStepID: ID!, toTechniqueID: ID!): Step @cypher(
-  #   statement:
-  #   """
-  #   MATCH (step:Step {id: $fromStepID})
-  #   MATCH (tech:Technique {id: $toTechniqueID})
-  #   MERGE (step)-[:USES]->(tech)
-  #   """
-  # )
+  ConnectStepToTechnique(fromStepID: ID!, toTechniqueID: ID!): Step @cypher(
+    statement:
+    """
+    MATCH (step:Step {id: $fromStepID})
+    MATCH (tech:Technique {id: $toTechniqueID})
+    MERGE (step)-[:USES]->(tech)
+    RETURN step
+    """
+  )
 
-  # InsertStepBetween(prevStepID: ID!, newStepID: ID!, nextStepID: ID!): Step @cypher(
-  #   statement:
-  #   """
-  #   MATCH(prev:Step {id: $prevStepID})-[r:NEXT_STEP]->(next:Step {id: $nextStepID})
-  #   WITH prev, r, next
-  #   DELETE r
-  #   WITH prev, next
-  #   MATCH (new:Step {id: $newStepID})
-  #   MERGE (prev)-[:NEXT_STEP]->(new)-[:NEXT_STEP]->(next)
-  #   RETURN new
-  #   """
-  # )
+  ConnectAdjacentSteps(prevStepID: ID!, nextStepID: ID!): Step @cypher(
+    statement:
+    """
+    MATCH (prevStep:Step {id: $prevStepID})
+    MATCH (nextStep:Step {id: $nextStepID})
+    MERGE (prevStep)-[:NEXT_STEP]->(nextStep)
+    RETURN nextStep
+    """
+  )
 
-  # InsertStepNextTo(prevStepID: ID!, nextStepID: ID!): Step @cypher(
-  #   statement:
-  #   """
-  #   MATCH (prev:Step {id: $prevStepID})
-  #   MATCH (next:Step {id: $nextStepID})
-  #   MERGE (prev)-[:NEXT_STEP]->(next)
-  #   """
-  # )
+  InsertStepBetween(prevStepID: ID!, newStepID: ID!, nextStepID: ID!): Step @cypher(
+    statement:
+    """
+    MATCH(prev:Step {id: $prevStepID})-[r:NEXT_STEP]->(next:Step {id: $nextStepID})
+    WITH prev, r, next
+    DELETE r
+    WITH prev, next
+    MATCH (new:Step {id: $newStepID})
+    MERGE (prev)-[:NEXT_STEP]->(new)-[:NEXT_STEP]->(next)
+    RETURN new
+    """
+  )
+
+  InsertStepNextTo(prevStepID: ID!, nextStepID: ID!): Step @cypher(
+    statement:
+    """
+    MATCH (prev:Step {id: $prevStepID})
+    MATCH (next:Step {id: $nextStepID})
+    MERGE (prev)-[:NEXT_STEP]->(next)
+    RETURN next
+    """
+  )
 
   # DeleteStepBetween(prevStepID: ID!, nextStepID: ID!): [Step] @cypher(
   #   statement:
