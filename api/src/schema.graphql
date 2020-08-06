@@ -253,7 +253,7 @@ type Step {
   nextStep: Step @relation(name: "NEXT_STEP", direction: "OUT")
   prevStep: Step @relation(name: "NEXT_STEP", direction: "IN")
 
-  # technique: Technique @relation(name: "USES", direction: "OUT")
+  technique: Technique @relation(name: "USES", direction: "OUT")
   block: Block @relation(name: "USES", direction: "OUT")
   strike: Strike @relation(name: "USES", direction: "OUT")
   kick: Kick @relation(name: "USES", direction: "OUT")

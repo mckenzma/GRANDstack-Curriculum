@@ -47,30 +47,48 @@ const GET_TESTING_REQUIREMENTS = gql`
       	id
       	name
       	description
+      	firstRank
       }
       kicks {
       	id
       	name
       	description
+      	firstRank
       }
       stances {
       	id
       	name
       	description
+      	firstRank
       }
       movements {
       	id
       	name
       	description
+      	firstRank
       }
       turns {
       	id
       	name
       	description
+      	firstRank
       }
       katas {
       	id
       	name
+      	firstRank
+      	orderedMoves {
+      		id
+      		name
+      		orderedSteps {
+      			id
+      			name
+      			technique {
+      				id
+      				name
+      			}
+      		}
+      	}
       }
     }
   }
@@ -227,12 +245,25 @@ export default function Testing({headerHeight}) {
 										<Typography variant="h3">Katas</Typography>
 										{r.katas.map(k => {
 											return (
+												<List>
 												<ListItem key={k.id}>
 													<ListItemText
 														primary={k.name}
-														secondary={ k.firstRank === r.id ? k.description : null }
 													/>
 												</ListItem>
+											 	<List component="div">
+													{ k.firstRank === r.id && k.orderedMoves.map( (move,index) => {
+														return(
+															<ListItem key={move.id}>
+																<ListItemText
+																	secondary={index+1 + ". " + move.orderedSteps.map(os => {return os.technique.name }).flat(2).join(', ')}
+																/>
+															}
+															</ListItem>
+														);
+													})}
+												</List>
+											</List>		
 											);
 										})}
 									</Paper>
