@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
+
+import { useQuery, useMutation } from "@apollo/react-hooks";
+
+import gql from "graphql-tag";
+
 import { makeStyles } from '@material-ui/core/styles';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
-import IconButton from '@material-ui/core/IconButton';
-import StarBorderIcon from '@material-ui/icons/StarBorder';
+// import GridList from '@material-ui/core/GridList';
+// import GridListTile from '@material-ui/core/GridListTile';
+// import GridListTileBar from '@material-ui/core/GridListTileBar';
+// import IconButton from '@material-ui/core/IconButton';
+// import StarBorderIcon from '@material-ui/icons/StarBorder';
 // import tileData from './tileData';
 
 import Icon from '@material-ui/core/Icon';
@@ -20,6 +25,61 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 
+import CreateStepDialog from './CreateStepDialog';
+import UpdateStepDialog from './UpdateStepDialog';
+import DeleteStepDialog from './DeleteStepDialog';
+
+const GET_MOVE_STEPS = gql`
+  query moveStepsQuery(
+    $selectedMove: ID!
+  ) {
+    Move(
+      filter: {
+        id: $selectedMove
+      }
+    ) {
+      id
+      name
+      #__typename
+      orderedSteps {
+        id
+        name
+        #__typename
+        technique {
+          id
+          name
+          #__typename
+        }
+        #block {
+        #  id
+        #  name
+        #}
+        #strike {
+        #  id
+        #  name
+        #}
+        #kick {
+        #  id
+        #  name
+        #}
+        #movement {
+        #  id
+        #  name
+        #}
+        #turn {
+        #  id
+        #  name
+        #}
+        #stance {
+        #  id
+        #  name
+        #}
+      }
+    }
+  }
+`;
+
+
 const useStyles = makeStyles((theme) => ({
   root: {
     // minWidth: 275,
@@ -29,8 +89,10 @@ const useStyles = makeStyles((theme) => ({
     // 'overflow-x': 'hidden'
   },
   container: {
-    overflowX: 'auto',
-    maxHeight: 250
+    // width: '100%',
+    overflowX: 'hidden',
+    // maxHeight: 250,
+    flexWrap: 'nowrap'
   },
   bullet: {
     display: 'inline-block',
@@ -45,84 +107,185 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
  
-export default function SingleLineGridList({move}) {
+export default function StepList({/*kata,*/move}) {
   const classes = useStyles();
 
-  const [stepsSize, setStepsSize] = useState(move.steps.length);
+  const [selectedStep, setSelectedStep] = useState("");
+  const [_type, _setType] = useState("");
+  const [_technique, _setTechnique] = useState("");
+  
+  const [prevStep, setPrevStep] = useState("");
+  const [nextStep, setNextStep] = useState("");
 
-  console.log(move);
-  console.log(move.steps);
+  // console.log("move: ", move);
 
-  var arr = new Array(2*(move.steps.length) + 1);
-  console.log(arr);
-  for (var i = 0; i<move.steps.length;i++){
-      console.log(i, 2*(i+1)-1, 2*(i+1));
-      arr[2*(i+1)-1] = move.steps[i];
-  }
+  const [openCreate, setOpenCreate] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
 
-  for (var i = 0; i<arr.length; i=i+2){
-    arr[i] = {type: "icon"};
-    if (arr[i-1] !== undefined) {
-      arr[i].prevId = arr[i-1].id; 
-    } else {
-      arr[i].prevId = "";
+  const handleClickOpenCreate = (move,step) => {
+    // console.log("step: ", step);
+    setSelectedStep(step);
+    setOpenCreate(true);
+  };
+
+  const handleClickOpenUpdate = event => {
+    setOpenUpdate(true);
+  };
+
+  const handleClickOpenDelete = (step,index) => {
+    // console.log("step: ", step);
+    // console.log("index: ", index);
+    setSelectedStep(step);
+    setOpenDelete(true);
+  };
+
+  const { loading, error, data } = useQuery(GET_MOVE_STEPS, {
+    variables: {
+      selectedMove: move.id
     }
-    if (arr[i+1] !== undefined) {
-      arr[i].nextId = arr[i+1].id; 
-    } else {
-      arr[i].nextId = "";
-    }
-  }
+  });
 
-  console.log(arr);
+  // console.log("data: ", data);
+
+  if (loading) return "Loading...";
+  if (error) return `Error ${error.message}`;
 
   return (
-    <div className={classes.root}>
-          <Grid className={classes.container} container spacing={1} alignItems="center" /*flexWrap="nowrap"*/ display="flex" /*overflow="hidden"*/ maxHeight={250} width="100%" overflowX="auto">
-                
-        {arr.map((step,index) => {
-          console.log(stepsSize, index, step);
+    // <div className={classes.root}>
+    <Grid className={classes.container} container spacing={1} alignItems="center" /*flexWrap="nowrap"*/ /*display="flex"*/ /*overflow="hidden"*/ /*maxHeight={250}*/ /*width="100%"*/ /*overflowX="auto"*/>
+      <CreateStepDialog selectedStep={selectedStep} setSelectedStep={setSelectedStep} openCreate={openCreate} setOpenCreate={setOpenCreate} move={move}/>      
+      <UpdateStepDialog openUpdate={openUpdate} setOpenUpdate={setOpenUpdate} />      
+      <DeleteStepDialog selectedStep={selectedStep} setSelectedStep={setSelectedStep} openDelete={openDelete} setOpenDelete={setOpenDelete} prevStep={prevStep} setPrevStep={setPrevStep} nextStep={nextStep} setNextStep={setNextStep}/>      
+      {data.Move.map(move => {
+        return (
+          <React.Fragment key={0}>
+            {move.orderedSteps.length === 0 &&
+              <Grid item key={0}>
+                <Button onClick={() => handleClickOpenCreate(move,{prevId: "", type: "icon", id: 0, nextId: ""})}><Icon fontSize="large">add_circle</Icon></Button>
+              </Grid>
+            }
 
-          return (
-            <Grid item display="inline">
-              {step.type === "icon" &&
-                <Button><Icon fontSize="large">add_circle</Icon></Button>
-              }
-
-              {step.type !== "icon" &&
-                <Card>
-                  <CardContent>
-                    <Typography className={classes.title} color="textSecondary" gutterBottom>
-                      {step.name}
-                    </Typography>
-                    <Typography variant="h5" component="h2">
-                      blah blah
-                    </Typography>
-                    <Typography className={classes.pos} color="textSecondary">
-                      adjective
-                    </Typography>
-                    <Typography variant="body2" component="p">
-                      well meaning and kindly.
-                      <br />
-                      {'"a benevolent smile"'}
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button color="primary">
-                      <EditIcon />
+            {move.orderedSteps.length !== 0 &&
+              move.orderedSteps.map((step,index) => {
+              return (
+                <React.Fragment key={index}>
+                  <Grid item key={2*index}/*display="inline"*/>
+                    <Button onClick={
+                      () => handleClickOpenCreate(
+                          move,
+                          {
+                            prevId: move.orderedSteps[index-1] !== undefined ? move.orderedSteps[index-1].id : "", 
+                            type: "icon", 
+                            id: 2*index, 
+                            nextId: step.id
+                          }
+                        )
+                      }><Icon fontSize="large">add_circle</Icon>
                     </Button>
-                    <Button color="primary">
-                      <DeleteOutlineIcon />
-                    </Button>
-                  </CardActions>
-                </Card>
-              }
+                  </Grid>
+                  <Grid item key={2*index+1}/*display="inline"*/>
+                    <Card>
+                      <CardContent>
+                        <Typography className={classes.title} color="textSecondary" gutterBottom>
+                          Step {index+1}
+                        </Typography>
+                        <Typography variant="h5" component="h2">
+                          {/* TODO - simplify once I can use a shared label */}
+                          {step.technique !== null && step.technique.name}
+                          {step.technique === null && "Select Move"}
+                          {/*step.block !== null && step.block.name}
+                          {step.strike !== null && step.strike.name}
+                          {step.kick !== null && step.kick.name}
+                          {step.turn !== null && step.turn.name}
+                          {step.movement !== null && step.movement.name}
+                          {step.stance !== null && step.stance.name}
+                          {(step.block === null 
+                            && step.strike === null 
+                            && step.kick === null 
+                            && step.turn === null
+                            && step.movement === null
+                            && step.stance === null) && "Select Move"*/}
+                        </Typography>
+                      </CardContent>
+                      <CardActions>
+                        <Button color="primary" onClick={handleClickOpenUpdate}>
+                          <EditIcon />
+                        </Button>
+                        <Button color="primary" onClick={() => handleClickOpenDelete(step,index)}>
+                          <DeleteOutlineIcon />
+                        </Button>
+                      </CardActions>
+                    </Card>
 
-            </Grid>
-          )
+                  </Grid>
+                  {index === move.orderedSteps.length-1 &&
+                    <Grid item key={2*index+2}/*display="inline"*/>
+                      <Button onClick={
+                        () => handleClickOpenCreate(
+                          move,
+                          {
+                            prevId: step.id, 
+                            type: "icon", 
+                            id: 2*index+2, 
+                            nextId: ""
+                          }
+                          )
+                      }><Icon fontSize="large">add_circle</Icon></Button>
+                    </Grid>
+                  }
+                </React.Fragment>
+              )
+            })}
+          </React.Fragment>
+        );
+      })}
+      {/*arr.map((step,index) => {
 
-        })}
-      </Grid>
-    </div>
+        return (
+          <Grid item key={index}/*display="inline"* / >
+            {step.type === "icon" &&
+              <Button onClick={() => handleClickOpenCreate(move,step)}><Icon fontSize="large">add_circle</Icon></Button>
+            }
+
+            {step.type !== "icon" &&
+              <Card>
+                <CardContent>
+                  <Typography className={classes.title} color="textSecondary" gutterBottom>
+                    Step {(index + 1)/2}
+                  </Typography>
+                  <Typography variant="h5" component="h2">
+                    {/* TODO - simplify once I can use a shared label * /}
+                    {step.block !== null && step.block.name}
+                    {step.strike !== null && step.strike.name}
+                    {step.kick !== null && step.kick.name}
+                    {step.turn !== null && step.turn.name}
+                    {step.movement !== null && step.movement.name}
+                    {step.stance !== null && step.stance.name}
+                    {(step.block === null 
+                      && step.strike === null 
+                      && step.kick === null 
+                      && step.turn === null
+                      && step.movement === null
+                      && step.stance === null) && "Select Move"}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button color="primary" onClick={handleClickOpenUpdate}>
+                    <EditIcon />
+                  </Button>
+                  <Button color="primary" onClick={() => handleClickOpenDelete(step,index)}>
+                    <DeleteOutlineIcon />
+                  </Button>
+                </CardActions>
+              </Card>
+            }
+
+          </Grid>
+        )
+
+      })*/}
+    </Grid>
+    // </div>
   );
 }

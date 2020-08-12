@@ -433,13 +433,13 @@ type Mutation {
     """
   )
 
-  ConnectStepToTechnique(fromStepID: ID!, toTechniqueID: ID!): Step @cypher(
+  ConnectStepToTechnique(fromStepID: ID!, toTechniqueID: ID!): Technique @cypher(
     statement:
     """
     MATCH (step:Step {id: $fromStepID})
     MATCH (tech:Technique {id: $toTechniqueID})
     MERGE (step)-[:USES]->(tech)
-    RETURN step
+    RETURN tech
     """
   )
 

@@ -15,6 +15,56 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import SelectType from './SelectType';
 import SelectTechnique from './SelectTechnique';
 
+const GET_MOVE_STEPS = gql`
+  query moveStepsQuery(
+    $selectedMove: ID!
+  ) {
+    Move(
+      filter: {
+        id: $selectedMove
+      }
+    ) {
+      id
+      name
+      #__typename
+      orderedSteps {
+        id
+        name
+        #__typename
+        technique {
+          id
+          name
+          #__typename
+        }
+        #block {
+        #  id
+        #  name
+        #}
+        #strike {
+        #  id
+        #  name
+        #}
+        #kick {
+        #  id
+        #  name
+        #}
+        #movement {
+        #  id
+        #  name
+        #}
+        #turn {
+        #  id
+        #  name
+        #}
+        #stance {
+        #  id
+        #  name
+        #}
+      }
+    }
+  }
+`;
+
 const CREATE_STEP = gql`
   mutation CreateStep($name: String!) {
     CreateStep(name: $name)
@@ -90,9 +140,9 @@ export default function CreateStepDialog({
 
   const handleCreate = event => {
 
-    console.log("selectedStep: ", selectedStep);
-    console.log("prevId: ", selectedStep.prevId);
-    console.log("nextId: ", selectedStep.nextId);
+    // console.log("selectedStep: ", selectedStep);
+    // console.log("prevId: ", selectedStep.prevId);
+    // console.log("nextId: ", selectedStep.nextId);
 
     new Promise(resolve => {
       setTimeout(() => {
@@ -103,7 +153,13 @@ export default function CreateStepDialog({
               name: "New Step"
             },
             update: (cache, { data: { CreateStep } }) => {
+              console.log("cache: ", cache);
+              console.log("CreateStep: ", CreateStep);
+              const { Move } = cache.readQuery({ query: GET_MOVE_STEPS, variables: { selectedMove: move.id} });
+              const existingSteps = Move[0].orderedSteps;
+              console.log("Move: ", Move[0], " existingSteps: ", existingSteps);
               // const { Step } = cache.readQuery({ query: GET_STEPS });
+              let newSteps = existingSteps;
 
               // Connect Step to Move
               ConnectMoveToStep({
@@ -117,43 +173,92 @@ export default function CreateStepDialog({
                 variables: {
                   fromStepID: CreateStep.id,
                   toTechniqueID: _technique
+                },
+                update: (cache, { data: { ConnectStepToTechnique } }) => {
+                  console.log("ConnectStepToTechnique:", ConnectStepToTechnique);
+                  CreateStep.technique = ConnectStepToTechnique;
+                  console.log("CreateStep: ", CreateStep);
+                  if (selectedStep.prevId === "" && selectedStep.nextId === ""){
+                    console.log("do nothing");
+                    newSteps = newSteps.concat([CreateStep]);
+                  }
+                  if (selectedStep.prevId !== "" && selectedStep.nextId !== ""){
+                    console.log("insert between");
+                    // Insert Step Between
+                    var index = existingSteps.map(function(e) { return e.id; }).indexOf(selectedStep.prevId);
+                    // console.log(index);
+                    if(index+1 === newSteps.length - 1){
+                      newSteps[index+2] = newSteps[index+1];
+                    }
+                    newSteps[index+1] = CreateStep;
+
+                    InsertStepBetween({
+                      variables: {
+                        prevStepID: selectedStep.prevId,
+                        newStepID: CreateStep.id, 
+                        nextStepID: selectedStep.nextId
+                      }
+                    })
+                  }
+                  if (selectedStep.prevId !== "" && selectedStep.nextId === ""){
+                    console.log("insert next to (after)");
+                    // Insert Step Next To
+                    newSteps = newSteps.push([CreateStep]);
+                    InsertStepNextTo({
+                      variables: {
+                        prevStepID: selectedStep.prevId, 
+                        nextStepID: CreateStep.id
+                      }
+                    });
+                    
+                  }
+                  if (selectedStep.prevId === "" && selectedStep.nextId !== ""){
+                    console.log("insert next to (before)");
+                    // Insert Step Next To
+                    newSteps.unshift(CreateStep);
+                    InsertStepNextTo({
+                      variables: {
+                        prevStepID: CreateStep.id, 
+                        nextStepID: selectedStep.nextId
+                      }
+                    });
+                    
+                  }
+
+                  console.log('newSteps: ', newSteps);
+
+                  cache.writeQuery({
+                    query: GET_MOVE_STEPS,
+                    variable: {
+                      selectedMove: move.id
+                    },
+                    data: { 
+                      // Move: //Move[0]//.orderedSteps.concat([CreateStep]) 
+                      Move: {
+                        __typename: "Move",
+                        id: move.id,
+                        name: move.name,
+                        // orderedSteps: existingSteps.map(step => {
+                        orderedSteps: newSteps.map(step => {
+                          console.log("step: ", step);
+                          return {
+                            id: step.id,
+                            name: step.name,
+                            __typename: "Step",
+                            technique: {
+                              id: step.techniuque !== undefined ? step.technique.id : '',
+                              name: step.technique !== undefined ? step.technique.name : '',
+                              __typename: step.technique !== undefined ? step.technique.__typename : ''
+                            }
+                          }
+                        })
+                      }
+                    }
+                  });
                 }
               });
 
-              if (selectedStep.prevId === "" && selectedStep.nextId === ""){
-                // console.log("do nothing");
-              }
-              if (selectedStep.prevId !== "" && selectedStep.nextId !== ""){
-                // console.log("insert between");
-                // Insert Step Between
-                InsertStepBetween({
-                  variables: {
-                    prevStepID: selectedStep.prevId,
-                    newStepID: CreateStep.id, 
-                    nextStepID: selectedStep.nextId
-                  }
-                })
-              }
-              if (selectedStep.prevId !== "" && selectedStep.nextId === ""){
-                // console.log("insert next to (after)");
-                // Insert Step Next To
-                InsertStepNextTo({
-                  variables: {
-                    prevStepID: selectedStep.prevId, 
-                    nextStepID: CreateStep.id
-                  }
-                });
-              }
-              if (selectedStep.prevId === "" && selectedStep.nextId !== ""){
-                // console.log("insert next to (before)");
-                // Insert Step Next To
-                InsertStepNextTo({
-                  variables: {
-                    prevStepID: CreateStep.id, 
-                    nextStepID: selectedStep.nextId
-                  }
-                });
-              }
+              
 
             }
           });
