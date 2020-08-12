@@ -134,15 +134,7 @@ export default function CreateStepDialog({
     _setType("");
   };
 
-  // console.log("_technique: ", _technique);
-  // console.log("selectedStep :", selectedStep);
-  // console.log("move: ", move);
-
   const handleCreate = event => {
-
-    // console.log("selectedStep: ", selectedStep);
-    // console.log("prevId: ", selectedStep.prevId);
-    // console.log("nextId: ", selectedStep.nextId);
 
     new Promise(resolve => {
       setTimeout(() => {
@@ -203,7 +195,7 @@ export default function CreateStepDialog({
                   if (selectedStep.prevId !== "" && selectedStep.nextId === ""){
                     console.log("insert next to (after)");
                     // Insert Step Next To
-                    newSteps = newSteps.push([CreateStep]);
+                    newSteps.push(CreateStep);
                     InsertStepNextTo({
                       variables: {
                         prevStepID: selectedStep.prevId, 
@@ -233,12 +225,10 @@ export default function CreateStepDialog({
                       selectedMove: move.id
                     },
                     data: { 
-                      // Move: //Move[0]//.orderedSteps.concat([CreateStep]) 
                       Move: {
                         __typename: "Move",
                         id: move.id,
                         name: move.name,
-                        // orderedSteps: existingSteps.map(step => {
                         orderedSteps: newSteps.map(step => {
                           console.log("step: ", step);
                           return {
@@ -257,9 +247,6 @@ export default function CreateStepDialog({
                   });
                 }
               });
-
-              
-
             }
           });
       }, 600);
