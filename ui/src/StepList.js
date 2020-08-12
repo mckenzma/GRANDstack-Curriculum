@@ -133,10 +133,14 @@ export default function StepList({/*kata,*/move}) {
     setOpenUpdate(true);
   };
 
-  const handleClickOpenDelete = (step,index) => {
+  const handleClickOpenDelete = (step,index,prev,next) => {
     // console.log("step: ", step);
+    // console.log("prev: ", prev);
+    // console.log("next: ", next);
     // console.log("index: ", index);
     setSelectedStep(step);
+    setPrevStep(prev !== undefined ? prev.id : "");
+    setNextStep(next !== undefined ? next.id : "");
     setOpenDelete(true);
   };
 
@@ -156,7 +160,7 @@ export default function StepList({/*kata,*/move}) {
     <Grid className={classes.container} container spacing={1} alignItems="center" /*flexWrap="nowrap"*/ /*display="flex"*/ /*overflow="hidden"*/ /*maxHeight={250}*/ /*width="100%"*/ /*overflowX="auto"*/>
       <CreateStepDialog selectedStep={selectedStep} setSelectedStep={setSelectedStep} openCreate={openCreate} setOpenCreate={setOpenCreate} move={move}/>      
       <UpdateStepDialog openUpdate={openUpdate} setOpenUpdate={setOpenUpdate} />      
-      <DeleteStepDialog selectedStep={selectedStep} setSelectedStep={setSelectedStep} openDelete={openDelete} setOpenDelete={setOpenDelete} prevStep={prevStep} setPrevStep={setPrevStep} nextStep={nextStep} setNextStep={setNextStep}/>      
+      <DeleteStepDialog selectedStep={selectedStep} setSelectedStep={setSelectedStep} openDelete={openDelete} setOpenDelete={setOpenDelete} prevStep={prevStep} setPrevStep={setPrevStep} nextStep={nextStep} setNextStep={setNextStep} move={move}/>      
       {data.Move.map(move => {
         return (
           <React.Fragment key={0}>
@@ -212,7 +216,7 @@ export default function StepList({/*kata,*/move}) {
                         <Button color="primary" onClick={handleClickOpenUpdate}>
                           <EditIcon />
                         </Button>
-                        <Button color="primary" onClick={() => handleClickOpenDelete(step,index)}>
+                        <Button color="primary" onClick={() => handleClickOpenDelete(step,index,move.orderedSteps[index-1],move.orderedSteps[index+1])}>
                           <DeleteOutlineIcon />
                         </Button>
                       </CardActions>
