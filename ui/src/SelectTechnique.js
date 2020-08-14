@@ -33,7 +33,7 @@ const GET_TECHNIQUES = gql`
 
 export default function SelectTechnique({type, _technique, _setTechnique}) {
   const classes = useStyles();
-  const [technique, setTechnique] = useState('');
+  const [technique, setTechnique] = useState(_technique);
 
   const { loading, error, data } = useQuery(GET_TECHNIQUES);
 

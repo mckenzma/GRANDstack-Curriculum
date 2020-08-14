@@ -443,6 +443,19 @@ type Mutation {
     """
   )
 
+  UpdateTechnique(stepID: ID!, techID: ID!): Technique @cypher(
+    statement:
+    """
+    MATCH (step:Step {id: $stepID})-[r:USES]->()
+    WITH step, r
+    DELETE r
+    WITH step
+    MATCH (tech:Technique {id: $techID})
+    MERGE (step)-[:USES]->(tech)
+    RETURN tech
+    """
+  )
+
   ConnectAdjacentSteps(prevStepID: ID!, nextStepID: ID!): Step @cypher(
     statement:
     """

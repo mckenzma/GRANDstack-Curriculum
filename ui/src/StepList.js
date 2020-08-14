@@ -129,7 +129,11 @@ export default function StepList({/*kata,*/move}) {
     setOpenCreate(true);
   };
 
-  const handleClickOpenUpdate = event => {
+  const handleClickOpenUpdate = (move,step,type,technique) => {
+    console.log(type,technique);
+    setSelectedStep(step);
+    _setType(type);
+    _setTechnique(technique);
     setOpenUpdate(true);
   };
 
@@ -159,7 +163,17 @@ export default function StepList({/*kata,*/move}) {
     // <div className={classes.root}>
     <Grid className={classes.container} container spacing={1} alignItems="center" /*flexWrap="nowrap"*/ /*display="flex"*/ /*overflow="hidden"*/ /*maxHeight={250}*/ /*width="100%"*/ /*overflowX="auto"*/>
       <CreateStepDialog selectedStep={selectedStep} setSelectedStep={setSelectedStep} openCreate={openCreate} setOpenCreate={setOpenCreate} move={move}/>      
-      <UpdateStepDialog openUpdate={openUpdate} setOpenUpdate={setOpenUpdate} />      
+      <UpdateStepDialog 
+        selectedStep={selectedStep} 
+        setSelectedStep={setSelectedStep} 
+        openUpdate={openUpdate} 
+        setOpenUpdate={setOpenUpdate} 
+        move={move} 
+        _type={_type} 
+        _setType={_setType}
+        _technique={_technique}
+        _setTechnique={_setTechnique}
+      />      
       <DeleteStepDialog selectedStep={selectedStep} setSelectedStep={setSelectedStep} openDelete={openDelete} setOpenDelete={setOpenDelete} prevStep={prevStep} setPrevStep={setPrevStep} nextStep={nextStep} setNextStep={setNextStep} move={move}/>      
       {data.Move.map(move => {
         return (
@@ -213,7 +227,14 @@ export default function StepList({/*kata,*/move}) {
                         </Typography>
                       </CardContent>
                       <CardActions>
-                        <Button color="primary" onClick={handleClickOpenUpdate}>
+                        <Button color="primary" onClick={
+                          () =>handleClickOpenUpdate(
+                            move,
+                            step,
+                            step.technique.__typename,
+                            step.technique.id
+                          )
+                        }>
                           <EditIcon />
                         </Button>
                         <Button color="primary" onClick={() => handleClickOpenDelete(step,index,move.orderedSteps[index-1],move.orderedSteps[index+1])}>
@@ -227,13 +248,13 @@ export default function StepList({/*kata,*/move}) {
                     <Grid item key={2*index+2}/*display="inline"*/>
                       <Button onClick={
                         () => handleClickOpenCreate(
-                          move,
-                          {
-                            prevId: step.id, 
-                            type: "icon", 
-                            id: 2*index+2, 
-                            nextId: ""
-                          }
+                            move,
+                            {
+                              prevId: step.id, 
+                              type: "icon", 
+                              id: 2*index+2, 
+                              nextId: ""
+                            }
                           )
                       }><Icon fontSize="large">add_circle</Icon></Button>
                     </Grid>
