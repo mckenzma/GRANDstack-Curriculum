@@ -37,6 +37,7 @@ const GET_RANKS = gql`
       name
       abbreviation
       rankOrder
+      colorhex
     }
   }
 `;
@@ -53,6 +54,7 @@ const GET_TECHNIQUES = gql`
         rankOrder
         name
         abbreviation
+        colorhex
       }
     }
   }
@@ -71,6 +73,7 @@ const CREATE_TECHNIQUE = gql`
         rankOrder
         name
         abbreviation
+        colorhex
       }
     }
   }
@@ -147,6 +150,7 @@ const MERGE_TECHNIQUE_RANKS_RELS = gql`
       name
       rankOrder
       abbreviation
+      colorhex
     }
   }
 `;
@@ -198,6 +202,9 @@ export default function Technique({headerHeight}) {
               <Chip
                 key={rank.id}
                 label={rank.abbreviation} // abbreviation vs name
+                variant="outlined"
+                color='primary' 
+                style={{backgroundColor:rank.colorhex}}
               />
             ))}
             </div>),
@@ -264,6 +271,8 @@ export default function Technique({headerHeight}) {
   const [DeleteTechniqueRanks] = useMutation(DELETE_TECHNIQUE_RANKS_RELS);
 
   const { loading, error, data } = useQuery(GET_TECHNIQUES);
+
+  console.log("data: ", data);
 
   if (loading) return "Loading...";
   if (error) return `Error ${error.message}`;

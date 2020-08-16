@@ -3,6 +3,7 @@ type Rank {
   rankOrder: Int!
   name: String!
   abbreviation: String!
+  colorhex: String
   
   strikes: [Strike] @relation(name: "REQUIRED_FOR", direction: "IN")
   blocks: [Block] @relation(name: "REQUIRED_FOR", direction: "IN")

@@ -6,6 +6,8 @@ import MaterialTable from 'material-table';
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 
+import Chip from "@material-ui/core/Chip";
+
 import TextField from "@material-ui/core/TextField";
 
 const useStyles = makeStyles(theme => ({
@@ -24,30 +26,33 @@ const GET_RANKS = gql`
       name
       abbreviation
       rankOrder
+      colorhex
     }
   }
 `;
 
 const CREATE_RANK = gql`
-  mutation CreateRank($name: String!, $rankOrder: Int!, $abbreviation: String!) 
+  mutation CreateRank($name: String!, $rankOrder: Int!, $abbreviation: String!, $colorhex: String) 
   {
-    CreateRank(name: $name, rankOrder: $rankOrder, abbreviation: $abbreviation) {
+    CreateRank(name: $name, rankOrder: $rankOrder, abbreviation: $abbreviation, colorhex: $colorhex) {
       id
       name
       abbreviation
       rankOrder
+      colorhex
     }
   }
 `;
 
 const UPDATE_RANK = gql`
-  mutation UpdateRank($id: ID!, $name: String!, $rankOrder: Int!,$abbreviation: String!) 
+  mutation UpdateRank($id: ID!, $name: String!, $rankOrder: Int!,$abbreviation: String!, $colorhex: String) 
   {
-    UpdateRank(id: $id, name: $name, rankOrder: $rankOrder, abbreviation: $abbreviation) {
+    UpdateRank(id: $id, name: $name, rankOrder: $rankOrder, abbreviation: $abbreviation, colorhex: $colorhex) {
       id
       name
       abbreviation
       rankOrder
+      colorhex
     }
   }
 `;
@@ -72,7 +77,7 @@ export default function Rank({headerHeight}) {
 
   const [state, setState] = React.useState({
     columns: [
-      { title: 'Order', field: 'rankOrder', 
+      { title: 'Order', field: 'rankOrder', //type: 'numeric',
         editComponent: props => (
           <TextField
             id="outlined-number"
@@ -81,6 +86,8 @@ export default function Rank({headerHeight}) {
             InputLabelProps={{
               shrink: true,
             }}
+            // value={props.value}
+            value={parseInt(props.value)}
             onChange={e => setRankOrder(parseInt(e.target.value))}
             // variant="outlined"
             helperText="Enter order of rank"
@@ -104,6 +111,18 @@ export default function Rank({headerHeight}) {
         // )
       },
       { title: 'Abbreviation', field: 'abbreviation'},
+      { title: 'Color Hex', field: 'colorhex'},
+      { title: 'Color Chip', field: 'colorhex', editable: 'never', render: rowData => (
+         <div className={classes.chips}>
+              <Chip
+                // key={rank.id}
+                // label={rank.abbreviation}
+                variant="outlined"
+                color='primary' 
+                style={{backgroundColor:rowData.colorhex}}
+              />
+          </div>),
+      }
       // { title: 'Birth Year', field: 'birthYear', type: 'numeric' },
       // {
       //   title: 'Birth Place',
@@ -157,6 +176,10 @@ export default function Rank({headerHeight}) {
           <MaterialTable
             title="Rank"
             columns={state.columns}
+            options={{
+              pageSize: 10,
+              // pageSizeOptions: [5, 10, 20, 30 ,50, 75, 100 ],
+            }}
             data={data.Rank.sort(getSorting(order,orderBy))}
             editable={{
               onRowAdd: newData =>
@@ -192,7 +215,8 @@ export default function Rank({headerHeight}) {
                         // name: name, 
                         name: newData.name, 
                         abbreviation: newData.abbreviation, 
-                        rankOrder: rankOrder
+                        rankOrder: rankOrder,
+                        colorhex: newData.colorhex
                         // rankOrder: newData.rankOrder
                       },
                       update: (cache) => {
@@ -204,7 +228,8 @@ export default function Rank({headerHeight}) {
                               // name: name, 
                               name: newData.name, 
                               abbreviation: newData.abbreviation, 
-                              rankOrder: rankOrder
+                              rankOrder: rankOrder,
+                              colorhex: newData.colorhex
                             };
                           } else {
                             return r;

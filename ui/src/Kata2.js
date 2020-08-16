@@ -51,6 +51,7 @@ const GET_KATAS = gql`
         rankOrder
         name
         abbreviation
+        colorhex
       }
     }
   }
@@ -67,6 +68,7 @@ const CREATE_KATA = gql`
         rankOrder
         name
         abbreviation
+        colorhex
       }
     }
   }
@@ -128,6 +130,9 @@ export default function Kata({headerHeight}) {
               <Chip
                 key={rank.id}
                 label={rank.abbreviation} // abbreviation vs name
+                variant="outlined"
+                color='primary' 
+                style={{backgroundColor:rank.colorhex}}
               />
             ))}
             </div>),
@@ -215,6 +220,7 @@ export default function Kata({headerHeight}) {
             }
             onRowClick={handleClickOpen}
             editable={{
+              // TODO - on add set number of moves to auto create
               onRowAdd: newData =>
                 new Promise(resolve => {
                   setTimeout(() => {
@@ -322,23 +328,24 @@ export default function Kata({headerHeight}) {
                     });
                   }, 600);
                 }),
-                onRowDelete: oldData =>
-                new Promise(resolve => {
-                  setTimeout(() => {
-                    resolve();
-                    DeleteKata({
-                      variables: { id: oldData.id },
-                      update: (cache) => {
-                        const existingKatas = cache.readQuery({ query: GET_KATAS });
-                        const newKatas = existingKatas.Kata.filter(r => (r.id !== oldData.id));
-                        cache.writeQuery({
-                          query: GET_KATAS,
-                          data: { Kata: newKatas }
-                        });
-                      }
-                    });
-                  }, 600);
-                }),
+                // TODO - update to delete moves & steps
+                // onRowDelete: oldData =>
+                // new Promise(resolve => {
+                //   setTimeout(() => {
+                //     resolve();
+                //     DeleteKata({
+                //       variables: { id: oldData.id },
+                //       update: (cache) => {
+                //         const existingKatas = cache.readQuery({ query: GET_KATAS });
+                //         const newKatas = existingKatas.Kata.filter(r => (r.id !== oldData.id));
+                //         cache.writeQuery({
+                //           query: GET_KATAS,
+                //           data: { Kata: newKatas }
+                //         });
+                //       }
+                //     });
+                //   }, 600);
+                // }),
             }}
           />
         </Grid>
