@@ -19,6 +19,7 @@ interface Technique {
   name: String!
   description: String
 
+  ranks: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
   # steps: [Step] @relation(name: "USES", direction: "IN")
 }
 
@@ -247,13 +248,14 @@ type Move {
 
 type Step {
   id: ID!
-  name: String!
+  name: String! # TODO - remove this
 
   move: Move @relation(name: "HAS_STEP", direction: "IN")
   nextStep: Step @relation(name: "NEXT_STEP", direction: "OUT")
   prevStep: Step @relation(name: "NEXT_STEP", direction: "IN")
 
   technique: Technique @relation(name: "USES", direction: "OUT")
+  # Do I need these below since I can use Technique?
   block: Block @relation(name: "USES", direction: "OUT")
   strike: Strike @relation(name: "USES", direction: "OUT")
   kick: Kick @relation(name: "USES", direction: "OUT")
@@ -263,6 +265,100 @@ type Step {
 }
 
 type Mutation {
+  CreateTechnique(type: String, name: String!, description: String): Technique @cypher(
+    statement:
+    """
+    CREATE (tech:Technique)
+    SET tech.name = $name,
+        tech.description = $description,
+        tech.id = apoc.create.uuid()
+    WITH tech
+    CALL apoc.create.addLabels( [tech], [$type])
+    YIELD node
+    RETURN node
+    """
+  )
+
+  # do we want label update in own mutation?
+  UpdateTechnique(id: ID!, newType: String, oldType: String, name: String!, description: String): Technique @cypher(
+    statement:
+    """
+    MATCH (tech:Technique {id: $id})
+    SET tech.name = $name,
+        tech.description = $description
+    WITH tech
+    CALL apoc.create.removeLabels( [tech], [$oldType])
+    YIELD node
+    WITH node
+    CALL apoc.create.addLabels( [node], [$newType])
+    YIELD node AS tech
+    RETURN tech
+    """
+  )
+
+  # DeleteTechnique(id: ID!): Technique @cypher(
+  #   statement:
+  #   """
+  #   MATCH (tech:Technique {id: $id})
+  #   DETACH DELETE tech
+  #   RETURN tech
+  #   """
+  # )
+
+  UpdateTechniqueProps(id: ID!, name: String!, description: String): Technique @cypher(
+    statement:
+    """
+    MATCH (tech:Technique {id: $id})
+    SET tech.name = $name,
+        tech.description = $description
+    RETURN tech
+    """
+  )
+
+  UpdateTechniqueLabels(id: ID!, newType: String, oldType: String): Technique @cypher(
+    statement:
+    """
+    MATCH (tech:Technique {id: $id})
+    WITH tech
+    CALL apoc.create.removeLabels( [tech], [$oldType])
+    YIELD node
+    WITH node
+    CALL apoc.create.addLabels( [node], [$newType])
+    YIELD node AS tech
+    RETURN tech
+    """
+  )
+
+
+  DeleteTechnique(id: ID!): Technique @cypher(
+    statement:
+    """
+    MATCH (tech:Technique {id: $id})
+    DETACH DELETE tech
+    """
+  )
+
+  MergeTechniqueRanks(fromTechniqueID: ID!, toRankIDs: [ID!]): [Rank] @cypher(
+    statement:
+    """
+    MATCH (technique:Technique {id: $fromTechniqueID})
+    UNWIND $toRankIDs AS toRankID
+    MATCH (rank:Rank {id: toRankID})
+    MERGE (technique)-[:REQUIRED_FOR]->(rank)
+    RETURN rank
+    """
+  )
+
+  DeleteTechniqueRanks(fromTechniqueID: ID!, toRankIDs: [ID!]): [Rank] @cypher(
+    statement:
+    """
+    MATCH (technique:Technique {id: $fromTechniqueID})-[r:REQUIRED_FOR]->(rank:Rank)
+    WHERE rank.id IN $toRankIDs
+    DELETE r
+    RETURN rank
+    """
+  )
+
   MergeStrikeRanks(fromStrikeID: ID!, toRankIDs: [ID!]): [Rank] @cypher(
     statement:
     """
@@ -410,19 +506,6 @@ type Mutation {
     """
   )
 
-  # CreateStepConnectToMove(fromMoveID: ID!): Step @cypher(
-  #   statement:
-  #   """
-  #   CREATE (newStep:Step)
-  #   SET newStep.name = ''
-  #       newStep.id = apoc.create.uuid()
-  #   WITH newStep
-  #   MATCH (move:Move {id: $fromMoveID})
-  #   MERGE (move)-[:HAS_STEP]->(newStep)
-  #   RETURN newStep
-  #   """
-  # )
-
   ConnectMoveToStep(fromMoveID: ID!, toStepID: ID!): Step @cypher(
     statement:
     """
@@ -443,7 +526,7 @@ type Mutation {
     """
   )
 
-  UpdateTechnique(stepID: ID!, techID: ID!): Technique @cypher(
+  UpdateStepTechnique(stepID: ID!, techID: ID!): Technique @cypher(
     statement:
     """
     MATCH (step:Step {id: $stepID})-[r:USES]->()

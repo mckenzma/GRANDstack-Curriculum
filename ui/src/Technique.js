@@ -94,6 +94,42 @@ const UPDATE_TECHNIQUE = gql`
   }
 `;
 
+const UPDATE_TECHNIQUE_PROPS = gql`
+  mutation UpdateTechniqueProps($id: ID!, $name: String!, $description: String) 
+  {
+    UpdateTechniqueProps(id: $id, name: $name, description: $description) {
+      id
+      name
+      description
+      __typename
+      #ranks {
+      #  id
+      #  rankOrder
+      #  name
+      #  abbreviation
+      #}
+    }
+  }
+`;
+
+const UPDATE_TECHNIQUE_LABELS = gql`
+  mutation UpdateTechniqueLabels($id: ID!, $newType: String, $oldType: String) 
+  {
+    UpdateTechniqueLabels(id: $id, newType: $newType, oldType: $oldType) {
+      id
+      name
+      description
+      __typename
+      #ranks {
+      #  id
+      #  rankOrder
+      #  name
+      #  abbreviation
+      #}
+    }
+  }
+`;
+
 const DELETE_TECHNIQUE = gql`
   mutation DeleteTechnique($id: ID!) 
   {
@@ -221,6 +257,8 @@ export default function Technique({headerHeight}) {
 
   const [CreateTechnique] = useMutation(CREATE_TECHNIQUE);
   const [UpdateTechnique] = useMutation(UPDATE_TECHNIQUE);
+  const [UpdateTechniqueProps] = useMutation(UPDATE_TECHNIQUE_PROPS);
+  const [UpdateTechniqueLabels] = useMutation(UPDATE_TECHNIQUE_LABELS);
   const [DeleteTechnique] = useMutation(DELETE_TECHNIQUE);
   const [MergeTechniqueRanks] = useMutation(MERGE_TECHNIQUE_RANKS_RELS);
   const [DeleteTechniqueRanks] = useMutation(DELETE_TECHNIQUE_RANKS_RELS);
@@ -256,7 +294,7 @@ export default function Technique({headerHeight}) {
                 new Promise(resolve => {
                   setTimeout(() => {
                     resolve();
-                    // console.log("newData: ", newData);
+                    console.log("newData: ", newData);
                     CreateTechnique({
                       variables: {
                         name: newData.name,
@@ -276,18 +314,18 @@ export default function Technique({headerHeight}) {
                             },
                             update: (cache, { data: { MergeTechniqueRanks } }) => {
                               CreateTechnique.ranks = CreateTechnique.ranks.concat(MergeTechniqueRanks)
-                              // cache.writeQuery({
-                              //   query: GET_TECHNIQUES,
-                              //   data: { Technique: Technique.concat([CreateTechnique]) },
-                              // })
+                              cache.writeQuery({
+                                query: GET_TECHNIQUES,
+                                data: { Technique: Technique.concat([CreateTechnique]) },
+                              })
                             }
                           });
-                        } //else {
+                        } else {
                           cache.writeQuery({
                             query: GET_TECHNIQUES,
                             data: { Technique: Technique.concat([CreateTechnique]) },
                           })
-                        //}
+                        }
                       }
                     });
 
@@ -297,19 +335,43 @@ export default function Technique({headerHeight}) {
                 new Promise(resolve => {
                   setTimeout(() => {
                     resolve();
-                    // console.log("newData: ", newData);
-                    // console.log("oldData: ", oldData);
-                    UpdateTechnique({
+                    console.log("newData: ", newData);
+                    console.log("oldData: ", oldData);
+                    // UpdateTechnique({
+                    UpdateTechniqueProps({
                       variables: { 
                         id: newData.id,
                         name: newData.name,
                         description: newData.description,
                         // TODO - address 2 line below. here -->
-                        newType: (newData.type !== undefined ? newData.type : "Block"),
-                        oldType: (newData.type !== undefined ? newData.type : "Block")
+                        // newType: (newData.type !== undefined ? newData.type : "Block"),
+                        // oldType: (newData.type !== undefined ? newData.type : "Block")
                         // <-- to here
                       },
-                      update: (cache, { data: { UpdateTechnique } }) => {
+                      // update: (cache, { data: { UpdateTechnique } }) => {
+                      update: (cache, { data: { UpdateTechniqueProps } }) => {
+                        console.log(UpdateTechniqueProps);
+
+                        if (newData.__typename !== oldData.__typename) {
+                          console.log("update label");
+                          UpdateTechniqueLabels({
+                            variables: {
+                              id: UpdateTechniqueProps.id,
+                              oldType: oldData.__typename,
+                              newType: newData.__typename
+                            },
+                            update: (cache, { data: { UpdateTechniqueLabels } }) => {
+                              console.log(UpdateTechniqueLabels);
+                              const existingTechniques = cache.readQuery({ query: GET_TECHNIQUES });
+                              const newTechniques = existingTechniques.Technique.filter(r => (r.id !== oldData.id));
+                              cache.writeQuery({
+                                query: GET_TECHNIQUES,
+                                data: { Technique: newTechniques.concat(newData) }
+                              });
+                            }
+                          });
+                        }
+
                         let relsToAdd = [];
                         let relsToDelete = [];
 
@@ -356,10 +418,12 @@ export default function Technique({headerHeight}) {
                         const existingTechniques = cache.readQuery({ query: GET_TECHNIQUES });
                         const newTechniques = existingTechniques.Technique.map(r => {
                           if (r.id === oldData.id) {
+                            console.log("r: ", r);
                             return {
                               ...r, 
                               name: newData.name, 
                               description: newData.description,
+                              // _typename: newData._typename
                             };
                           } else {
                             return r;
@@ -379,6 +443,7 @@ export default function Technique({headerHeight}) {
                 new Promise(resolve => {
                   setTimeout(() => {
                     resolve();
+                    console.log("oldData: ",oldData);
                     DeleteTechnique({
                       variables: { id: oldData.id },
                       update: (cache) => {
