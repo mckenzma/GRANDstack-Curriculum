@@ -46,7 +46,7 @@ const GET_STRIKES = gql`
   }
 `;
 
-export default function Strike() {
+export default function Strike2() {
   const classes = useStyles();
 
   const [order, setOrder] = useState("asc");
