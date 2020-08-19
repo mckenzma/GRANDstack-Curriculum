@@ -87,8 +87,6 @@ export default function StackedBarChart_TechniqueCountByTypeByRank() {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error</p>;
 
-  console.log(data);
-
   const ranks = data.techniqueCountByTypeByRank.map(n => {
         return n.rank
       }).filter((v, i, a) => a.indexOf(v) === i);
@@ -96,9 +94,6 @@ export default function StackedBarChart_TechniqueCountByTypeByRank() {
   const types = data.techniqueCountByTypeByRank.map(m => {
         return m.type
       }).filter((v, i,a) => a.indexOf(v) === i);
-
-  console.log(ranks);
-  console.log(types);
 
   const options = {
     chart: {
@@ -127,7 +122,7 @@ export default function StackedBarChart_TechniqueCountByTypeByRank() {
         colors: ["#fff"]
       },
       title: {
-        text: "Techniques By Type By Rank"
+        text: "Num of Testing Requirements By Type per Rank"
       },
       xaxis: {
         labels: {
@@ -166,8 +161,6 @@ export default function StackedBarChart_TechniqueCountByTypeByRank() {
     .map(t => {
       let dataPoints = [];
       for (var i=0;i<ranks.length;i++){
-        console.log(data.techniqueCountByTypeByRank.filter(item => (item.type === t && item.rank === ranks[i])));
-
         let value = data.techniqueCountByTypeByRank.filter(item => (item.type === t && item.rank === ranks[i]));
         if (value.length === 1){
           dataPoints.push(value[0].count);
@@ -175,14 +168,11 @@ export default function StackedBarChart_TechniqueCountByTypeByRank() {
           dataPoints.push(0);
         }
       }
-      console.log(dataPoints);
       return {
         name: t !== null ? t : 'undefined',
         data: dataPoints
       }
     });
-
-    console.log(series);
 
   return (
     <div className="bar">
