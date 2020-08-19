@@ -273,6 +273,12 @@ type TechniqueCountByTypeByRank {
   count: Int
 }
 
+type TechniqueCountByRankByType {
+  rank: String
+  type: String
+  name: String
+}
+
 type Mutation {
   CreateTechnique(type: String, name: String!, description: String): Technique @cypher(
     statement:
@@ -585,7 +591,8 @@ type Mutation {
 
 type Query {
   techniqueCountByTypeByRank: [TechniqueCountByTypeByRank] @cypher(
-    statement: """
+    statement: 
+    """
     MATCH (rank:Rank)
     WITH rank
     ORDER BY rank.rankOrder ASC
@@ -595,4 +602,17 @@ type Query {
     RETURN { rankOrder: rank.rankOrder, rank: rank.name, type: label, count: count(thing) } AS datapoint
     """
   )  
+
+  techniqueByRankByType: [TechniqueCountByRankByType] @cypher(
+    statement: 
+    """
+    MATCH (thing)
+    WHERE thing:Technique OR thing:Kata
+    WITH thing, labels(thing) AS labels
+    WITH thing, filter(label in labels WHERE label <> 'Technique')[0] AS label
+    OPTIONAL MATCH (thing)-[:REQUIRED_FOR]->(rank)
+    WITH thing, label, rank
+    RETURN { rank: rank.name, type: label, name: thing.name } AS datapoint
+    """
+  )
 }

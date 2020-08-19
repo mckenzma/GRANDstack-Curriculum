@@ -17,6 +17,7 @@ import AssessmentIcon from '@material-ui/icons/Assessment';
 import Grid from '@material-ui/core/Grid';
 
 import StackedBarChart_TechniqueCountByTypeByRank from "./StackedBarChart_TechniqueCountByTypeByRank";
+import HeatmapChart_TechniqueCountByRankByType from "./HeatmapChart_TechniqueCountByRankByType";
 
 const DialogTitle = withStyles(theme => ({
   root: {
@@ -92,6 +93,10 @@ export default function SummaryDialog() {
             <Grid item xs={12} md={12}>
               {/*<GraphSummaryRelationships />*/}
               <StackedBarChart_TechniqueCountByTypeByRank />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              {/*<GraphSummaryRelationships />*/}
+              <HeatmapChart_TechniqueCountByRankByType />
             </Grid>
           </Grid>
         </DialogContent>
