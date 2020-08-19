@@ -277,6 +277,7 @@ type TechniqueCountByRankByType {
   rank: String
   type: String
   name: String
+  color: String
 }
 
 type Mutation {
@@ -612,7 +613,8 @@ type Query {
     WITH thing, filter(label in labels WHERE label <> 'Technique')[0] AS label
     OPTIONAL MATCH (thing)-[:REQUIRED_FOR]->(rank)
     WITH thing, label, rank
-    RETURN { rank: rank.name, type: label, name: thing.name } AS datapoint
+    ORDER BY rank.rankOrder ASC, label ASC
+    RETURN { rank: rank.name, type: label, name: thing.name, color: rank.colorhex } AS datapoint
     """
   )
 }

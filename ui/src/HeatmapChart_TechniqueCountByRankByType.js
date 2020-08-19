@@ -13,6 +13,7 @@ const TECHNIQUE_COUNT_BY_TYPE_BY_RANK = gql`
       rank
       type
       name
+      color
     }
   }
 `;
@@ -54,6 +55,13 @@ export default function HeatChart_TechniqueCountByRankByType() {
       }).filter((v, i,a) => a.indexOf(v) === i);
   console.log("types: ", types);
 
+  const colors = data.techniqueByRankByType.map(n => {
+        return n.color !== null ? n.color : "#008FFB"
+      }).filter((v, i, a) => a.indexOf(v) === i);
+  console.log("colors: ", colors);
+
+  console.log("ranks: ", ranks);
+
   const options = {
     chart: {
         type: 'heatmap',
@@ -63,29 +71,15 @@ export default function HeatChart_TechniqueCountByRankByType() {
           enableShades: true,
           shadeIntensity: 0.5,
           distributed: true,
-          // colorScale: {
-          //   ranges: [{
-          //       from: 0,
-          //       to: 0,
-          //       color: '#FFFFFF',
-          //       name: 'Not Assigned',
-          //     },
-          //     {
-          //       from: 1,
-          //       to: 1000,
-          //       color: '#008FFB',
-          //       name: 'Assigned',
-          //     },
-          //   ]
-          // }
         }
       },
       dataLabels: {
         enabled: true
       },
-      colors: ["#008FFB"],
+      // colors: ["#008FFB"],
+      colors: colors,
       title: {
-        text: "Num of Testing Requirements By Rank per Rank"
+        text: "Num Techniques by Rank"
       },
   };
 
