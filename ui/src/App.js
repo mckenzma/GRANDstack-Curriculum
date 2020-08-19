@@ -21,10 +21,11 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 // import { mailFolderListItems, otherMailFolderListItems } from "./tileData";
 
-import HomeIcon from "@material-ui/icons/Home";
-import CropFreeIcon from "@material-ui/icons/CropFree";
-import ListIcon from "@material-ui/icons/List";
-import PersonIcon from "@material-ui/icons/Person";
+// import HomeIcon from "@material-ui/icons/Home";
+// import CropFreeIcon from "@material-ui/icons/CropFree";
+// import ListIcon from "@material-ui/icons/List";
+// import PersonIcon from "@material-ui/icons/Person";
+import AssessmentIcon from '@material-ui/icons/Assessment';
 
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
@@ -40,6 +41,8 @@ import { ThemeProvider } from '@material-ui/core/styles';
 // import grey from '@material-ui/core/colors/grey';
 // import green from '@material-ui/core/colors/green';
 
+import SummaryDialog from './SummaryDialog';
+
 const drawerWidth = 240;
 
 // const styles = theme => ({
@@ -49,7 +52,7 @@ const useStyles = makeStyles(theme => ({
   },
   appFrame: {
     // height: 430,
-    height: "100%",
+    // height: "100%",
     // height: "auto",
     zIndex: 1,
     overflow: "hidden",
@@ -156,7 +159,7 @@ export default function App() {
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
-  const [anchor, setAnchor] = useState("left");
+  const [anchor/*, setAnchor*/] = useState("left");
 
   const handleDrawerOpen = () => {
     // this.setState({ open: true });
@@ -204,14 +207,15 @@ export default function App() {
           </ListItemIcon>
           <ListItemText primary="Home" />
         </ListItem>
-        <Divider />
-        <ListItem button>
+        <Divider />*/}
+        <SummaryDialog />
+        {/*<ListItem button>
           <ListItemIcon>
-            <CropFreeIcon />
+            <AssessmentIcon />
           </ListItemIcon>
-          <ListItemText primary="Rings" />
+          <ListItemText primary="Technique Analysis" />
         </ListItem>
-        <Divider />
+        {/*<Divider />
         <ListItem button>
           <ListItemIcon>
             <ListIcon />

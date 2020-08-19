@@ -5,6 +5,7 @@ type Rank {
   abbreviation: String!
   colorhex: String
   
+  techniques: [Technique] @relation(name: "REQUIRED_FOR", direction: "IN")
   strikes: [Strike] @relation(name: "REQUIRED_FOR", direction: "IN")
   blocks: [Block] @relation(name: "REQUIRED_FOR", direction: "IN")
   kicks: [Kick] @relation(name: "REQUIRED_FOR", direction: "IN")
@@ -265,6 +266,13 @@ type Step {
   movement: Movement @relation(name: "USES", direction: "OUT")
 }
 
+type TechniqueCountByTypeByRank {
+  rankOrder: Int
+  rank: String
+  type: String
+  count: Int
+}
+
 type Mutation {
   CreateTechnique(type: String, name: String!, description: String): Technique @cypher(
     statement:
@@ -297,15 +305,6 @@ type Mutation {
     """
   )
 
-  # DeleteTechnique(id: ID!): Technique @cypher(
-  #   statement:
-  #   """
-  #   MATCH (tech:Technique {id: $id})
-  #   DETACH DELETE tech
-  #   RETURN tech
-  #   """
-  # )
-
   UpdateTechniqueProps(id: ID!, name: String!, description: String): Technique @cypher(
     statement:
     """
@@ -329,7 +328,6 @@ type Mutation {
     RETURN tech
     """
   )
-
 
   DeleteTechnique(id: ID!): Technique @cypher(
     statement:
@@ -582,4 +580,19 @@ type Mutation {
   #   RETURN prev, next
   #   """
   # )
+
+}
+
+type Query {
+  techniqueCountByTypeByRank: [TechniqueCountByTypeByRank] @cypher(
+    statement: """
+    MATCH (rank:Rank)
+    WITH rank
+    ORDER BY rank.rankOrder ASC
+    OPTIONAL MATCH (rank)<-[:REQUIRED_FOR]-(thing)
+    WITH rank, thing, labels(thing) AS labels
+    WITH rank, thing, filter(label in labels WHERE label <> 'Technique')[0] AS label
+    RETURN { rankOrder: rank.rankOrder, rank: rank.name, type: label, count: count(thing) } AS datapoint
+    """
+  )  
 }
