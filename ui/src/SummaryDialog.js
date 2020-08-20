@@ -18,6 +18,7 @@ import Grid from '@material-ui/core/Grid';
 
 import StackedBarChart_TechniqueCountByTypeByRank from "./StackedBarChart_TechniqueCountByTypeByRank";
 import HeatmapChart_TechniqueCountByRankByType from "./HeatmapChart_TechniqueCountByRankByType";
+import HeatChart_TechniqueByRankByType from './HeatChart_TechniqueByRankByType';
 
 const DialogTitle = withStyles(theme => ({
   root: {
@@ -90,13 +91,31 @@ export default function SummaryDialog() {
         </DialogTitle>
         <DialogContent>
           <Grid container /*spacing={10}*/>
-            <Grid item xs={12} md={12}>
+            <Grid item xs={12} md={6}>
               {/*<GraphSummaryRelationships />*/}
               <StackedBarChart_TechniqueCountByTypeByRank />
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid item xs={12} md={6}>
               {/*<GraphSummaryRelationships />*/}
               <HeatmapChart_TechniqueCountByRankByType />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <HeatChart_TechniqueByRankByType label={"Block"}/>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <HeatChart_TechniqueByRankByType label={"Strike"}/>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <HeatChart_TechniqueByRankByType label={"Kick"}/>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <HeatChart_TechniqueByRankByType label={"Stance"}/>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <HeatChart_TechniqueByRankByType label={"Movement"}/>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <HeatChart_TechniqueByRankByType label={"Turn"}/>
             </Grid>
           </Grid>
         </DialogContent>

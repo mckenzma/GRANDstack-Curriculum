@@ -19,8 +19,7 @@ const TECHNIQUE_COUNT_BY_TYPE_BY_RANK = gql`
 `;
 
 
-export default function HeatChart_TechniqueCountByRankByType() {
-
+export default function HeatChart_TechniqueByRankByType(obj) {
   const state = {
     options: {
       chart: {
@@ -28,7 +27,7 @@ export default function HeatChart_TechniqueCountByRankByType() {
       },
       plotOptions: {
         heatmap: {
-          height: 350,
+
         }
       },
       title: {
@@ -50,10 +49,11 @@ export default function HeatChart_TechniqueCountByRankByType() {
 
   // console.log("ranks: ", ranks);
 
-  const types = data.techniqueByRankByType.map(m => {
-        return m.type
+  const names = data.techniqueByRankByType.map(m => {
+      if (m.type === obj.label)
+        return m.name
       }).filter((v, i,a) => a.indexOf(v) === i);
-  // console.log("types: ", types);
+  console.log("names: ", names);
 
   const colors = data.techniqueByRankByType.map(n => {
         return n.color !== null ? n.color : "#008FFB"
@@ -65,37 +65,42 @@ export default function HeatChart_TechniqueCountByRankByType() {
   const options = {
     chart: {
         type: 'heatmap',
+        height: 300
       },
       plotOptions: {
         heatmap: {
           enableShades: true,
           shadeIntensity: 0.5,
           distributed: true,
+          colorScale: {
+              inverse: true
+            }
         }
       },
       dataLabels: {
-        enabled: true
+        enabled: false
       },
       // colors: ["#008FFB"],
       colors: colors,
       title: {
-        text: "Num Techniques by Rank"
+        text: obj.label + " by Rank"
       },
   };
 
-  const series = ranks
-    .map(r => {
+  const series = names
+    .map(n => {
       let dataPoints = [];
-      for (var i=0;i<types.length;i++){
-        let value = data.techniqueByRankByType.filter(item => (item.type === types[i] && item.rank === r));
-        if (value.length > 0){
-          dataPoints.push({ x: types[i], y: value.length});
+      for (var i=0;i<ranks.length;i++){
+        let value = data.techniqueByRankByType.filter(item => (item.rank === ranks[i] && item.name === n && item.type === obj.label));
+        // console.log(value);
+        if (value.length === 1){
+          dataPoints.push({ x: ranks[i] !== null ? ranks[i] : 'Unassigned', y: 1});
         } else {
-          dataPoints.push({ x: types[i], y: 0});
+          dataPoints.push({ x: ranks[i] !== null ? ranks[i] : 'Unassigned', y: 0});
         }
       }
       return {
-        name: r !== null ? r : 'Unassigned',
+        name: n,// !== null ? n : 'Unassigned',
         data: dataPoints
       }
     });
@@ -104,7 +109,11 @@ export default function HeatChart_TechniqueCountByRankByType() {
 
   return (
     <div className="heatmap">
-      <Chart options={options} series={series} type="heatmap" />
+      <Chart 
+        options={options} 
+        series={series} 
+        type="heatmap" 
+      />
     </div>
   );
 
