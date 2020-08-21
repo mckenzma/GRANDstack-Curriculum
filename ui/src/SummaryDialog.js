@@ -19,6 +19,7 @@ import Grid from '@material-ui/core/Grid';
 import StackedBarChart_TechniqueCountByTypeByRank from "./StackedBarChart_TechniqueCountByTypeByRank";
 import HeatmapChart_TechniqueCountByRankByType from "./HeatmapChart_TechniqueCountByRankByType";
 import HeatChart_TechniqueByRankByType from './HeatChart_TechniqueByRankByType';
+import HeatChart_KataByRank from './HeatChart_KataByRank';
 
 const DialogTitle = withStyles(theme => ({
   root: {
@@ -118,7 +119,7 @@ export default function SummaryDialog() {
               <HeatChart_TechniqueByRankByType label={"Turn"}/>
             </Grid>
             <Grid item xs={12} md={12}>
-              <HeatChart_TechniqueByRankByType label={"Kata"}/>
+              <HeatChart_KataByRank />
             </Grid>
           </Grid>
         </DialogContent>
