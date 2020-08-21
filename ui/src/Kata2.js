@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
   },
   chips: {
     display: "flex",
-    flexWrap: "wrap"
+    // flexWrap: "wrap"
   },
   chip: {
     margin: theme.spacing(0.25)
@@ -46,6 +46,7 @@ const GET_KATAS = gql`
     Kata {
       id
       name
+      order
       ranks {
         id
         rankOrder
@@ -58,11 +59,12 @@ const GET_KATAS = gql`
 `;
 
 const CREATE_KATA = gql`
-  mutation CreateKata($name: String!) 
+  mutation CreateKata($name: String!, $order: Int!) 
   {
-    CreateKata(name: $name) {
+    CreateKata(name: $name, order: $order) {
       id
       name
+      order
       ranks {
         id
         rankOrder
@@ -75,11 +77,12 @@ const CREATE_KATA = gql`
 `;
 
 const UPDATE_KATA = gql`
-  mutation UpdateKata($id: ID!, $name: String!) 
+  mutation UpdateKata($id: ID!, $name: String!, $order: Int!) 
   {
-    UpdateKata(id: $id, name: $name) {
+    UpdateKata(id: $id, name: $name, order: $order) {
       id
       name
+      order
     }
   }
 `;
@@ -117,12 +120,34 @@ export default function Kata({headerHeight}) {
   const classes = useStyles();
 
   const [ranks, setRanks] = useState("");
+  const [kataOrder, setKataOrder] = useState('');
 
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("name");
+  const [orderBy, setOrderBy] = useState("order");
 
   const [state, setState] = React.useState({
     columns: [
+      { title: 'Order', field: 'order', type: 'numeric',
+        // editComponent: props => {
+        //   return (
+        //     <TextField
+        //       id="outlined-number"
+        //       label="Number"
+        //       type="number"
+        //       InputLabelProps={{
+        //         shrink: true,
+        //       }}
+        //       // value={props.value}
+        //       // value={parseInt(props.value)}
+        //       value={parseInt(props.value)}
+        //       // onChange={e => setKataOrder(parseInt(e.target.value))}
+        //       onChange={props.onChange}
+        //       // variant="outlined"
+        //       helperText="Enter order of kata"
+        //     />
+        //   )
+        // }
+      },
       { title: 'Name', field: 'name' },
       { title: 'Ranks', field: 'ranks', render: rowData => (
           <div className={classes.chips}>
@@ -218,6 +243,12 @@ export default function Kata({headerHeight}) {
                 }
               })
             }
+            options={{
+              pageSize: 10,
+              // pageSizeOptions: [5, 10, 20, 30 ,50, 75, 100 ],
+              sorting: false,
+              addRowPosition: 'first'
+            }}
             onRowClick={handleClickOpen}
             editable={{
               // TODO - on add set number of moves to auto create
@@ -227,7 +258,8 @@ export default function Kata({headerHeight}) {
                     resolve();
                     CreateKata({
                       variables: {
-                        name: newData.name
+                        name: newData.name,
+                        order: parseInt(newData.order)
                       },
                       update: (cache, { data: { CreateKata } }) => {
                         const { Kata } = cache.readQuery({ query: GET_KATAS });
@@ -262,6 +294,7 @@ export default function Kata({headerHeight}) {
                       variables: { 
                         id: newData.id,
                         name: newData.name,
+                        order: parseInt(newData.order)
                       },
                       update: (cache, { data: { UpdateKata } }) => {
                         let relsToAdd = [];
@@ -313,6 +346,7 @@ export default function Kata({headerHeight}) {
                             return {
                               ...r, 
                               name: newData.name, 
+                              order: parseInt(newData.order)
                             };
                           } else {
                             return r;

@@ -77,22 +77,22 @@ export default function Rank({headerHeight}) {
 
   const [state, setState] = React.useState({
     columns: [
-      { title: 'Order', field: 'rankOrder', //type: 'numeric',
-        editComponent: props => (
-          <TextField
-            id="outlined-number"
-            label="Number"
-            type="number"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            // value={props.value}
-            value={parseInt(props.value)}
-            onChange={e => setRankOrder(parseInt(e.target.value))}
-            // variant="outlined"
-            helperText="Enter order of rank"
-          />
-        )
+      { title: 'Order', field: 'rankOrder', type: 'numeric',
+        // editComponent: props => (
+        //   <TextField
+        //     id="outlined-number"
+        //     label="Number"
+        //     type="number"
+        //     InputLabelProps={{
+        //       shrink: true,
+        //     }}
+        //     // value={props.value}
+        //     value={parseInt(props.value)}
+        //     onChange={e => setRankOrder(parseInt(e.target.value))}
+        //     // variant="outlined"
+        //     helperText="Enter order of rank"
+        //   />
+        // )
       },
       { title: 'Name', field: 'name'//,
         // editComponent: props => (
@@ -179,6 +179,8 @@ export default function Rank({headerHeight}) {
             options={{
               pageSize: 10,
               // pageSizeOptions: [5, 10, 20, 30 ,50, 75, 100 ],
+              addRowPosition: 'first',
+              sorting: false
             }}
             data={data.Rank.sort(getSorting(order,orderBy))}
             editable={{
