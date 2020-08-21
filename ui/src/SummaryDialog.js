@@ -117,6 +117,9 @@ export default function SummaryDialog() {
             <Grid item xs={12} md={12}>
               <HeatChart_TechniqueByRankByType label={"Turn"}/>
             </Grid>
+            <Grid item xs={12} md={12}>
+              <HeatChart_TechniqueByRankByType label={"Kata"}/>
+            </Grid>
           </Grid>
         </DialogContent>
       </Dialog>
