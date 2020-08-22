@@ -36,10 +36,10 @@ const GET_MOVE_STEPS = gql`
   }
 `;
 
-const UPDATE_TECHNIQUE = gql`
-  mutation UpdateTechnique($stepID: ID!, $techID: ID!)
+const UPDATE_STEP_TECHNIQUE = gql`
+  mutation UpdateStepTechnique($stepID: ID!, $techID: ID!)
   {
-    UpdateTechnique(stepID: $stepID, techID: $techID)
+    UpdateStepTechnique(stepID: $stepID, techID: $techID)
     {
       id
       name
@@ -63,9 +63,9 @@ export default function UpdateStepDialog({
 
   // TODO only update if selected a new technique
 
-  console.log(selectedStep);
-  console.log(_type);
-  console.log(_technique);
+  // console.log(selectedStep);
+  // console.log(_type);
+  // console.log(_technique);
   
   // const [_type, _setType] = useState(selectedStep.technique !== undefined ? selectedStep.technique.__typename : '');
   // const [_technique, _setTechnique] = useState();
@@ -78,22 +78,24 @@ export default function UpdateStepDialog({
   };
 
   const handleCloseUpdate = event => {
-    console.log("update step");
+    // console.log("update step");
 
     new Promise(resolve => {
       setTimeout(() => {
         resolve();
 
-        UpdateTechnique({
+        console.log(selectedStep.id, _technique);
+
+        UpdateStepTechnique({
           variables: {
             stepID: selectedStep.id,
             techID: _technique
           },
-          update: (cache, { data: { UpdateTechnique } }) => {
-            console.log(cache);
-            console.log(UpdateTechnique);
+          update: (cache, { data: { UpdateStepTechnique } }) => {
+            // console.log(cache);
+            // console.log(UpdateStepTechnique);
             const { Move } = cache.readQuery({ query: GET_MOVE_STEPS, variables: { selectedMove: move.id} });
-            console.log(Move);
+            // console.log(Move);
 
             cache.writeQuery({
               query: GET_MOVE_STEPS,
@@ -112,9 +114,9 @@ export default function UpdateStepDialog({
                       name: step.name,
                       __typename: "Step",
                       technique: {
-                        id: step.id === selectedStep.id ? UpdateTechnique.id : step.technique.id,
-                        name: step.id === selectedStep.id ? UpdateTechnique.name : step.technique.name,
-                        __typename: step === selectedStep.id ? UpdateTechnique.__typename : step.technique.__typename
+                        id: step.id === selectedStep.id ? UpdateStepTechnique.id : step.technique.id,
+                        name: step.id === selectedStep.id ? UpdateStepTechnique.name : step.technique.name,
+                        __typename: step === selectedStep.id ? UpdateStepTechnique.__typename : step.technique.__typename
                       }
                     }
                   })
@@ -132,14 +134,15 @@ export default function UpdateStepDialog({
     setOpenUpdate(false);
   };
 
-  const [UpdateTechnique] = useMutation(UPDATE_TECHNIQUE);
+  const [UpdateStepTechnique] = useMutation(UPDATE_STEP_TECHNIQUE);
 
   return (
       <Dialog open={openUpdate} onClose={handleCloseUpdate} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">Update Step</DialogTitle>
         <DialogContent>
 
-          <SelectType _type={_type} _setType={_setType} />
+          {/*<SelectType _type={_type} _setType={_setType} />*/}
+          <SelectType value={_type} onChange={_setType} />
           <SelectTechnique type={_type} _technique={_technique} _setTechnique={_setTechnique} />
 
         </DialogContent>
@@ -147,7 +150,7 @@ export default function UpdateStepDialog({
           <Button onClick={handleCancelUpdate} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleCloseUpdate} color="primary">
+          <Button onClick={handleCloseUpdate} color="primary" /*disabled={ _technique === "" ? true : false }*/>
             Update
           </Button>
         </DialogActions>
