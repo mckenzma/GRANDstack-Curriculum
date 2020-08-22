@@ -18,7 +18,7 @@ const KATA_BY_RANK = gql`
 `;
 
 
-export default function HeatChart_KataByRank(obj) {
+export default function HeatChart_KataByRank() {
   const state = {
     options: {
       chart: {
@@ -37,7 +37,7 @@ export default function HeatChart_KataByRank(obj) {
 
   const { loading, error, data } = useQuery(KATA_BY_RANK);
 
-  console.log("data: ", data);
+  // console.log("data: ", data);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error</p>;
@@ -46,13 +46,13 @@ export default function HeatChart_KataByRank(obj) {
         return n.rank
       }).filter((v, i, a) => a.indexOf(v) === i);
 
-  // console.log("ranks: ", ranks);
+  console.log("ranks: ", ranks);
 
   const names = data.kataByRank.map(m => {
-      if (m.type === obj.label)
+      // if (m.type === obj.label)
         return m.name
       }).filter((v, i,a) => a.indexOf(v) === i);
-  console.log("names: ", names);
+  // console.log("names: ", names);
 
   const colors = data.kataByRank.map(n => {
         return n.color !== null ? n.color : "#008FFB"
@@ -72,9 +72,12 @@ export default function HeatChart_KataByRank(obj) {
           shadeIntensity: 0.5,
           distributed: true,
           colorScale: {
-              inverse: true
-            }
-        }
+            inverse: true
+          },
+        },
+      },
+      tooltip: {
+        enabled: false,
       },
       dataLabels: {
         enabled: false
@@ -82,7 +85,7 @@ export default function HeatChart_KataByRank(obj) {
       // colors: ["#008FFB"],
       colors: colors,
       title: {
-        text: obj.label + " by Rank"
+        text: "Kata by Rank"
       },
   };
 
@@ -90,8 +93,8 @@ export default function HeatChart_KataByRank(obj) {
     .map(n => {
       let dataPoints = [];
       for (var i=0;i<ranks.length;i++){
-        let value = data.kataByRank.filter(item => (item.rank === ranks[i] && item.name === n && item.type === obj.label));
-        console.log(value);
+        let value = data.kataByRank.filter(item => (item.rank === ranks[i] && item.name === n /*&& item.type === obj.label*/));
+        // console.log(value);
         if (value.length === 1){
           dataPoints.push({ x: ranks[i] !== null ? ranks[i] : 'Unassigned', y: 1});
         } else {

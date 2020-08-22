@@ -53,7 +53,7 @@ export default function HeatChart_TechniqueByRankByType(obj) {
       if (m.type === obj.label)
         return m.name
       }).filter((v, i,a) => a.indexOf(v) === i);
-  console.log("names: ", names);
+  // console.log("names: ", names);
 
   const colors = data.techniqueByRankByType.map(n => {
         return n.color !== null ? n.color : "#008FFB"
@@ -79,6 +79,9 @@ export default function HeatChart_TechniqueByRankByType(obj) {
       },
       dataLabels: {
         enabled: false
+      },
+      tooltip: {
+        enabled: false,
       },
       // colors: ["#008FFB"],
       colors: colors,
