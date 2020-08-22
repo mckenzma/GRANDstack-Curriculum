@@ -26,40 +26,13 @@ const GET_MOVE_STEPS = gql`
     ) {
       id
       name
-      #__typename
       orderedSteps {
         id
         name
-        #__typename
         technique {
           id
           name
-          #__typename
         }
-        #block {
-        #  id
-        #  name
-        #}
-        #strike {
-        #  id
-        #  name
-        #}
-        #kick {
-        #  id
-        #  name
-        #}
-        #movement {
-        #  id
-        #  name
-        #}
-        #turn {
-        #  id
-        #  name
-        #}
-        #stance {
-        #  id
-        #  name
-        #}
       }
     }
   }
@@ -132,6 +105,7 @@ export default function CreateStepDialog({
     setOpenCreate(false);
     setSelectedStep("");
     _setType("");
+    _setTechnique("");
   };
 
   const handleCreate = event => {
@@ -140,118 +114,119 @@ export default function CreateStepDialog({
       setTimeout(() => {
         resolve();
 
-          CreateStep({
-            variables: {
-              name: "New Step"
-            },
-            update: (cache, { data: { CreateStep } }) => {
-              console.log("cache: ", cache);
-              console.log("CreateStep: ", CreateStep);
-              const { Move } = cache.readQuery({ query: GET_MOVE_STEPS, variables: { selectedMove: move.id} });
-              const existingSteps = Move[0].orderedSteps;
-              console.log("Move: ", Move[0], " existingSteps: ", existingSteps);
-              // const { Step } = cache.readQuery({ query: GET_STEPS });
-              let newSteps = existingSteps;
+        CreateStep({
+          variables: {
+            name: "New Step"
+          },
+          update: (cache, { data: { CreateStep } }) => {
+            const { Move } = cache.readQuery({ query: GET_MOVE_STEPS, variables: { selectedMove: move.id} });
+            const existingSteps = Move[0].orderedSteps;
+            let newSteps = existingSteps;
+            console.log('newSteps: ', newSteps);
 
-              // Connect Step to Move
-              ConnectMoveToStep({
-                variables: {
-                  fromMoveID: move.id,
-                  toStepID: CreateStep.id
+            // Connect Step to Move
+            ConnectMoveToStep({
+              variables: {
+                fromMoveID: move.id,
+                toStepID: CreateStep.id
+              }
+            });
+
+            ConnectStepToTechnique({
+              variables: {
+                fromStepID: CreateStep.id,
+                toTechniqueID: _technique
+              },
+              update: (cache, { data: { ConnectStepToTechnique } }) => {
+                // console.log("ConnectStepToTechnique:", ConnectStepToTechnique);
+                CreateStep.technique = ConnectStepToTechnique;
+                // console.log("CreateStep: ", CreateStep);
+                if (selectedStep.prevId === "" && selectedStep.nextId === ""){
+                  // console.log("do nothing");
+                  newSteps = newSteps.concat([CreateStep]);
                 }
-              });
+                if (selectedStep.prevId !== "" && selectedStep.nextId !== ""){
+                  // console.log("insert between");
+                  // Insert Step Between
+                  var index = existingSteps.map(function(e) { return e.id; }).indexOf(selectedStep.prevId);
+                  // console.log(existingSteps);
+                  // console.log(index);
+                  // if(index+1 === newSteps.length - 1){
+                  //   newSteps[index+2] = newSteps[index+1];
+                  // }
+                  // newSteps[index+1] = CreateStep;
+                  newSteps.splice(index+1,0,CreateStep);
 
-              ConnectStepToTechnique({
-                variables: {
-                  fromStepID: CreateStep.id,
-                  toTechniqueID: _technique
-                },
-                update: (cache, { data: { ConnectStepToTechnique } }) => {
-                  console.log("ConnectStepToTechnique:", ConnectStepToTechnique);
-                  CreateStep.technique = ConnectStepToTechnique;
-                  console.log("CreateStep: ", CreateStep);
-                  if (selectedStep.prevId === "" && selectedStep.nextId === ""){
-                    console.log("do nothing");
-                    newSteps = newSteps.concat([CreateStep]);
-                  }
-                  if (selectedStep.prevId !== "" && selectedStep.nextId !== ""){
-                    console.log("insert between");
-                    // Insert Step Between
-                    var index = existingSteps.map(function(e) { return e.id; }).indexOf(selectedStep.prevId);
-                    // console.log(index);
-                    if(index+1 === newSteps.length - 1){
-                      newSteps[index+2] = newSteps[index+1];
+                  InsertStepBetween({
+                    variables: {
+                      prevStepID: selectedStep.prevId,
+                      newStepID: CreateStep.id, 
+                      nextStepID: selectedStep.nextId
                     }
-                    newSteps[index+1] = CreateStep;
-
-                    InsertStepBetween({
-                      variables: {
-                        prevStepID: selectedStep.prevId,
-                        newStepID: CreateStep.id, 
-                        nextStepID: selectedStep.nextId
-                      }
-                    })
-                  }
-                  if (selectedStep.prevId !== "" && selectedStep.nextId === ""){
-                    console.log("insert next to (after)");
-                    // Insert Step Next To
-                    newSteps.push(CreateStep);
-                    InsertStepNextTo({
-                      variables: {
-                        prevStepID: selectedStep.prevId, 
-                        nextStepID: CreateStep.id
-                      }
-                    });
-                    
-                  }
-                  if (selectedStep.prevId === "" && selectedStep.nextId !== ""){
-                    console.log("insert next to (before)");
-                    // Insert Step Next To
-                    newSteps.unshift(CreateStep);
-                    InsertStepNextTo({
-                      variables: {
-                        prevStepID: CreateStep.id, 
-                        nextStepID: selectedStep.nextId
-                      }
-                    });
-                    
-                  }
-
-                  console.log('newSteps: ', newSteps);
-
-                  cache.writeQuery({
-                    query: GET_MOVE_STEPS,
-                    variable: {
-                      selectedMove: move.id
-                    },
-                    data: { 
-                      Move: {
-                        __typename: "Move",
-                        id: move.id,
-                        name: move.name,
-                        orderedSteps: newSteps.map(step => {
-                          console.log("step: ", step);
-                          return {
-                            id: step.id,
-                            name: step.name,
-                            __typename: "Step",
-                            technique: {
-                              id: step.techniuque !== undefined ? step.technique.id : '',
-                              name: step.technique !== undefined ? step.technique.name : '',
-                              __typename: step.technique !== undefined ? step.technique.__typename : ''
-                            }
-                          }
-                        })
-                      }
+                  })
+                }
+                if (selectedStep.prevId !== "" && selectedStep.nextId === ""){
+                  // console.log("insert next to (after)");
+                  // Insert Step Next To
+                  newSteps.push(CreateStep);
+                  // newSteps = newSteps.concat([CreateStep]);
+                  InsertStepNextTo({
+                    variables: {
+                      prevStepID: selectedStep.prevId, 
+                      nextStepID: CreateStep.id
+                    }
+                  });
+                  
+                }
+                if (selectedStep.prevId === "" && selectedStep.nextId !== ""){
+                  // console.log("insert next to (before)");
+                  // Insert Step Next To
+                  newSteps.unshift(CreateStep);
+                  InsertStepNextTo({
+                    variables: {
+                      prevStepID: CreateStep.id, 
+                      nextStepID: selectedStep.nextId
                     }
                   });
                 }
-              });
-            }
-          });
+
+                console.log('newSteps: ', newSteps);
+
+                cache.writeQuery({
+                  query: GET_MOVE_STEPS,
+                  variable: {
+                    selectedMove: move.id
+                  },
+                  data: { 
+                    Move: {
+                      __typename: "Move",
+                      id: move.id,
+                      name: move.name,
+                      orderedSteps: newSteps.map(step => {
+                      // orderedSteps: _steps.map(step => {
+                        // console.log("step: ", step);
+                        return {
+                          id: step.id,
+                          name: step.name,
+                          __typename: "Step",
+                          technique: {
+                            id: step.techniuque !== undefined ? step.technique.id : '',
+                            name: step.technique !== undefined ? step.technique.name : '',
+                            __typename: step.technique !== undefined ? step.technique.__typename : ''
+                          }
+                        }
+                      })
+                    }
+                  }
+                });
+              }
+            });
+          }
+        });
       }, 600);
     });
-    
+
+    _setTechnique("");
     setSelectedStep("");
     setOpenCreate(false);
   };
@@ -265,7 +240,6 @@ export default function CreateStepDialog({
   const [InsertStepNextTo] = useMutation(INSERT_STEP_NEXT_TO);
 
   return (
-    <div>
       <Dialog open={openCreate} /*onClose={handleCloseCreate}*/ aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">Create Step</DialogTitle>
         <DialogContent>
@@ -287,6 +261,5 @@ export default function CreateStepDialog({
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
   );
 }
