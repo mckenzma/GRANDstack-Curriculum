@@ -100,25 +100,25 @@ export default function SummaryDialog() {
               {/*<GraphSummaryRelationships />*/}
               <HeatmapChart_TechniqueCountByRankByType />
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid item xs={12} md={6}>
               <HeatChart_TechniqueByRankByType label={"Block"}/>
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid item xs={12} md={6}>
               <HeatChart_TechniqueByRankByType label={"Strike"}/>
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid item xs={12} md={6}>
               <HeatChart_TechniqueByRankByType label={"Kick"}/>
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid item xs={12} md={6}>
               <HeatChart_TechniqueByRankByType label={"Stance"}/>
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid item xs={12} md={6}>
               <HeatChart_TechniqueByRankByType label={"Movement"}/>
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid item xs={12} md={6}>
               <HeatChart_TechniqueByRankByType label={"Turn"}/>
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid item xs={12} md={6}>
               <HeatChart_KataByRank />
             </Grid>
           </Grid>
