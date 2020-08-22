@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
   },
   chips: {
     display: "flex",
-    flexWrap: "wrap"
+    // flexWrap: "wrap"
   },
   chip: {
     margin: theme.spacing(0.25)
@@ -272,7 +272,7 @@ export default function Technique({headerHeight}) {
 
   const { loading, error, data } = useQuery(GET_TECHNIQUES);
 
-  console.log("data: ", data);
+  // console.log("data: ", data);
 
   if (loading) return "Loading...";
   if (error) return `Error ${error.message}`;
@@ -288,7 +288,7 @@ export default function Technique({headerHeight}) {
               pageSize: 10,
               // pageSizeOptions: [5, 10, 20, 30 ,50, 75, 100 ],
               sorting: false,
-              addRowPosition: 'first'
+              addRowPosition: 'first',
             }}
             data={
               // data.Technique.sort(getSorting(order,orderBy)).map(t => {
