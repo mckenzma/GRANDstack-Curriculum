@@ -93,23 +93,17 @@ export default function DeleteStepDialog({
             const { Move } = cache.readQuery({ query: GET_MOVE_STEPS, variables: { selectedMove: move.id} });
             const existingSteps = Move[0].orderedSteps;
             let newSteps = existingSteps;
-            console.log("newSteps: ", newSteps);
 
             if (prevStep !== "" && nextStep !== "") {
               console.log('Delete Between');
               var index = existingSteps.map(function(e) { return e.id; }).indexOf(selectedStep.prevId);
-              // newSteps = existingSteps.slice(0,index).concat(existingSteps.slice(index+1));
-              console.log(existingSteps.slice(0,index));
               newSteps.splice(index,1);
 
               ConnectAdjacentSteps({
                 variables: {
                   prevStepID: prevStep,
                   nextStepID: nextStep
-                },
-                // update: (cache) => {
-
-                // }
+                }
               });
             } else if (prevStep !== "" && nextStep === "") {
               newSteps.length = newSteps.length - 1;
@@ -120,7 +114,6 @@ export default function DeleteStepDialog({
               newSteps.length = newSteps.length - 1;
             }
 
-            console.log("newSteps: ", newSteps);
             setPrevStep("");
             setNextStep("");
 
@@ -135,7 +128,6 @@ export default function DeleteStepDialog({
                   id: move.id,
                   name: move.name,
                   orderedSteps: newSteps.map(step => {
-                    // console.log("step: ", step);
                     return {
                       id: step.id,
                       name: step.name,
