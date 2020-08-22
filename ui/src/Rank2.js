@@ -8,7 +8,7 @@ import Paper from "@material-ui/core/Paper";
 
 import Chip from "@material-ui/core/Chip";
 
-import TextField from "@material-ui/core/TextField";
+// import TextField from "@material-ui/core/TextField";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -194,7 +194,7 @@ export default function Rank({headerHeight}) {
                         name: newData.name,
                         abbreviation: newData.abbreviation,
                         rankOrder: rankOrder 
-                        // rankOrder: newData.rankOrder
+                        // rankOrder: parseInt(newData.rankOrder)
                       },
                       update: (cache, { data: { CreateRank } }) => {
                         const { Rank } = cache.readQuery({ query: GET_RANKS });
@@ -218,8 +218,8 @@ export default function Rank({headerHeight}) {
                         name: newData.name, 
                         abbreviation: newData.abbreviation, 
                         rankOrder: rankOrder,
-                        colorhex: newData.colorhex
-                        // rankOrder: newData.rankOrder
+                        colorhex: newData.colorhex,
+                        // rankOrder: parseInt(newData.rankOrder)
                       },
                       update: (cache) => {
                         const existingRanks = cache.readQuery({ query: GET_RANKS });
