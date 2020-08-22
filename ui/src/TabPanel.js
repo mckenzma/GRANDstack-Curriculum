@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { /*useState,*/ useRef } from "react";
 import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
@@ -17,7 +17,9 @@ import Box from "@material-ui/core/Box";
 // import CreateRank from "./CreateRank";
 import Rank from "./Rank2";
 
-// import Strike from "./Strike";
+import Technique from "./Technique";
+
+// import Strike2 from "./Strike";
 import Strike from "./Strike2";
 // import Block from "./Block";
 import Block from "./Block2";
@@ -57,11 +59,11 @@ function TabPanel(props) {
       aria-labelledby={`scrollable-force-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box p={3}>
-          <Typography>{children}</Typography>
+      {value === index && 
+        <Box /*p={3}*/>
+          {/*<Typography>*/}{children}{/*</Typography>*/}
         </Box>
-      )}
+      }
     </div>
   );
 }
@@ -116,15 +118,16 @@ export default function TabsWrappedLabel({headerHeight}) {
           variant="scrollable"
           // scrollButtons="on"
         >
-          <Tab /*value="one"*/ label="Testing" {...a11yProps(0)} />
-          <Tab /*value="two"*/ label="Rank" {...a11yProps(1)} />
-          <Tab /*value="three"*/ label="Strike" {...a11yProps(2)} />
-          <Tab /*value="four"*/ label="Block" {...a11yProps(3)} />
-          <Tab /*value="five"*/ label="Kick" {...a11yProps(4)} />
-          <Tab /*value="six"*/ label="Stance" {...a11yProps(5)} />
-          <Tab /*value="seven"*/ label="Movement" {...a11yProps(6)} />
-          <Tab /*value="eight"*/ label="Turn" {...a11yProps(7)} />
-          <Tab /*value="nine"*/ label="Kata" {...a11yProps(8)} />
+          <Tab label="Testing" {...a11yProps(0)} />
+          <Tab label="Rank" {...a11yProps(1)} />
+          <Tab label="Technique" {...a11yProps(2)} />
+          {/*<Tab label="Strike" {...a11yProps(3)} />
+          <Tab label="Block" {...a11yProps(4)} />
+          <Tab label="Kick" {...a11yProps(5)} />
+          <Tab label="Stance" {...a11yProps(6)} />
+          <Tab label="Movement" {...a11yProps(7)} />
+          <Tab label="Turn" {...a11yProps(8)} />*/}
+          <Tab label="Kata" {...a11yProps(3)} />
           {/*<Tab /*value="nine"* / label="MDS" {...a11yProps(9)} />*/}
         </Tabs>
       </AppBar>
@@ -134,29 +137,30 @@ export default function TabsWrappedLabel({headerHeight}) {
         <Testing headerHeight={headerHeight}/>
       </TabPanel>
       <TabPanel value={value} index={1}>
-        {/*<Rank />*/}
         <Rank headerHeight={headerHeight}/>
-        {/*<CreateRank />*/}
       </TabPanel>
       <TabPanel value={value} index={2}>
+        <Technique headerHeight={headerHeight}/>
+      </TabPanel>
+      {/*<TabPanel value={value} index={3}>
         <Strike headerHeight={headerHeight}/>
       </TabPanel>
-      <TabPanel value={value} index={3}>
+      <TabPanel value={value} index={4}>
         <Block headerHeight={headerHeight}/>
       </TabPanel>
-      <TabPanel value={value} index={4}>
+      <TabPanel value={value} index={5}>
         <Kick headerHeight={headerHeight}/>
       </TabPanel>
-      <TabPanel value={value} index={5}>
+      <TabPanel value={value} index={6}>
         <Stance headerHeight={headerHeight}/>
       </TabPanel>
-      <TabPanel value={value} index={6}>
+      <TabPanel value={value} index={7}>
         <Movement headerHeight={headerHeight}/>
       </TabPanel>
-      <TabPanel value={value} index={7}>
-        <Turn headerHeight={headerHeight}/>
-      </TabPanel>
       <TabPanel value={value} index={8}>
+        <Turn headerHeight={headerHeight}/>
+      </TabPanel>*/}
+      <TabPanel value={value} index={3}>
         <Kata headerHeight={headerHeight}/>
       </TabPanel>
       {/*<TabPanel value={value} index={9}>
