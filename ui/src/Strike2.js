@@ -175,8 +175,8 @@ export default function Strike({headerHeight}) {
 
   const getSorting = (order, orderBy) => {
   return order === "desc"
-    ? (a, b) => (b[orderBy] < a[orderBy] ? -1 : 1)
-    : (a, b) => (a[orderBy] < b[orderBy] ? -1 : 1);
+    ? (a, b) => (b[orderBy]/*.toLowerCase()*/ < a[orderBy]/*.toLowerCase()*/ ? -1 : 1)
+    : (a, b) => (a[orderBy]/*.toLowerCase()*/ < b[orderBy]/*.toLowerCase()*/ ? -1 : 1);
   };
 
   const [CreateStrike] = useMutation(CREATE_STRIKE);
@@ -197,6 +197,10 @@ export default function Strike({headerHeight}) {
           <MaterialTable
             title="Strike"
             columns={state.columns}
+            options={{
+              pageSize: 10,
+              // pageSizeOptions: [5, 10, 20, 30 ,50, 75, 100 ],
+            }}
             data={
               data.Strike.sort(getSorting(order,orderBy)).map(s => {
                 return {
@@ -217,7 +221,8 @@ export default function Strike({headerHeight}) {
                       update: (cache, { data: { CreateStrike } }) => {
                         const { Strike } = cache.readQuery({ query: GET_STRIKES });
 
-                        if (newData.ranks.length !== 0) {
+                        // if (newData.ranks.length !== 0) {
+                        if (newData.ranks !== undefined) {
                           MergeStrikeRanks({
                             variables: {
                               fromStrikeID: CreateStrike.id,
@@ -231,6 +236,11 @@ export default function Strike({headerHeight}) {
                               })
                             }
                           });
+                        } else {
+                          cache.writeQuery({
+                            query: GET_STRIKES,
+                            data: { Strike: Strike.concat([CreateStrike]) },
+                          })
                         }
                       }
                     });

@@ -175,8 +175,8 @@ export default function Stance({headerHeight}) {
 
   const getSorting = (order, orderBy) => {
   return order === "desc"
-    ? (a, b) => (b[orderBy] < a[orderBy] ? -1 : 1)
-    : (a, b) => (a[orderBy] < b[orderBy] ? -1 : 1);
+    ? (a, b) => (b[orderBy].toLowerCase() < a[orderBy].toLowerCase() ? -1 : 1)
+    : (a, b) => (a[orderBy].toLowerCase() < b[orderBy].toLowerCase() ? -1 : 1);
   };
 
   const [CreateStance] = useMutation(CREATE_STANCE);
@@ -197,6 +197,10 @@ export default function Stance({headerHeight}) {
           <MaterialTable
             title="Stance"
             columns={state.columns}
+            options={{
+              pageSize: 10,
+              // pageSizeOptions: [5, 10, 20, 30 ,50, 75, 100 ],
+            }}
             data={
               data.Stance.sort(getSorting(order,orderBy)).map(s => {
                 return {
