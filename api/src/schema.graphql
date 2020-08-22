@@ -196,7 +196,9 @@ type Turn implements Technique {
 type Kata {
   id: ID!
   name: String!
+  order: Int!
   # description: String
+  numMoves: Int @cypher(statement: "MATCH (this)-[r:HAS_MOVE]->() RETURN count(r)")
 
   firstRank: String @cypher(
     statement:
@@ -277,6 +279,12 @@ type TechniqueByRankByType {
   rank: String
   type: String
   name: String
+  color: String
+}
+
+type KataByRank {
+  rank: String
+  name: String 
   color: String
 }
 
@@ -595,6 +603,28 @@ type Mutation {
   #   """
   # )
 
+  CreateKataMoves(kataID: ID!, numMoves: Int!): [Move] @cypher(
+    statement:
+    """
+    MATCH (kata:Kata {id: $kataID})
+    WITH kata, $numMoves AS numMoves
+    UNWIND range(0,numMoves-1) AS idx
+    CREATE (new:Move)
+    SET new.id = apoc.create.uuid(),
+        new.name = 'Move'
+    WITH kata, numMoves, collect(new) AS newNodes
+    UNWIND newNodes AS newNode
+    MERGE (kata)-[:HAS_MOVE]->(newNode)
+    WITH newNodes, numMoves
+    UNWIND range(0,numMoves-2) AS idx
+    WITH newNodes, newNodes[idx] AS start, newNodes[idx+1] AS end
+    MERGE (start)-[:NEXT_MOVE]->(end)
+    WITH newNodes
+    UNWIND newNodes AS newNode
+    RETURN newNode
+    """
+  )
+
 }
 
 type Query {
@@ -614,14 +644,24 @@ type Query {
   techniqueByRankByType: [TechniqueByRankByType] @cypher(
     statement: 
     """
-    MATCH (thing)
-    WHERE thing:Technique OR thing:Kata
-    WITH thing, labels(thing) AS labels
-    WITH thing, filter(label in labels WHERE label <> 'Technique')[0] AS label
-    OPTIONAL MATCH (thing)-[:REQUIRED_FOR]->(rank)
-    WITH thing, label, rank
+    MATCH (tech:Technique)
+    WITH tech, labels(tech) AS labels
+    WITH tech, filter(label in labels WHERE label <> 'Technique')[0] AS label
+    OPTIONAL MATCH (tech)-[:REQUIRED_FOR]->(rank)
+    WITH tech, label, rank
     ORDER BY rank.rankOrder ASC, label ASC
-    RETURN { rank: rank.name, type: label, name: thing.name, color: rank.colorhex } AS datapoint
+    RETURN { rank: rank.name, type: label, name: tech.name, color: rank.colorhex } AS datapoint
+    """
+  )
+
+  kataByRank: [KataByRank] @cypher(
+    statement:
+    """
+    MATCH (kata:Kata)
+    OPTIONAL MATCH (kata)-[:REQUIRED_FOR]->(rank)
+    WITH kata, rank
+    ORDER BY kata.order ASC, rank.rankOrder ASC
+    RETURN { rank: rank.name, name: kata.name, color: rank.colorhex } AS datapoint
     """
   )
 
