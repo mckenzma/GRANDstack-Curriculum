@@ -47,6 +47,7 @@ const GET_KATAS = gql`
       id
       name
       order
+      numMoves
       ranks {
         id
         rankOrder
@@ -65,6 +66,7 @@ const CREATE_KATA = gql`
       id
       name
       order
+      numMoves
       ranks {
         id
         rankOrder
@@ -116,6 +118,16 @@ const DELETE_KATA_RANK_RELS = gql`
   }
 `;
 
+const CREATE_KATA_MOVES = gql`
+  mutation CreateKataMoves($kataID: ID!, $numMoves: Int!)
+  {
+    CreateKataMoves(kataID: $kataID, numMoves: $numMoves){
+      id
+      name
+    }
+  }
+`;
+
 export default function Kata({headerHeight}) {
   const classes = useStyles();
 
@@ -124,6 +136,8 @@ export default function Kata({headerHeight}) {
 
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("order");
+
+  const [numMoves, setNumMoves] = useState(0);
 
   const [state, setState] = React.useState({
     columns: [
@@ -149,6 +163,7 @@ export default function Kata({headerHeight}) {
         // }
       },
       { title: 'Name', field: 'name' },
+      { title: 'Number of Moves', field: 'numMoves', type: 'numeric', editable: 'onAdd'},
       { title: 'Ranks', field: 'ranks', render: rowData => (
           <div className={classes.chips}>
             {rowData.ranks.sort(getSorting("asc","rankOrder")).map(rank => (
@@ -201,7 +216,9 @@ export default function Kata({headerHeight}) {
 
   const handleClickOpen = (event,rowData) => {
     setOpen(true);
-    // console.log(rowData);
+    console.log(rowData);
+    setNumMoves(rowData.numMoves);
+    console.log(numMoves);
     setSelectedKata(rowData.id);
     // console.log(rowData.id);
   };
@@ -221,6 +238,7 @@ export default function Kata({headerHeight}) {
   const [DeleteKata] = useMutation(DELETE_KATA);
   const [MergeKataRanks] = useMutation(MERGE_KATA_RANKS_RELS);
   const [DeleteKataRanks] = useMutation(DELETE_KATA_RANK_RELS);
+  const [CreateKataMoves] = useMutation(CREATE_KATA_MOVES);
 
   const { loading, error, data } = useQuery(GET_KATAS);
 
@@ -229,7 +247,7 @@ export default function Kata({headerHeight}) {
 
   return (
     <div>
-    <KataDialog open={open} setOpen={setOpen} selectedKata={selectedKata} setSelectedKata={setSelectedKata}/>
+    <KataDialog open={open} setOpen={setOpen} selectedKata={selectedKata} setSelectedKata={setSelectedKata} numMoves={numMoves}/>
     <Paper className={classes.root} elevation={3} style={style2}>
       <Grid container>
         <Grid item xs={12}>
@@ -244,7 +262,7 @@ export default function Kata({headerHeight}) {
               })
             }
             options={{
-              pageSize: 10,
+              pageSize: 20,
               // pageSizeOptions: [5, 10, 20, 30 ,50, 75, 100 ],
               sorting: false,
               addRowPosition: 'first'
@@ -264,7 +282,24 @@ export default function Kata({headerHeight}) {
                       update: (cache, { data: { CreateKata } }) => {
                         const { Kata } = cache.readQuery({ query: GET_KATAS });
 
-                        if(newData.ranks.length !== 0) {
+                        if(newData.numMoves > 0){
+                          console.log("add moves here");
+                          CreateKataMoves({
+                            variables: {
+                              kataID: CreateKata.id,
+                              numMoves: parseInt(newData.numMoves)
+                            },
+                            update: (cache, { data: { CreateKataMoves } }) => {
+                              cache.writeQuery({
+                                query: GET_KATAS,
+                                data: { Kata: Kata.concat([CreateKata]) },
+                              })
+                            }
+                          })
+                        }
+
+                        // if(newData.ranks.length !== 0) {
+                        if(newData.ranks !== undefined) {
                           MergeKataRanks({
                             variables: {
                               fromKataID: CreateKata.id,
@@ -277,11 +312,13 @@ export default function Kata({headerHeight}) {
                               })
                             }
                           })
+                        } else {
+                          cache.writeQuery({
+                            query: GET_KATAS,
+                            data: { Kata: Kata.concat([CreateKata]) },
+                          })  
                         }
-                        // cache.writeQuery({
-                        //   query: GET_KATAS,
-                        //   data: { Kata: Kata.concat([CreateKata]) },
-                        // })
+                        
                       }
                     });
                   }, 600);

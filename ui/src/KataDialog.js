@@ -1,23 +1,11 @@
 import React, { useState } from "react";
-import { withStyles } from "@material-ui/core/styles";
-
 import { useQuery, useMutation } from "@apollo/react-hooks";
-
 import gql from "graphql-tag";
-
-// Material UI components
+import { makeStyles } from "@material-ui/core/styles";
+import MaterialTable from "material-table";
 import Dialog from "@material-ui/core/Dialog";
-import MuiDialogTitle from "@material-ui/core/DialogTitle";
-import MuiDialogContent from "@material-ui/core/DialogContent";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
-import Typography from "@material-ui/core/Typography";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
 
-import MaterialTable from 'material-table';
-
-import SingleLineGridList from './StepList';
+import StepList from './StepList';
 
 const GET_KATA_MOVES = gql`
   query kataMovesQuery(
@@ -30,87 +18,132 @@ const GET_KATA_MOVES = gql`
     ) {
       id
       name
+      numMoves
       orderedMoves {
         id
         name
+        #__typename
         orderedSteps {
           id
           name
+          #__typename
+          technique {
+            id
+            name
+            #__typename
+          }
+          #block {
+          #  id
+          #  name
+          #}
+          #strike {
+          #  id
+          #  name
+          #}
+          #kick {
+          #  id
+          #  name
+          #}
+          #movement {
+          #  id
+          #  name
+          #}
+          #turn {
+          #  id
+          #  name
+          #}
+          #stance {
+          #  id
+          #  name
+          #}
         }
       }
     }
   }
 `;
 
-// const CREATE_MOVE = gql``;
-
-// const CREATE_KATA = gql``;
-
-// const UPDATE_KATA = gql``;
-
-// const DELETE_KATA = gql``;
-
-// const MERGE_KATA_RANK_REL = gql``;
-
-// const MERGE_KATA_RANKS_RELS = gql``;
-
-
-
-const DialogTitle = withStyles(theme => ({
-  root: {
-    borderBottom: `1px solid ${theme.palette.divider}`,
-    margin: 0,
-    padding: theme.spacing(2)
-  },
-  closeButton: {
-    position: "absolute",
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500]
+const CREATE_MOVE = gql`
+  mutation CreateMove($name: String!) {
+    CreateMove(name: $name)
+    {
+      id
+      name
+    }
   }
-}))(props => {
-  const { children, classes, onClose } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root}>
-      <Typography>{children}</Typography>
-      {onClose ? (
-        <IconButton
-          aria-label="Close"
-          className={classes.closeButton}
-          onClick={onClose}
-        >
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
+`;
 
-const DialogContent = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2)
+const CONNECT_MOVE_TO_KATA = gql`
+  mutation ConnectMoveToKata($fromKataID: ID!, $toMoveID: ID!)
+  {
+    id
+    name
   }
-}))(MuiDialogContent);
+`;
+
+const INSERT_MOVE_BETWEEN = gql`
+  mutation InsertMoveBetween($prevMoveID: ID!, $newMoveID: ID!, $nextMoveID: ID!)
+  {
+    InsertMoveBetween(prevMoveID: $prevMoveID, newMoveID: $newMoveID, nextMoveID: $nextMoveID)
+    {
+      id
+      name
+    }
+  }
+`;
+
+const INSERT_MOVE_NEXT_TO = gql`
+  mutation InsertMoveNextTo($prevMoveID: ID!, $nextMoveID: ID!)
+  {
+    InsertMoveNextTo(prevMoveID: $prevMoveID, nextMoveID: $nextMoveID)
+    {
+      id
+      Name
+    }
+  }
+`;
+
+const DELETE_MOVE = gql`
+  mutation DeleteMove($id: ID!)
+  {
+    DeleteMove(id: $id)
+    {
+      id
+    }
+  }
+`;
+
+// const DELETE_MOVE_STEPS = gql``;
+
+const CONNECT_ADJACENT_MOVE = gql`
+  mutation ConnectAdjacentMoves($prevMoveID: ID!, $nextMoveID: ID!)
+  {
+    ConnectAdjacentMoves(prevMoveID: $prevMoveID, nextMoveID: $nextMoveID)
+    {
+      id
+    }
+  }
+`;
+
 
 export default function KataDialog({open, setOpen, selectedKata, setSelectedKata}) {
-  // const [open, setOpen] = useState(false);
 
-  // const handleClickOpen = event => {
-  //   setOpen(true);
-  // };
-
-  // console.log(selectedKata);
+  const [selectedMove, setSelectedMove] = useState("");
+  const [prevMove, setPrevMove] = useState("");
+  const [nextMove, setNextMove] = useState('');
 
   const handleClose = event => {
     setOpen(false);
     setSelectedKata("");
   };
 
+
+
   const [state, setState] = React.useState({
     columns: [
       { title: 'Name', field: 'name' },
-      { title: 'Steps', field: 'stepsString'}
+      { title: 'Move Number', field: 'index', type: 'numeric' },
+      // { title: 'Steps', field: 'stepsString'}
+      { title: 'Steps', field: 'stepTechniqueString'}
     ],
   });
   // console.log(selectedKata);
@@ -133,13 +166,15 @@ export default function KataDialog({open, setOpen, selectedKata, setSelectedKata
   if (loading) return "Loading...";
   if (error) return `Error ${error.message}`;
 
-  // console.log("kata data: ", data.Kata);
+
+
 
   return (
     <div>
     {data.Kata.map(kata => {
       return (
       <Dialog
+        key={kata.id}
         fullWidth={true}
         maxWidth={'xl'}
         onClose={handleClose}
@@ -161,57 +196,63 @@ export default function KataDialog({open, setOpen, selectedKata, setSelectedKata
                 //   ...s,
                 //   movesString: s.moves.sort(getSorting("asc","rankOrder")).map(r => { return r.name }).flat(2).join(', ')
                 // }
-                kata.orderedMoves.map(m => {
+                kata.orderedMoves.map((m, index) => {
                 return {
-                  
-                    // console.log(m);
-                    // return {
-                      // ...m
-                      name: m.name,
-                      steps: m.orderedSteps,
-                      stepsString: m.orderedSteps/*.sort(getSorting("asc","rankOrder"))*/.map(r => { return r.name }).flat(2).join(', ')
-
-                    // }
-                  
+                  id: m.id,
+                  name: m.name,
+                  index: index + 1, 
+                  steps: m.orderedSteps,
+                  stepsString: m.orderedSteps/*.sort(getSorting("asc","rankOrder"))*/.map(r => { return r.name }).flat(2).join(', '),
+                  stepTechniqueString: m.orderedSteps.map(r => {
+                    return (r.technique !== null ? r.technique.name : '')
+                  }).flat(2).join(', ')
                 }
-
               })
             }
+            options={{
+              pageSize: 20,
+              // pageSizeOptions: [5, 10, 20, 30 ,50, 75, 100 ],
+              sorting: false,
+              addRowPosition: 'first',
+            }}
             detailPanel={rowData => {
-              console.log(rowData);
+              // console.log(rowData.tableData.showDetailPanel);
               return (
-                // <div>
-                //   row data
-                // </div>
-                <SingleLineGridList move={rowData}/>
+                <StepList /*kata={kata}*/ move={rowData}/>
               )
             }}
           // }
-            onRowClick={(event, rowData, togglePanel) => togglePanel()}
+            // onRowClick={(event, rowData, togglePanel) => togglePanel()}
             
-            // editable={{
-            //   onRowAdd: newData =>
-            //     new Promise(resolve => {
-            //       setTimeout(() => {
-            //         resolve();
-            //         CreateKata({
-            //           variables: {
-            //             name: newData.name
-            //           },
-            //           update: (cache, { data: { CreateKata } }) => {
-            //             const { Kata } = cache.readQuery({ query: GET_KATA_MOVES });
-            //             cache.writeQuery({
-            //               query: GET_KATA_MOVES,
-            //               data: { Kata: Kata.concat([CreateKata]) },
-            //             })
-            //           }
-            //         });
-            //       }, 600);
-            //     }),
-            //   onRowUpdate: (newData, oldData) => 
-            //     new Promise(resolve => {
-            //       setTimeout(() => {
-            //         resolve();
+            editable={{
+              onRowAdd: newData =>
+                new Promise(resolve => {
+                  setTimeout(() => {
+                    resolve();
+                    console.log("create move");
+                    console.log("add move to array of moves");
+
+
+
+                    // CreateKata({
+                    //   variables: {
+                    //     name: newData.name
+                    //   },
+                    //   update: (cache, { data: { CreateKata } }) => {
+                    //     const { Kata } = cache.readQuery({ query: GET_KATA_MOVES });
+                    //     cache.writeQuery({
+                    //       query: GET_KATA_MOVES,
+                    //       data: { Kata: Kata.concat([CreateKata]) },
+                    //     })
+                    //   }
+                    // });
+                  }, 600);
+                }),
+              onRowUpdate: (newData, oldData) => 
+                new Promise(resolve => {
+                  setTimeout(() => {
+                    resolve();
+
             //         UpdateKata({
             //           variables: { 
             //             // id: oldData.id,
@@ -237,12 +278,12 @@ export default function KataDialog({open, setOpen, selectedKata, setSelectedKata
             //             })
             //           }
             //         });
-            //       }, 600);
-            //     }),
-            //   onRowDelete: oldData =>
-            //     new Promise(resolve => {
-            //       setTimeout(() => {
-            //         resolve();
+                  }, 600);
+                }),
+              onRowDelete: oldData =>
+                new Promise(resolve => {
+                  setTimeout(() => {
+                    resolve();
             //         DeleteKata({
             //           variables: { id: oldData.id },
             //           update: (cache) => {
@@ -254,9 +295,9 @@ export default function KataDialog({open, setOpen, selectedKata, setSelectedKata
             //             });
             //           }
             //         });
-            //       }, 600);
-            //     }),
-            // }}
+                  }, 600);
+                }),
+            }}
 
           />
 
