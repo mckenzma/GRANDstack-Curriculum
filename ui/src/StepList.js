@@ -48,7 +48,7 @@ const GET_MOVE_STEPS = gql`
         technique {
           id
           name
-          #__typename
+          __typename
         }
         #block {
         #  id
@@ -79,6 +79,7 @@ const GET_MOVE_STEPS = gql`
   }
 `;
 
+// TODO - set technique name to something unique if technique is deleted and no longer exists
 
 const useStyles = makeStyles((theme) => ({
   root: {
