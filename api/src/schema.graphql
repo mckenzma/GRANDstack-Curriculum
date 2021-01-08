@@ -2,7 +2,11 @@ type Rank {
   id: ID!
   rankOrder: Int!
   name: String!
+  name_en: String!
+  name_sp: String!
   abbreviation: String!
+  abbreviation_en: String!
+  abbreviation_sp: String!
   colorhex: String
   
   techniques: [Technique] @relation(name: "REQUIRED_FOR", direction: "IN")
@@ -19,7 +23,11 @@ type Rank {
 interface Technique {
   id: ID!
   name: String!
+  name_en: String!
+  name_sp: String!
   description: String
+  description_en: String
+  description_sp: String
 
   ranks: [Rank] @relation(name: "REQUIRED_FOR", direction: "OUT")
   # steps: [Step] @relation(name: "USES", direction: "IN")
@@ -29,7 +37,11 @@ interface Technique {
 type Strike implements Technique {
   id: ID!
   name: String!
+  name_en: String!
+  name_sp: String!
   description: String
+  description_en: String
+  description_sp: String
 
   firstRank: String @cypher(
     statement:
@@ -67,7 +79,11 @@ type Strike implements Technique {
 type Block implements Technique {
   id: ID!
   name: String!
+  name_en: String!
+  name_sp: String!
   description: String
+  description_en: String
+  description_sp: String
 
   firstRank: String @cypher(
     statement:
@@ -93,7 +109,11 @@ type Block implements Technique {
 type Kick implements Technique {
   id: ID!
   name: String!
+  name_en: String!
+  name_sp: String!
   description: String
+  description_en: String
+  description_sp: String
 
   firstRank: String @cypher(
     statement:
@@ -119,7 +139,11 @@ type Kick implements Technique {
 type Stance implements Technique {
   id: ID!
   name: String!
+  name_en: String!
+  name_sp: String!
   description: String
+  description_en: String
+  description_sp: String
 
   firstRank: String @cypher(
     statement:
@@ -145,7 +169,11 @@ type Stance implements Technique {
 type Movement implements Technique {
   id: ID!
   name: String!
+  name_en: String!
+  name_sp: String!
   description: String
+  description_en: String
+  description_sp: String
 
   firstRank: String @cypher(
     statement:
@@ -171,7 +199,11 @@ type Movement implements Technique {
 type Turn implements Technique {
   id: ID!
   name: String!
+  name_en: String!
+  name_sp: String!
   description: String
+  description_en: String
+  description_sp: String
 
   firstRank: String @cypher(
     statement:
@@ -295,6 +327,7 @@ type KataByRank {
 #   color: String
 # }
 
+# TODO - need to update these mutations to include other properties for each language
 type Mutation {
   CreateTechnique(type: String, name: String!, description: String): Technique @cypher(
     statement:
