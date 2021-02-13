@@ -15,6 +15,10 @@ import ListItemText from '@material-ui/core/ListItemText';
 
 import RankSelect from "./RankSelect";
 
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import CardHeader from '@material-ui/core/CardHeader';
+
 const useStyles = makeStyles(theme => ({
 	root: {
 		maxWidth: "auto",
@@ -76,13 +80,14 @@ const GET_TESTING_REQUIREMENTS = gql`
       katas {
       	id
       	name
+      	order
       	firstRank
       	orderedMoves {
       		id
       		name
       		orderedSteps {
       			id
-      			name
+#      			name
       			technique {
       				id
       				name
@@ -113,6 +118,12 @@ export default function Testing({headerHeight}) {
     }
   });
 
+  const getSorting = (order, orderBy) => {
+  return order === "desc"
+    ? (a, b) => (b[orderBy] < a[orderBy] ? -1 : 1)
+    : (a, b) => (a[orderBy] < b[orderBy] ? -1 : 1);
+  };
+
 	if (loading) return "Loading...";
 	if (error) return `Error ${error.message}`;
 
@@ -132,9 +143,10 @@ export default function Testing({headerHeight}) {
 							{r.strikes.length > 0 && 
 								<Grid item sm={12}>
 									<Paper elevation={2}>
-										<Typography variant="h3">Strikes</Typography>
+										<Typography variant="h3" justify="center">Strikes</Typography>
+										
 										<List>
-										{r.strikes.map(s => {
+										{r.strikes.sort(getSorting("asc","name")).map(s => {
 											return (
 												<ListItem key={s.id}>
 													<ListItemText
@@ -153,7 +165,7 @@ export default function Testing({headerHeight}) {
 								<Grid item sm={12}>
 								 	<Paper elevation={2}>
 										<Typography variant="h3">Blocks</Typography>
-										{r.blocks.map(b => {
+										{r.blocks.sort(getSorting("asc","name")).map(b => {
 											return (
 												<ListItem key={b.id}>
 													<ListItemText
@@ -171,7 +183,7 @@ export default function Testing({headerHeight}) {
 								<Grid item sm={12}>
 									<Paper elevation={2}>
 										<Typography variant="h3">Kicks</Typography>
-										{r.kicks.map(k => {
+										{r.kicks.sort(getSorting("asc","name")).map(k => {
 											return (
 												<ListItem key={k.id}>
 													<ListItemText
@@ -189,7 +201,7 @@ export default function Testing({headerHeight}) {
 								<Grid item sm={12}>
 									<Paper elevation={2}>
 										<Typography variant="h3">Stances</Typography>
-										{r.stances.map(s => {
+										{r.stances.sort(getSorting("asc","name")).map(s => {
 											return (
 												<ListItem key={s.id}>
 													<ListItemText
@@ -207,7 +219,7 @@ export default function Testing({headerHeight}) {
 								<Grid item sm={12}>
 									<Paper elevation={2}>
 										<Typography variant="h3">Movements</Typography>
-										{r.movements.map(m => {
+										{r.movements.sort(getSorting("asc","name")).map(m => {
 											return (
 												<ListItem key={m.id}>
 													<ListItemText
@@ -225,7 +237,7 @@ export default function Testing({headerHeight}) {
 								<Grid item sm={12}>
 									<Paper elevation={2}>
 										<Typography variant="h3">Turns</Typography>
-										{r.turns.map(t => {
+										{r.turns.sort(getSorting("asc","name")).map(t => {
 											return (
 												<ListItem key={t.id}>
 													<ListItemText
@@ -243,9 +255,9 @@ export default function Testing({headerHeight}) {
 								<Grid item sm={12}>
 									<Paper elevation={2}>
 										<Typography variant="h3">Katas</Typography>
-										{r.katas.map(k => {
+										{r.katas.sort(getSorting("asc","order")).map(k => {
 											return (
-												<List>
+												<List key={k.id}>
 												<ListItem key={k.id}>
 													<ListItemText
 														primary={k.name}
@@ -258,7 +270,6 @@ export default function Testing({headerHeight}) {
 																<ListItemText
 																	secondary={index+1 + ". " + move.orderedSteps.map(os => {return os.technique.name }).flat(2).join(', ')}
 																/>
-															}
 															</ListItem>
 														);
 													})}
