@@ -196,6 +196,7 @@ export default function Technique({headerHeight}) {
       },
       { title: 'Name', field: 'name' },
       { title: 'Description', field: 'description' },
+      { title: 'Variation', field: 'variation' },
       { title: 'Ranks', field: 'ranks', render: rowData => (
           <div className={classes.chips}>
             {rowData.ranks.sort(getSorting("asc","rankOrder")).map(rank => (
