@@ -46,7 +46,7 @@ export default function HeatChart_KataByRank() {
         return n.rank
       }).filter((v, i, a) => a.indexOf(v) === i);
 
-  console.log("ranks: ", ranks);
+  // console.log("ranks: ", ranks);
 
   const names = data.kataByRank.map(m => {
       // if (m.type === obj.label)

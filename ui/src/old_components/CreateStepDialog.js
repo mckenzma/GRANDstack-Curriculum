@@ -122,7 +122,7 @@ export default function CreateStepDialog({
             const { Move } = cache.readQuery({ query: GET_MOVE_STEPS, variables: { selectedMove: move.id} });
             const existingSteps = Move[0].orderedSteps;
             let newSteps = existingSteps;
-            console.log('newSteps: ', newSteps);
+            // console.log('newSteps: ', newSteps);
 
             // Connect Step to Move
             ConnectMoveToStep({
@@ -190,7 +190,7 @@ export default function CreateStepDialog({
                   });
                 }
 
-                console.log('newSteps: ', newSteps);
+                // console.log('newSteps: ', newSteps);
 
                 cache.writeQuery({
                   query: GET_MOVE_STEPS,

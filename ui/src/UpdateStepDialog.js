@@ -84,7 +84,7 @@ export default function UpdateStepDialog({
       setTimeout(() => {
         resolve();
 
-        console.log(selectedStep.id, _technique);
+        // console.log(selectedStep.id, _technique);
 
         UpdateStepTechnique({
           variables: {

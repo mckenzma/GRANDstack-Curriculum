@@ -304,7 +304,7 @@ export default function Technique({headerHeight}) {
                 new Promise(resolve => {
                   setTimeout(() => {
                     resolve();
-                    console.log("newData: ", newData);
+                    // console.log("newData: ", newData);
                     CreateTechnique({
                       variables: {
                         name: newData.name,
@@ -345,8 +345,8 @@ export default function Technique({headerHeight}) {
                 new Promise(resolve => {
                   setTimeout(() => {
                     resolve();
-                    console.log("newData: ", newData);
-                    console.log("oldData: ", oldData);
+                    // console.log("newData: ", newData);
+                    // console.log("oldData: ", oldData);
                     // UpdateTechnique({
                     UpdateTechniqueProps({
                       variables: { 
@@ -360,10 +360,10 @@ export default function Technique({headerHeight}) {
                       },
                       // update: (cache, { data: { UpdateTechnique } }) => {
                       update: (cache, { data: { UpdateTechniqueProps } }) => {
-                        console.log(UpdateTechniqueProps);
+                        // console.log(UpdateTechniqueProps);
 
                         if (newData.__typename !== oldData.__typename) {
-                          console.log("update label");
+                          // console.log("update label");
                           UpdateTechniqueLabels({
                             variables: {
                               id: UpdateTechniqueProps.id,
@@ -371,7 +371,7 @@ export default function Technique({headerHeight}) {
                               newType: newData.__typename
                             },
                             update: (cache, { data: { UpdateTechniqueLabels } }) => {
-                              console.log(UpdateTechniqueLabels);
+                              // console.log(UpdateTechniqueLabels);
                               const existingTechniques = cache.readQuery({ query: GET_TECHNIQUES });
                               const newTechniques = existingTechniques.Technique.filter(r => (r.id !== oldData.id));
                               cache.writeQuery({
@@ -428,7 +428,7 @@ export default function Technique({headerHeight}) {
                         const existingTechniques = cache.readQuery({ query: GET_TECHNIQUES });
                         const newTechniques = existingTechniques.Technique.map(r => {
                           if (r.id === oldData.id) {
-                            console.log("r: ", r);
+                            // console.log("r: ", r);
                             return {
                               ...r, 
                               name: newData.name, 
@@ -453,7 +453,7 @@ export default function Technique({headerHeight}) {
                 new Promise(resolve => {
                   setTimeout(() => {
                     resolve();
-                    console.log("oldData: ",oldData);
+                    // console.log("oldData: ",oldData);
                     DeleteTechnique({
                       variables: { id: oldData.id },
                       update: (cache) => {

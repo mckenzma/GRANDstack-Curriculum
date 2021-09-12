@@ -216,9 +216,9 @@ export default function Kata({headerHeight}) {
 
   const handleClickOpen = (event,rowData) => {
     setOpen(true);
-    console.log(rowData);
+    // console.log(rowData);
     setNumMoves(rowData.numMoves);
-    console.log(numMoves);
+    // console.log(numMoves);
     setSelectedKata(rowData.id);
     // console.log(rowData.id);
   };
@@ -283,7 +283,7 @@ export default function Kata({headerHeight}) {
                         const { Kata } = cache.readQuery({ query: GET_KATAS });
 
                         if(newData.numMoves > 0){
-                          console.log("add moves here");
+                          // console.log("add moves here");
                           CreateKataMoves({
                             variables: {
                               kataID: CreateKata.id,

@@ -229,8 +229,8 @@ export default function KataDialog({open, setOpen, selectedKata, setSelectedKata
                 new Promise(resolve => {
                   setTimeout(() => {
                     resolve();
-                    console.log("create move");
-                    console.log("add move to array of moves");
+                    // console.log("create move");
+                    // console.log("add move to array of moves");
 
 
 

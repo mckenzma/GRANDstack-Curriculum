@@ -131,7 +131,7 @@ export default function StepList({/*kata,*/move}) {
   };
 
   const handleClickOpenUpdate = (move,step,type,technique) => {
-    console.log(type,technique);
+    // console.log(type,technique);
     setSelectedStep(step);
     _setType(type);
     _setTechnique(technique);
