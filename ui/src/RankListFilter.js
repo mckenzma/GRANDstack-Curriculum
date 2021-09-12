@@ -43,6 +43,7 @@ const GET_RANKS = gql`
       name
       abbreviation
       rankOrder
+      colorhex
     }
   }
 `;
@@ -127,6 +128,9 @@ export default function RankListFilter( props ){
               <Chip
                 key={value.id}
                 label={value.name}
+                variant="outlined"
+                color='primary' 
+                style={{backgroundColor:value.colorhex}}
               />
             ))}
           </div>
@@ -158,8 +162,16 @@ export default function RankListFilter( props ){
                   onClick={event =>
                     handleClick(event, n)
                   }
+                  // style={{backgroundColor:n.colorhex}}
                 />
-                <ListItemText>{n.name}</ListItemText>
+                <ListItemText>
+                  {n.name + " "}
+                  <Chip
+                    variant="outlined"
+                    color='primary'
+                    style={{backgroundColor:n.colorhex}}
+                  />
+                </ListItemText>
               </MenuItem>
             );
           })}
