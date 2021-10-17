@@ -25,6 +25,7 @@ const GET_RANKS = gql`
       id
       name
       rankOrder
+      colorhex
     }
   }
 `;
@@ -72,7 +73,7 @@ export default function RankSelect({ rankID, setRankID }) {
           .sort(getSorting(order, orderBy))
           .map(n => {
             return (
-              <MenuItem key={n.id} value={n.id}>{n.name}</MenuItem>
+              <MenuItem key={n.id} value={n.id} style={{backgroundColor:n.colorhex}}>{n.name}</MenuItem>
             );
           })}
         </Select>
