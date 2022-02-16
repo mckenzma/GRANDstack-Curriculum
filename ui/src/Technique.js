@@ -14,6 +14,7 @@ import Chip from "@material-ui/core/Chip";
 
 import SelectType from "./SelectType";
 
+
 const useStyles = makeStyles(theme => ({
   root: {
     maxWidth: "auto",
@@ -195,7 +196,27 @@ export default function Technique({headerHeight}) {
         }
       },
       { title: 'Name', field: 'name' },
-      { title: 'Description', field: 'description' },
+      { title: 'Description', field: 'description',
+        editComponent: props => {
+          if (props.value !== undefined) {
+            return (
+              <TextField
+                multiline
+                value={props.value}
+                onChange={props.onChange}
+              />
+            )
+          } else {
+            return (
+              <TextField
+                multiline
+                value={""}
+                onChange={props.onChange}
+              />
+            )
+          }
+        }
+      },
       { title: 'Variation', field: 'variation' },
       { title: 'Ranks', field: 'ranks', render: rowData => (
           <div className={classes.chips}>
