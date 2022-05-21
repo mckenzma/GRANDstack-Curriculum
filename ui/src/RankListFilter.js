@@ -130,7 +130,8 @@ export default function RankListFilter( props ){
                 label={value.name}
                 variant="outlined"
                 color='primary' 
-                style={{backgroundColor:value.colorhex}}
+                // style={{backgroundColor:value.colorhex}}
+                style={{backgroundColor:value.colorhex, color: (value.colorhex === "#000000" ? "#ffeb3b" : "#000000")}}
               />
             ))}
           </div>

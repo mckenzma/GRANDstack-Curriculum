@@ -166,7 +166,7 @@ export default function RankSelectFilter() {
                 }
                 color="primary"
               />
-              <ListItemText>{n.name}</ListItemText>
+              <ListItemText style={{backgroundColor:rank.colorhex, color: (rank.colorhex === "#000000" ? "#ffeb3b" : "#000000")}}>{n.name}</ListItemText>
             </MenuItem>
           );
         })}
