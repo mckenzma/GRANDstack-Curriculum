@@ -134,13 +134,13 @@ export default function TabsWrappedLabel({headerHeight}) {
       <TabPanel value={value} index={0}>
         {/*Testing*/}
         {/*<RankSelect />*/}
-        <Testing headerHeight={headerHeight}/>
+        <Testing headerHeight={1.5*headerHeight}/>
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <Rank headerHeight={headerHeight}/>
+        <Rank headerHeight={1.5*headerHeight}/>
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <Technique headerHeight={headerHeight}/>
+        <Technique headerHeight={1.5*headerHeight}/>
       </TabPanel>
       {/*<TabPanel value={value} index={3}>
         <Strike headerHeight={headerHeight}/>
@@ -161,7 +161,7 @@ export default function TabsWrappedLabel({headerHeight}) {
         <Turn headerHeight={headerHeight}/>
       </TabPanel>*/}
       <TabPanel value={value} index={3}>
-        <Kata headerHeight={headerHeight}/>
+        <Kata headerHeight={1.5*headerHeight}/>
       </TabPanel>
       {/*<TabPanel value={value} index={9}>
         
