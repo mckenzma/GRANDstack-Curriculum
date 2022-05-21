@@ -21,20 +21,22 @@ const useStyles = makeStyles((theme) => ({
 // TO FIX - for creating adding a new technique need "_type, _setType"
 // for updating need "props, onUpdate"
 
-export default function SelectType({ _type, _setType }) {
+export default function SelectType( props ) {
 // export default function SelectType( props ) {
+  // console.log(value);
   const classes = useStyles();
   // console.log(props);
   // const { value, onChange } = props;
-  const [type, setType] = useState(_type);
   // const [type, setType] = useState(value);
+  // const [type, setType] = useState(value);
+  const { value, onChange } = props;
 
 
 
   const handleChange = (event) => {
-    setType(event.target.value);
-    _setType(event.target.value);
-    // onChange(event.target.value);
+    // setType(event.target.value);
+    // _setType(event.target.value);
+    onChange(event.target.value);
   };
 
   // TODO - set this list dynamically
@@ -45,7 +47,8 @@ export default function SelectType({ _type, _setType }) {
         <Select
           labelId="demo-simple-select-helper-label"
           id="demo-simple-select-helper"
-          value={type}
+          // value={type}
+          value={value}
           onChange={handleChange}
         >
           <MenuItem value="">
