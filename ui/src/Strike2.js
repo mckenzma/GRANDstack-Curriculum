@@ -129,7 +129,7 @@ export default function Strike({headerHeight}) {
     columns: [
       { title: 'Name', field: 'name' },
       { title: 'Description', field: 'description' },
-      { title: 'Ranks', field: 'ranks', render: rowData => (
+      { title: 'Testing Ranks', field: 'ranks', render: rowData => (
           <div className={classes.chips}>
             {rowData.ranks.sort(getSorting("asc","rankOrder")).map(rank => (
               <Chip

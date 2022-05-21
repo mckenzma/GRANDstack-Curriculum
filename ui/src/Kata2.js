@@ -164,7 +164,7 @@ export default function Kata({headerHeight}) {
       },
       { title: 'Name', field: 'name' },
       { title: 'Number of Moves', field: 'numMoves', type: 'numeric', editable: 'onAdd'},
-      { title: 'Ranks', field: 'ranks', render: rowData => (
+      { title: 'Testing Ranks', field: 'ranks', render: rowData => (
           <div className={classes.chips}>
             {rowData.ranks.sort(getSorting("asc","rankOrder")).map(rank => (
               <Chip
@@ -172,7 +172,8 @@ export default function Kata({headerHeight}) {
                 label={rank.abbreviation} // abbreviation vs name
                 variant="outlined"
                 color='primary' 
-                style={{backgroundColor:rank.colorhex}}
+                // style={{backgroundColor:rank.colorhex}}
+                style={{backgroundColor:rank.colorhex, color: (rank.colorhex === "#000000" ? "#ffeb3b" : "#000000")}}
               />
             ))}
             </div>),
