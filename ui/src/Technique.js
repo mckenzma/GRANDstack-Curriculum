@@ -196,7 +196,7 @@ export default function Technique({headerHeight}) {
         }
       },
       { title: 'Name', field: 'name' },
-      { title: 'Description', field: 'description',
+      { title: 'Description', field: 'description'/*,
         editComponent: props => {
           if (props.value !== undefined) {
             return (
@@ -215,7 +215,7 @@ export default function Technique({headerHeight}) {
               />
             )
           }
-        }
+        }*/
       },
       { title: 'Variation', field: 'variation' },
       { title: 'Testing Ranks', field: 'ranks', render: rowData => (
