@@ -73,7 +73,7 @@ export default function RankSelect({ rankID, setRankID }) {
           .sort(getSorting(order, orderBy))
           .map(n => {
             return (
-              <MenuItem key={n.id} value={n.id} style={{backgroundColor:n.colorhex}}>{n.name}</MenuItem>
+              <MenuItem key={n.id} value={n.id} style={{backgroundColor:n.colorhex, color: (n.colorhex === "#000000" ? "#ffeb3b" : "#000000")}}>{n.name}</MenuItem>
             );
           })}
         </Select>
